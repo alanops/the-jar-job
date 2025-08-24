@@ -1,6 +1,6 @@
 extends Area3D
 
-class_name VisionCone
+class_name VisionConeOptimized
 
 @export var cone_angle: float = 60.0
 @export var cone_length: float = 6.0

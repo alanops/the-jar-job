@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://optimizedwall123"]
+[gd_scene load_steps=5 format=3 uid="uid://d0blfbhok3mwg"]
 
 [ext_resource type="Script" uid="uid://dff1h67qiw0bf" path="res://scripts/fadeable_wall.gd" id="1_4xqwe"]
 
