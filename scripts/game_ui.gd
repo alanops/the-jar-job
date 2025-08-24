@@ -45,9 +45,14 @@ func _ready() -> void:
 	game_over_panel.visible = false
 	victory_panel.visible = false
 
+var last_time_update: int = -1
+
 func _process(_delta: float) -> void:
 	if GameManager.current_state == GameManager.GameState.PLAYING:
-		timer_label.text = "Time: " + GameManager.get_time_string()
+		var current_seconds = int(GameManager.game_timer)
+		if current_seconds != last_time_update:
+			last_time_update = current_seconds
+			timer_label.text = "Time: " + GameManager.get_time_string()
 
 func _on_game_started() -> void:
 	objective_label.text = "Sneak to the kitchen and steal the biscuit jar!"

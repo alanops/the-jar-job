@@ -308,17 +308,7 @@ func _has_line_of_sight_to_player() -> bool:
 	
 	var result := not raycast.is_colliding() or raycast.get_collider() == player_reference
 	
-	# Debug line of sight every few frames when player is in area
-	if Engine.get_process_frames() % 60 == 0 and vision_cone.player_in_area:
-		print("  LOS Debug:")
-		print("    Raycast from: ", raycast.global_position)
-		print("    Raycast to: ", player_reference.global_position)
-		print("    Target position: ", raycast.target_position)
-		print("    Is colliding: ", raycast.is_colliding())
-		if raycast.is_colliding():
-			print("    Collider: ", raycast.get_collider())
-			print("    Collision point: ", raycast.get_collision_point())
-		print("    LOS result: ", result)
+	# Line of sight check complete
 	
 	return result
 
