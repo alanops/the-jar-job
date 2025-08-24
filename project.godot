@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="The Jar Job"
-config/version="1.0.1"
 config/description="Light-hearted stealth game where you sneak into a house to steal the biscuit jar. 
 Created for Brackeys Game Jam 2025.2"
+config/version="1.1.0"
 config/tags=PackedStringArray("3d", "demo", "stealth", "jam")
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.4")
@@ -98,10 +98,9 @@ reset={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-textures/default_filters/anisotropic_filtering_level=1
-anti_aliasing/quality/msaa_3d=0
 lights_and_shadows/directional_shadow/size=1024
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=1
-lights_and_shadows/positional_shadow/atlas_size=1024
 lights_and_shadows/positional_shadow/soft_shadow_filter_quality=1
-environment/defaults/default_clear_color=Color(0.1, 0.1, 0.15, 1)
+textures/default_filters/anisotropic_filtering_level=1
+environment/defaults/default_clear_color=Color(0.85, 0.9, 0.95, 1)
+lights_and_shadows/positional_shadow/atlas_size=1024
