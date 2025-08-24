@@ -8,7 +8,7 @@ set -e
 PROJECT_NAME="the-jar-job"
 ITCH_USER="downfallgames"
 BUILD_DIR="builds/web"
-GODOT_EXPORT_TEMPLATE="HTML5"
+GODOT_EXPORT_TEMPLATE="Web"
 
 echo "🚀 Starting deployment to itch.io..."
 

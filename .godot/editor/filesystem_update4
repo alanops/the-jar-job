@@ -1,3 +1,4 @@
 res://src/scenes/Main.tscn
 res://scripts/game_ui.gd
 res://scripts/npc_controller.gd
+res://scripts/vision_cone_optimized.gd

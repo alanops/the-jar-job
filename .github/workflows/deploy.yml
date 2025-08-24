@@ -34,7 +34,7 @@ jobs:
       - name: Web Build
         run: |
           mkdir -v -p builds/web
-          godot --headless --export-release "HTML5" builds/web/index.html 2>&1
+          godot --headless --export-release "Web" builds/web/index.html 2>&1
 
       - name: Install Butler
         run: |
