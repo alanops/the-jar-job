@@ -27,6 +27,11 @@ func _ready() -> void:
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
 	camera.size = 10.0
 	
+	# Enable culling optimizations
+	camera.cull_mask = 0xFFFFF  # See all layers
+	camera.near = 0.1
+	camera.far = 100.0  # Reduce far plane for better culling
+	
 	# Set up fade raycast
 	fade_raycast.target_position = Vector3(0, -20, -20)
 	fade_raycast.collision_mask = 1  # Only check world layer

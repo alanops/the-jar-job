@@ -10,6 +10,9 @@ func _ready() -> void:
 	# Set up camera to follow player
 	camera_rig.set_target(player)
 	
+	# Set up automatic occluders for better performance
+	AutoOccluder.setup_scene_occluders(self)
+	
 	# Set up NPC patrol waypoints
 	var waypoints: Array[Node3D] = []
 	for child in patrol_waypoints.get_children():
