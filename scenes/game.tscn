@@ -1,7 +1,8 @@
-[gd_scene load_steps=24 format=3 uid="uid://b7hf5w8nxkgvq"]
+[gd_scene load_steps=25 format=3 uid="uid://b7hf5w8nxkgvq"]
 
 [ext_resource type="Script" uid="uid://dx38cl2wfggri" path="res://scripts/game.gd" id="1_game"]
 [ext_resource type="PackedScene" path="res://environment/office_floor.tscn" id="2_office"]
+[ext_resource type="PackedScene" uid="uid://c8ug6tlvm6hb3" path="res://environment/office_floor_dark.tscn" id="2_office_dark"]
 [ext_resource type="PackedScene" uid="uid://dpq1kvj7fn4hd" path="res://environment/wall.tscn" id="3_wall"]
 [ext_resource type="PackedScene" path="res://environment/cubicle_wall.tscn" id="4_cubicle"]
 [ext_resource type="PackedScene" path="res://environment/office_desk.tscn" id="5_desk"]
@@ -67,19 +68,19 @@ navigation_mesh = SubResource("NavigationMesh_1")
 
 [node name="Floor" type="Node3D" parent="Office"]
 
-[node name="OfficeFloor" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -10)
 
 [node name="OfficeFloor2" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -10)
 
-[node name="OfficeFloor3" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor3" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -10)
 
 [node name="OfficeFloor4" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -10)
 
-[node name="OfficeFloor5" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor5" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -10)
 
 [node name="OfficeFloor6" parent="Office/Floor" instance=ExtResource("2_office")]
@@ -88,34 +89,34 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -10)
 [node name="OfficeFloor7" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -6)
 
-[node name="OfficeFloor8" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor8" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -6)
 
 [node name="OfficeFloor9" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -6)
 
-[node name="OfficeFloor10" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor10" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -6)
 
 [node name="OfficeFloor11" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -6)
 
-[node name="OfficeFloor12" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor12" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -6)
 
-[node name="OfficeFloor13" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor13" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -2)
 
 [node name="OfficeFloor14" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -2)
 
-[node name="OfficeFloor15" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor15" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
 
 [node name="OfficeFloor16" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
 
-[node name="OfficeFloor17" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor17" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -2)
 
 [node name="OfficeFloor18" parent="Office/Floor" instance=ExtResource("2_office")]
@@ -124,34 +125,34 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -2)
 [node name="OfficeFloor19" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 2)
 
-[node name="OfficeFloor20" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor20" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 2)
 
 [node name="OfficeFloor21" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
 
-[node name="OfficeFloor22" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor22" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
 
 [node name="OfficeFloor23" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 2)
 
-[node name="OfficeFloor24" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor24" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 2)
 
-[node name="OfficeFloor25" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor25" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 6)
 
 [node name="OfficeFloor26" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 6)
 
-[node name="OfficeFloor27" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor27" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 6)
 
 [node name="OfficeFloor28" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 6)
 
-[node name="OfficeFloor29" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor29" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 6)
 
 [node name="OfficeFloor30" parent="Office/Floor" instance=ExtResource("2_office")]
@@ -160,19 +161,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 6)
 [node name="OfficeFloor31" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 10)
 
-[node name="OfficeFloor32" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor32" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 10)
 
 [node name="OfficeFloor33" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 10)
 
-[node name="OfficeFloor34" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor34" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 10)
 
 [node name="OfficeFloor35" parent="Office/Floor" instance=ExtResource("2_office")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 10)
 
-[node name="OfficeFloor36" parent="Office/Floor" instance=ExtResource("2_office")]
+[node name="OfficeFloor36" parent="Office/Floor" instance=ExtResource("2_office_dark")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 10)
 
 [node name="OuterWalls" type="Node3D" parent="Office"]
