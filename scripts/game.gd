@@ -11,7 +11,8 @@ func _ready() -> void:
 	camera_rig.set_target(player)
 	
 	# Set up automatic occluders for better performance
-	AutoOccluder.setup_scene_occluders(self)
+	# Temporarily disabled for debugging
+	# AutoOccluder.setup_scene_occluders(self)
 	
 	# Set up NPC patrol waypoints
 	var waypoints: Array[Node3D] = []
