@@ -1,0 +1,243 @@
+[gd_scene load_steps=2 format=3 uid="uid://bxphv8gxrykwj"]
+
+[ext_resource type="Script" uid="uid://bfgojwts7bwwq" path="res://scripts/game_ui.gd" id="1_rtnqk"]
+
+[node name="GameUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_rtnqk")
+
+[node name="HUD" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TimerLabel" type="Label" parent="HUD"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 200.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 24
+text = "Time: 00:00"
+
+[node name="ObjectiveLabel" type="Label" parent="HUD"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 20.0
+offset_right = 150.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 24
+text = "Find the biscuit jar!"
+horizontal_alignment = 1
+
+[node name="AlertPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 100.0
+offset_right = 200.0
+offset_bottom = 160.0
+grow_horizontal = 2
+pivot_offset = Vector2(200, 30)
+
+[node name="AlertLabel" type="Label" parent="AlertPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 36
+text = "SPOTTED!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameOverPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameOverPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="GameOverPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "GAME OVER"
+horizontal_alignment = 1
+
+[node name="GameOverLabel" type="Label" parent="GameOverPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "You were spotted!"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="GameOverPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="RetryButton" type="Button" parent="GameOverPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Retry"
+
+[node name="MenuButton" type="Button" parent="GameOverPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Main Menu"
+
+[node name="VictoryPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VictoryPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="VictoryPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 48
+text = "VICTORY!"
+horizontal_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="VictoryPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Time: 00:00"
+horizontal_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="VictoryPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Score: 0"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VictoryPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="RetryButton" type="Button" parent="VictoryPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Play Again"
+
+[node name="MenuButton" type="Button" parent="VictoryPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Main Menu"
+
+[node name="DebugConsole" type="Panel" parent="."]
+modulate = Color(1, 1, 1, 0.85)
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 400.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DebugConsole"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="DebugConsole/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Debug Console"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="DebugConsole/VBoxContainer"]
+layout_mode = 2
+
+[node name="NPCStateLabel" type="Label" parent="DebugConsole/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "NPC State: IDLE"
+
+[node name="SuspicionLabel" type="Label" parent="DebugConsole/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Suspicion: 0%"
+
+[node name="DetectionLabel" type="Label" parent="DebugConsole/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Detection: 0%"
+
+[node name="PlayerInVisionLabel" type="Label" parent="DebugConsole/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Player In Vision: No"
+
+[node name="LastSeenLabel" type="Label" parent="DebugConsole/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Last Seen: Never"
+
+[node name="PatrolLabel" type="Label" parent="DebugConsole/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Patrol Point: 0"

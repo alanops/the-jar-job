@@ -1,0 +1,55 @@
+[gd_scene load_steps=6 format=3 uid="uid://cevuj3wqn8kxp"]
+
+[ext_resource type="Script" uid="uid://bt585qnsv7v8" path="res://scripts/npc_controller.gd" id="1_8qxkr"]
+[ext_resource type="Script" uid="uid://3ft4p55d5klw" path="res://scripts/vision_cone.gd" id="2_v8xgw"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.8, 0.3, 0.3, 1)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.35
+height = 1.8
+
+[node name="NPC" type="CharacterBody3D" groups=["npc"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_8qxkr")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_1")
+surface_material_override/0 = SubResource("StandardMaterial3D_1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 0.5
+avoidance_enabled = true
+
+[node name="VisionCone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+script = ExtResource("2_v8xgw")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="VisionCone"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="VisionCone"]
+
+[node name="RayCast3D" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+target_position = Vector3(0, 0, -5)
+collision_mask = 3
+
+[node name="StateTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="StateLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+billboard = 1
+text = "PATROL"
+font_size = 24
