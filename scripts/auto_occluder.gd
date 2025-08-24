@@ -1,5 +1,7 @@
 extends Node
 
+class_name AutoOccluder
+
 # This script automatically adds occluders to walls and large objects for better performance
 
 static func add_occluder_to_wall(wall_node: StaticBody3D) -> void:

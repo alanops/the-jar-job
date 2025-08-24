@@ -2,3 +2,5 @@ res://src/scenes/Main.tscn
 res://scripts/game_ui.gd
 res://scripts/npc_controller.gd
 res://scripts/vision_cone_optimized.gd
+res://scripts/game.gd
+res://scripts/isometric_camera.gd
