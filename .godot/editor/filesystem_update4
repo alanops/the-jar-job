@@ -6,3 +6,4 @@ res://scripts/game.gd
 res://scripts/isometric_camera.gd
 res://scripts/auto_occluder.gd
 res://scripts/vision_cone.gd
+res://scripts/player_controller.gd

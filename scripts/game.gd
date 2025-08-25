@@ -5,6 +5,10 @@ extends Node3D
 @onready var security_guard: NPCController = $SecurityGuard
 @onready var patrol_waypoints: Node3D = $PatrolWaypoints
 @onready var game_ui: Control = $GameUI
+@onready var performance_monitor: PerformanceMonitor = $PerformanceMonitor
+
+# Add advanced performance monitor as well
+var advanced_performance_monitor: AdvancedPerformanceMonitor
 
 func _ready() -> void:
 	# Set up camera to follow player
@@ -34,6 +38,31 @@ func _ready() -> void:
 	
 	# Connect timer for game start
 	$GameStart/Timer.timeout.connect(_on_game_start_timer_timeout)
+	
+	# Set up performance monitor
+	if performance_monitor:
+		performance_monitor.set_position_preset("bottom_right")
+	
+	# Create advanced performance monitor
+	advanced_performance_monitor = preload("res://ui/advanced_performance_monitor.tscn").instantiate()
+	add_child(advanced_performance_monitor)
+	advanced_performance_monitor.position = Vector2(50, 50)
+
+func _input(event: InputEvent) -> void:
+	# Toggle performance monitors
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_F3:
+			# Simple monitor
+			if performance_monitor:
+				performance_monitor.toggle_visibility()
+		elif event.keycode == KEY_F4:
+			# Advanced monitor
+			if advanced_performance_monitor:
+				advanced_performance_monitor.toggle_visibility()
+		elif event.keycode == KEY_F5:
+			# Log performance report
+			if advanced_performance_monitor:
+				advanced_performance_monitor.log_performance_report()
 
 func _on_game_start_timer_timeout() -> void:
 	GameManager.start_game()

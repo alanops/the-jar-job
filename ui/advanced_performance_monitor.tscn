@@ -1,0 +1,110 @@
+[gd_scene load_steps=2 format=3 uid="uid://dqn5x8mb7v2ft"]
+
+[ext_resource type="Script" uid="uid://bd3u2yh4wk7rq" path="res://scripts/advanced_performance_monitor.gd" id="1_advanced"]
+
+[node name="AdvancedPerformanceMonitor" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 500.0
+offset_bottom = 400.0
+mouse_filter = 2
+script = ExtResource("1_advanced")
+
+[node name="Panel" type="Panel" parent="."]
+modulate = Color(1, 1, 1, 0.9)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TabContainer" type="TabContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Overview" type="Control" parent="Panel/TabContainer"]
+layout_mode = 2
+metadata/_tab_name = "Overview"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Overview"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Panel/TabContainer/Overview/VBoxContainer"]
+layout_mode = 2
+text = "Real-time Performance Graphs"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/TabContainer/Overview/VBoxContainer"]
+layout_mode = 2
+
+[node name="FPSLabel" type="Label" parent="Panel/TabContainer/Overview/VBoxContainer"]
+layout_mode = 2
+text = "FPS Graph:"
+
+[node name="FPSGraph" type="Control" parent="Panel/TabContainer/Overview/VBoxContainer"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+
+[node name="MemoryLabel" type="Label" parent="Panel/TabContainer/Overview/VBoxContainer"]
+layout_mode = 2
+text = "Memory Graph:"
+
+[node name="MemoryGraph" type="Control" parent="Panel/TabContainer/Overview/VBoxContainer"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+
+[node name="CPU" type="Control" parent="Panel/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_name = "CPU Profile"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/CPU"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Panel/TabContainer/CPU/VBoxContainer"]
+layout_mode = 2
+text = "CPU Section Timings"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/TabContainer/CPU/VBoxContainer"]
+layout_mode = 2
+
+[node name="CPUList" type="ItemList" parent="Panel/TabContainer/CPU/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Summary" type="Control" parent="Panel/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_name = "Summary"
+
+[node name="SummaryLabel" type="RichTextLabel" parent="Panel/TabContainer/Summary"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+text = "[b]Performance Summary[/b]
+
+Loading..."

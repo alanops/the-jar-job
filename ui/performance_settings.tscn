@@ -1,0 +1,178 @@
+[gd_scene load_steps=2 format=3 uid="uid://b5m7k3q8r4wtn"]
+
+[ext_resource type="Script" uid="uid://dxj7n2k8p9qvm" path="res://scripts/performance_settings.gd" id="1_settings"]
+
+[node name="PerformanceSettings" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_settings")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -300.0
+offset_right = 250.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Performance Settings"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="VSyncContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="VSyncLabel" type="Label" parent="Panel/VBoxContainer/VSyncContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "VSync:"
+
+[node name="VSyncOption" type="OptionButton" parent="Panel/VBoxContainer/VSyncContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShadowContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ShadowLabel" type="Label" parent="Panel/VBoxContainer/ShadowContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Shadows:"
+
+[node name="ShadowQualitySlider" type="HSlider" parent="Panel/VBoxContainer/ShadowContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShadowQualityLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Shadow Quality: Medium"
+horizontal_alignment = 1
+
+[node name="MSAAContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="MSAALabel" type="Label" parent="Panel/VBoxContainer/MSAAContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MSAA:"
+
+[node name="MSAAOption" type="OptionButton" parent="Panel/VBoxContainer/MSAAContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FXAAContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="FXAALabel" type="Label" parent="Panel/VBoxContainer/FXAAContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "FXAA:"
+
+[node name="FXAACheckbox" type="CheckBox" parent="Panel/VBoxContainer/FXAAContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LODContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="LODLabel" type="Label" parent="Panel/VBoxContainer/LODContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "LOD Quality:"
+
+[node name="LODBiasSlider" type="HSlider" parent="Panel/VBoxContainer/LODContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LODBiasLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "LOD Bias: 1.00"
+horizontal_alignment = 1
+
+[node name="MaxFPSContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="MaxFPSLabel2" type="Label" parent="Panel/VBoxContainer/MaxFPSContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Max FPS:"
+
+[node name="MaxFPSSlider" type="HSlider" parent="Panel/VBoxContainer/MaxFPSContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MaxFPSLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Max FPS: 60"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="PresetContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="LowPresetButton" type="Button" parent="Panel/VBoxContainer/PresetContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Low"
+
+[node name="MediumPresetButton" type="Button" parent="Panel/VBoxContainer/PresetContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Medium"
+
+[node name="HighPresetButton" type="Button" parent="Panel/VBoxContainer/PresetContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "High"
+
+[node name="ButtonContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AutoDetectButton" type="Button" parent="Panel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Auto Detect"
+
+[node name="ResetButton" type="Button" parent="Panel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reset"
+
+[node name="ApplyButton" type="Button" parent="Panel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Apply"
+
+[node name="CloseButton" type="Button" parent="Panel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Close"

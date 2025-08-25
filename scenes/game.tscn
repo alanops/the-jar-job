@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://cevuj3wqn8kxp" path="res://scenes/npc.tscn" id="10_npc"]
 [ext_resource type="PackedScene" uid="uid://cx6yb7xqiqy8d" path="res://objects/biscuit_jar.tscn" id="11_jar"]
 [ext_resource type="PackedScene" uid="uid://bxphv8gxrykwj" path="res://ui/game_ui.tscn" id="12_ui"]
+[ext_resource type="PackedScene" uid="uid://cxvh4pqv3n8fb" path="res://ui/performance_monitor.tscn" id="13_performance"]
 [ext_resource type="PackedScene" path="res://environment/invisible_wall.tscn" id="13_invisible"]
 [ext_resource type="PackedScene" path="res://environment/object_label.tscn" id="14_label"]
 [ext_resource type="PackedScene" path="res://environment/computer_monitor.tscn" id="15_monitor"]
@@ -349,6 +350,9 @@ label_text = "🚪 EXIT"
 show_always = true
 
 [node name="GameUI" parent="." instance=ExtResource("12_ui")]
+
+[node name="PerformanceMonitor" parent="." instance=ExtResource("13_performance")]
+visible = false
 
 [node name="GameStart" type="Node" parent="."]
 

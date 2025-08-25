@@ -77,6 +77,9 @@ var vision_check_timer: float = 0.0
 var vision_check_interval: float = 0.1  # Check vision every 0.1 seconds
 var distance_to_player: float = 0.0
 
+# Performance profiling
+var performance_monitor: AdvancedPerformanceMonitor
+
 # Signals
 signal player_spotted(npc: NPCController)
 signal detection_progress_changed(progress: float)
@@ -114,21 +117,37 @@ func _ready() -> void:
 	if players.size() > 0:
 		player_reference = players[0]
 		player_reference.made_noise.connect(_on_player_made_noise)
+	
+	# Find performance monitor
+	var game_node = get_tree().get_first_node_in_group("game")
+	if game_node and game_node.has_method("get") and game_node.advanced_performance_monitor:
+		performance_monitor = game_node.advanced_performance_monitor
 
 func _physics_process(delta: float) -> void:
+	if performance_monitor:
+		performance_monitor.profile_section_start("NPC_Physics")
+	
 	if GameManager.current_state != GameManager.GameState.PLAYING:
 		velocity = Vector3.ZERO
 		move_and_slide()
+		if performance_monitor:
+			performance_monitor.profile_section_end("NPC_Physics")
 		return
 	
 	# Calculate distance to player for LOD
 	if player_reference:
 		distance_to_player = global_position.distance_to(player_reference.global_position)
 	
+	if performance_monitor:
+		performance_monitor.profile_section_start("NPC_Suspicion")
 	# Update suspicion and player tracking
 	_update_suspicion_system(delta)
 	_update_player_tracking(delta)
+	if performance_monitor:
+		performance_monitor.profile_section_end("NPC_Suspicion")
 	
+	if performance_monitor:
+		performance_monitor.profile_section_start("NPC_StateMachine")
 	# Handle current state
 	match current_state:
 		NPCState.IDLE:
@@ -145,12 +164,18 @@ func _physics_process(delta: float) -> void:
 			_handle_chase_state(delta)
 		NPCState.RETURN_TO_PATROL:
 			_handle_return_state(delta)
+	if performance_monitor:
+		performance_monitor.profile_section_end("NPC_StateMachine")
 	
+	if performance_monitor:
+		performance_monitor.profile_section_start("NPC_Vision")
 	# LOD vision checking - only check when timer expires
 	vision_check_timer += delta
 	if vision_check_timer >= _get_vision_check_interval():
 		vision_check_timer = 0.0
 		_check_vision_cone()
+	if performance_monitor:
+		performance_monitor.profile_section_end("NPC_Vision")
 	
 	# Apply gravity
 	if not is_on_floor():
@@ -159,6 +184,9 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0
 	
 	move_and_slide()
+	
+	if performance_monitor:
+		performance_monitor.profile_section_end("NPC_Physics")
 
 func _handle_idle_state(_delta: float) -> void:
 	velocity.x = 0
