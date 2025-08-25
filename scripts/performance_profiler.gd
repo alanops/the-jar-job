@@ -74,8 +74,8 @@ func _collect_frame_data() -> void:
 	
 	# Memory usage
 	var static_memory := Performance.get_monitor(Performance.MEMORY_STATIC)
-	var dynamic_memory := Performance.get_monitor(Performance.MEMORY_DYNAMIC)
-	var total_memory := (static_memory + dynamic_memory) / 1048576.0  # Convert to MB
+	var message_memory := Performance.get_monitor(Performance.MEMORY_MESSAGE_BUFFER_MAX)
+	var total_memory := (static_memory + message_memory) / 1048576.0  # Convert to MB
 	memory_usage_history.append(total_memory)
 	
 	if total_memory > peak_memory_usage:

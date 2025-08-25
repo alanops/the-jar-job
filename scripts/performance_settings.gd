@@ -115,8 +115,8 @@ func _load_current_settings() -> void:
 	if viewport:
 		fxaa_checkbox.button_pressed = viewport.use_fxaa
 	
-	# LOD bias
-	lod_bias_slider.value = RenderingServer.camera_attributes_get_dof_blur_far_distance(RenderingServer.camera_attributes_create())
+	# LOD bias (simplified)
+	lod_bias_slider.value = 1.0  # Default value
 	_on_lod_bias_changed(lod_bias_slider.value)
 	
 	# Max FPS
@@ -161,9 +161,9 @@ func _apply_settings() -> void:
 	if viewport:
 		viewport.use_fxaa = fxaa_checkbox.button_pressed
 	
-	# Apply LOD bias (simplified)
+	# Apply LOD bias (simplified - store for future use)
 	var lod_bias := lod_bias_slider.value
-	RenderingServer.camera_set_use_vertical_aspect(get_viewport().get_camera_3d().get_camera_rid(), lod_bias > 1.0)
+	# Note: LOD bias implementation would require custom LOD system
 	
 	# Apply max FPS
 	Engine.max_fps = int(max_fps_slider.value)
@@ -237,7 +237,7 @@ func auto_detect_settings() -> void:
 	# Simple auto-detection based on performance
 	var current_fps := Engine.get_frames_per_second()
 	var memory_usage := (Performance.get_monitor(Performance.MEMORY_STATIC) + 
-						 Performance.get_monitor(Performance.MEMORY_DYNAMIC)) / 1048576.0
+						 Performance.get_monitor(Performance.MEMORY_MESSAGE_BUFFER_MAX)) / 1048576.0
 	
 	if current_fps < 30 or memory_usage > 512:
 		apply_preset("low")

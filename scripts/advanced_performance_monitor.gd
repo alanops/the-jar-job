@@ -5,8 +5,8 @@ class_name AdvancedPerformanceMonitor
 @onready var tabs: TabContainer = $Panel/TabContainer
 @onready var fps_graph: Control = $Panel/TabContainer/Overview/VBoxContainer/FPSGraph
 @onready var memory_graph: Control = $Panel/TabContainer/Overview/VBoxContainer/MemoryGraph
-@onready var cpu_list: ItemList = $Panel/TabContainer/CPU/VBoxContainer/CPUList
-@onready var summary_label: RichTextLabel = $Panel/TabContainer/Summary/SummaryLabel
+var cpu_list: ItemList
+var summary_label: RichTextLabel
 
 var profiler: PerformanceProfiler
 var graph_points: int = 120  # 2 seconds at 60fps
@@ -29,10 +29,16 @@ func _ready() -> void:
 	visible = false
 	
 	# Initialize graphs
-	fps_graph.custom_minimum_size = Vector2(300, 100)
-	memory_graph.custom_minimum_size = Vector2(300, 100)
-	fps_graph.draw.connect(_draw_fps_graph)
-	memory_graph.draw.connect(_draw_memory_graph)
+	if fps_graph:
+		fps_graph.custom_minimum_size = Vector2(300, 100)
+		fps_graph.draw.connect(_draw_fps_graph)
+	if memory_graph:
+		memory_graph.custom_minimum_size = Vector2(300, 100)
+		memory_graph.draw.connect(_draw_memory_graph)
+	
+	# Find other UI elements
+	cpu_list = get_node_or_null("Panel/TabContainer/CPU/VBoxContainer/CPUList")
+	summary_label = get_node_or_null("Panel/TabContainer/Summary/SummaryLabel")
 
 func _process(delta: float) -> void:
 	update_timer += delta
@@ -53,14 +59,18 @@ func _on_frame_data_updated(frame_data: Dictionary) -> void:
 
 func _update_displays() -> void:
 	# Redraw graphs
-	fps_graph.queue_redraw()
-	memory_graph.queue_redraw()
+	if fps_graph:
+		fps_graph.queue_redraw()
+	if memory_graph:
+		memory_graph.queue_redraw()
 	
 	# Update CPU list
-	_update_cpu_list()
+	if cpu_list:
+		_update_cpu_list()
 	
 	# Update summary
-	_update_summary()
+	if summary_label:
+		_update_summary()
 
 func _draw_fps_graph() -> void:
 	if fps_history.is_empty():

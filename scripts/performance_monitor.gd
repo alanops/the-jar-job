@@ -64,10 +64,11 @@ func _update_metrics() -> void:
 	draw_calls_label.text = "Draw Calls: %d" % render_info
 	vertices_label.text = "Vertices: %d" % vertex_count
 	
-	# Memory usage
+	# Memory usage (simplified - using available monitors)
 	var static_memory := Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
-	var dynamic_memory := Performance.get_monitor(Performance.MEMORY_DYNAMIC) / 1048576.0
-	memory_label.text = "Memory: %.1fMB (S:%.1f D:%.1f)" % [static_memory + dynamic_memory, static_memory, dynamic_memory]
+	# Use message queue memory as dynamic substitute
+	var message_memory := Performance.get_monitor(Performance.MEMORY_MESSAGE_BUFFER_MAX) / 1048576.0
+	memory_label.text = "Memory: %.1fMB (Static: %.1fMB)" % [static_memory + message_memory, static_memory]
 	
 	# Object counts
 	var object_count := Performance.get_monitor(Performance.OBJECT_COUNT)
