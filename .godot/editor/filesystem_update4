@@ -5,3 +5,4 @@ res://scripts/vision_cone_optimized.gd
 res://scripts/game.gd
 res://scripts/isometric_camera.gd
 res://scripts/auto_occluder.gd
+res://scripts/vision_cone.gd
