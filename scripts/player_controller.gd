@@ -19,6 +19,7 @@ var is_crouching: bool = false
 var current_speed: float = WALK_SPEED
 var current_noise_radius: float = noise_radius_walk
 var interactable_object: Node3D = null
+var game_ui: Control
 
 signal made_noise(position: Vector3, radius: float)
 
@@ -34,6 +35,17 @@ func _ready() -> void:
 	footstep_timer.timeout.connect(_on_footstep)
 	
 	GameManager.game_started.connect(_on_game_started)
+	
+	# Find the game UI
+	await get_tree().process_frame
+	var game_ui_nodes = get_tree().get_nodes_in_group("game_ui")
+	if game_ui_nodes.size() > 0:
+		game_ui = game_ui_nodes[0]
+	else:
+		# Try to find it by path
+		var game_node = get_tree().get_first_node_in_group("game")
+		if game_node:
+			game_ui = game_node.get_node("GameUI")
 
 func _on_game_started() -> void:
 	is_crouching = false
@@ -132,11 +144,15 @@ func _on_interaction_area_entered(body: Node3D) -> void:
 		interactable_object = body
 		print("Set interactable object: ", body.name)
 		# Show interaction prompt in UI
+		if game_ui and game_ui.has_method("show_interaction_prompt"):
+			game_ui.show_interaction_prompt(true)
 
 func _on_interaction_area_exited(body: Node3D) -> void:
 	if body == interactable_object:
 		interactable_object = null
 		# Hide interaction prompt
+		if game_ui and game_ui.has_method("show_interaction_prompt"):
+			game_ui.show_interaction_prompt(false)
 
 func _on_interaction_area_area_entered(area: Area3D) -> void:
 	print("Area entered: ", area.name, " Parent: ", area.get_parent().name if area.get_parent() else "None")
@@ -144,11 +160,17 @@ func _on_interaction_area_area_entered(area: Area3D) -> void:
 	if parent and parent.is_in_group("interactables"):
 		interactable_object = parent
 		print("Set interactable object from area: ", parent.name)
+		# Show interaction prompt
+		if game_ui and game_ui.has_method("show_interaction_prompt"):
+			game_ui.show_interaction_prompt(true)
 
 func _on_interaction_area_area_exited(area: Area3D) -> void:
 	var parent := area.get_parent()
 	if parent == interactable_object:
 		interactable_object = null
+		# Hide interaction prompt
+		if game_ui and game_ui.has_method("show_interaction_prompt"):
+			game_ui.show_interaction_prompt(false)
 
 func _interact_with_object() -> void:
 	print("Attempting to interact with: ", interactable_object.name if interactable_object else "null")

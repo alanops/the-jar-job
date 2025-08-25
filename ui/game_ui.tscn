@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bfgojwts7bwwq" path="res://scripts/game_ui.gd" id="1_rtnqk"]
 
-[node name="GameUI" type="Control"]
+[node name="GameUI" type="Control" groups=["game_ui"]]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,6 +41,33 @@ offset_bottom = 50.0
 theme_override_font_sizes/font_size = 24
 text = "Find the biscuit jar!"
 horizontal_alignment = 1
+
+[node name="InteractionPrompt" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -200.0
+offset_right = 150.0
+offset_bottom = -140.0
+grow_horizontal = 2
+grow_vertical = 0
+modulate = Color(1, 1, 1, 0.9)
+
+[node name="Label" type="Label" parent="InteractionPrompt"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 28
+text = "Press E to interact"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="AlertPanel" type="Panel" parent="."]
 layout_mode = 1

@@ -13,6 +13,7 @@ extends Control
 @onready var victory_score_label: Label = $VictoryPanel/VBoxContainer/ScoreLabel
 @onready var victory_retry_button: Button = $VictoryPanel/VBoxContainer/RetryButton
 @onready var victory_menu_button: Button = $VictoryPanel/VBoxContainer/MenuButton
+@onready var interaction_prompt: Panel = $InteractionPrompt
 
 # Debug console elements
 @onready var debug_console: Panel = $DebugConsole
@@ -44,6 +45,7 @@ func _ready() -> void:
 	alert_panel.visible = false
 	game_over_panel.visible = false
 	victory_panel.visible = false
+	interaction_prompt.visible = false
 
 var last_time_update: int = -1
 
@@ -131,3 +133,6 @@ func update_last_seen_position(position: Vector3) -> void:
 
 func update_patrol_point(point: int) -> void:
 	patrol_label.text = "Patrol Point: " + str(point)
+
+func show_interaction_prompt(show: bool) -> void:
+	interaction_prompt.visible = show
