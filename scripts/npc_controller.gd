@@ -39,6 +39,7 @@ enum NPCState {
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 @onready var vision_cone: Area3D = $VisionCone
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
+@onready var direction_arrow: DirectionArrow = $DirectionArrow
 @onready var state_timer: Timer = $StateTimer
 @onready var raycast: RayCast3D = $RayCast3D
 @onready var state_label: Label3D = $StateLabel
@@ -219,6 +220,11 @@ func _handle_investigate_state(delta: float) -> void:
 		
 		# Rotate while investigating
 		rotation.y += turn_speed * 0.5 * delta
+		
+		# Update direction arrow to match rotation
+		if direction_arrow:
+			direction_arrow.rotation.y = rotation.y
+		
 		velocity.x = 0
 		velocity.z = 0
 		return
@@ -377,6 +383,10 @@ func _set_next_patrol_target() -> void:
 func _rotate_towards_direction(direction: Vector3, delta: float) -> void:
 	var target_rotation := atan2(direction.x, direction.z)
 	rotation.y = lerp_angle(rotation.y, target_rotation, turn_speed * delta)
+	
+	# Update direction arrow to match NPC rotation
+	if direction_arrow:
+		direction_arrow.rotation.y = rotation.y
 
 func _on_state_timer_timeout() -> void:
 	match current_state:
@@ -522,6 +532,10 @@ func _handle_suspicious_state(delta: float) -> void:
 	
 	# Slowly turn around looking for the player
 	rotation.y += turn_speed * 0.3 * delta
+	
+	# Update direction arrow to match rotation
+	if direction_arrow:
+		direction_arrow.rotation.y = rotation.y
 
 func _handle_search_state(delta: float) -> void:
 	if search_positions.is_empty():
