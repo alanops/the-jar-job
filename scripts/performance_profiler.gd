@@ -66,8 +66,8 @@ func _collect_frame_data() -> void:
 	
 	# Frame timing
 	if frame_start_time > 0:
-		var frame_time_us := current_time - frame_start_time
-		var frame_time_ms := frame_time_us / 1000.0
+		var frame_time_us: int = current_time - frame_start_time
+		var frame_time_ms: float = frame_time_us / 1000.0
 		frame_times.append(frame_time_ms)
 		last_frame_time = frame_time_ms
 	frame_start_time = current_time
@@ -82,8 +82,8 @@ func _collect_frame_data() -> void:
 		peak_memory_usage = total_memory
 	
 	# Rendering metrics
-	var draw_calls := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
-	var vertices := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
+	var draw_calls: int = RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
+	var vertices: int = RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
 	
 	draw_call_history.append(draw_calls)
 	

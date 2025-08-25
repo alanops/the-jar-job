@@ -76,7 +76,7 @@ func _draw_fps_graph() -> void:
 	if fps_history.is_empty():
 		return
 	
-	var graph_size := fps_graph.size
+	var graph_size: Vector2 = fps_graph.size
 	var points := PackedVector2Array()
 	
 	# Find min/max for scaling
@@ -114,7 +114,7 @@ func _draw_memory_graph() -> void:
 	if memory_history.is_empty():
 		return
 	
-	var graph_size := memory_graph.size
+	var graph_size: Vector2 = memory_graph.size
 	var points := PackedVector2Array()
 	
 	# Find min/max for scaling

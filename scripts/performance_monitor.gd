@@ -86,7 +86,7 @@ func toggle_visibility() -> void:
 
 func set_position_preset(preset: String) -> void:
 	var viewport_size := get_viewport_rect().size
-	var panel_size := $Panel.size
+	var panel_size: Vector2 = $Panel.size
 	
 	match preset:
 		"top_left":
