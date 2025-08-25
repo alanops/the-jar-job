@@ -281,10 +281,13 @@ func _check_vision_cone() -> void:
 	
 	var player_detected: bool = false
 	
+	# Only do expensive checks if player is in the area
 	if vision_cone.player_in_area:
 		var in_cone: bool = vision_cone.is_target_in_cone(player_reference.global_position)
-		var los_clear: bool = _has_line_of_sight_to_player()
-		player_detected = in_cone and los_clear
+		# Only do line of sight check if player is in cone (expensive raycast)
+		if in_cone:
+			var los_clear: bool = _has_line_of_sight_to_player()
+			player_detected = los_clear
 	
 	player_in_sight = player_detected
 	
@@ -295,7 +298,9 @@ func _check_vision_cone() -> void:
 	
 	if player_detected:
 		detection_time += get_process_delta_time()
-		vision_cone.set_alert_mode(true)
+		# Only set alert mode if not already alert (avoid redundant calls)
+		if not vision_cone.is_alert:
+			vision_cone.set_alert_mode(true)
 		detection_progress_changed.emit(detection_time / detection_threshold)
 		
 		if detection_time >= detection_threshold:
@@ -305,7 +310,8 @@ func _check_vision_cone() -> void:
 
 func _reset_detection() -> void:
 	detection_time = 0.0
-	if vision_cone:
+	# Only reset alert mode if currently alert (avoid redundant calls)
+	if vision_cone and vision_cone.is_alert:
 		vision_cone.set_alert_mode(false)
 	detection_progress_changed.emit(0.0)
 

@@ -14,6 +14,11 @@ var cone_mesh: ArrayMesh
 var is_alert: bool = false
 var player_in_area: bool = false
 
+# Performance optimization
+var last_alert_state: bool = false
+var color_update_timer: float = 0.0
+var color_update_interval: float = 0.1  # Only update color every 0.1 seconds
+
 func _ready() -> void:
 	# Wait a frame to ensure all nodes are ready
 	await get_tree().process_frame
@@ -43,6 +48,10 @@ func _ready() -> void:
 	# Connect area signals
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
+	
+	# Optimize: Disable mesh visibility in release builds for better performance
+	if not OS.is_debug_build():
+		mesh_instance.visible = false
 
 func _on_body_entered(body: Node3D) -> void:
 	if body.is_in_group("player"):
@@ -100,43 +109,42 @@ func _create_cone_mesh() -> void:
 	
 	# Create optimized material
 	var material := StandardMaterial3D.new()
-	material.vertex_color_use_as_albedo = true
+	material.vertex_color_use_as_albedo = false  # We'll use albedo_color instead
+	material.albedo_color = cone_color
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.flags_unshaded = true
 	
-	cone_mesh.surface_set_material(0, material)
 	mesh_instance.mesh = cone_mesh
+	mesh_instance.set_surface_override_material(0, material)
 
 func set_alert_mode(alert: bool) -> void:
 	is_alert = alert
-	_update_cone_color()
+	# Only update color if state actually changed and enough time has passed
+	if alert != last_alert_state:
+		_update_cone_color()
+		last_alert_state = alert
 
 func _update_cone_color() -> void:
-	var target_color := alert_color if is_alert else cone_color
-	
-	if not cone_mesh or cone_mesh.get_surface_count() == 0:
+	# Optimize: Just change material color instead of rebuilding mesh
+	if not mesh_instance:
 		return
 	
-	var arrays := cone_mesh.surface_get_arrays(0)
-	var colors := PackedColorArray()
+	var material := mesh_instance.get_surface_override_material(0) as StandardMaterial3D
+	if not material:
+		# Material should exist from _create_cone_mesh(), but create if missing
+		material = StandardMaterial3D.new()
+		material.vertex_color_use_as_albedo = false
+		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		material.cull_mode = BaseMaterial3D.CULL_DISABLED
+		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		material.flags_unshaded = true
+		mesh_instance.set_surface_override_material(0, material)
 	
-	for i in range(arrays[Mesh.ARRAY_VERTEX].size()):
-		colors.push_back(target_color)
-	
-	arrays[Mesh.ARRAY_COLOR] = colors
-	
-	cone_mesh.clear_surfaces()
-	cone_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-	
-	var material := StandardMaterial3D.new()
-	material.vertex_color_use_as_albedo = true
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	
-	cone_mesh.surface_set_material(0, material)
+	# Simply change the albedo color instead of rebuilding mesh
+	var target_color := alert_color if is_alert else cone_color
+	material.albedo_color = target_color
 
 # Removed debug functions for performance
 
