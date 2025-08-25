@@ -72,6 +72,11 @@ var home_position: Vector3
 var detection_time: float = 0.0
 var detection_threshold: float = 1.0
 
+# Performance optimization
+var vision_check_timer: float = 0.0
+var vision_check_interval: float = 0.1  # Check vision every 0.1 seconds
+var distance_to_player: float = 0.0
+
 # Signals
 signal player_spotted(npc: NPCController)
 signal detection_progress_changed(progress: float)
@@ -109,26 +114,16 @@ func _ready() -> void:
 	if players.size() > 0:
 		player_reference = players[0]
 		player_reference.made_noise.connect(_on_player_made_noise)
-		print("NPC found player: ", player_reference.name)
-	else:
-		print("NPC could not find player in group 'player'")
-	
-	# Debug vision cone setup
-	await get_tree().process_frame  # Ensure vision cone is ready
-	print("Vision cone debug: ", vision_cone.get_cone_debug_info())
-	
-	# Add periodic debug timer
-	var debug_timer := Timer.new()
-	add_child(debug_timer)
-	debug_timer.wait_time = 2.0
-	debug_timer.timeout.connect(_on_debug_timer_timeout)
-	debug_timer.start()
 
 func _physics_process(delta: float) -> void:
 	if GameManager.current_state != GameManager.GameState.PLAYING:
 		velocity = Vector3.ZERO
 		move_and_slide()
 		return
+	
+	# Calculate distance to player for LOD
+	if player_reference:
+		distance_to_player = global_position.distance_to(player_reference.global_position)
 	
 	# Update suspicion and player tracking
 	_update_suspicion_system(delta)
@@ -151,8 +146,11 @@ func _physics_process(delta: float) -> void:
 		NPCState.RETURN_TO_PATROL:
 			_handle_return_state(delta)
 	
-	# Check vision cone for player
-	_check_vision_cone()
+	# LOD vision checking - only check when timer expires
+	vision_check_timer += delta
+	if vision_check_timer >= _get_vision_check_interval():
+		vision_check_timer = 0.0
+		_check_vision_cone()
 	
 	# Apply gravity
 	if not is_on_floor():
@@ -255,23 +253,10 @@ func _check_vision_cone() -> void:
 	
 	var player_detected: bool = false
 	
-	# Debug information
-	if vision_cone.player_in_area != player_in_sight:
-		print("NPC Vision Debug:")
-		print("  player_in_area: ", vision_cone.player_in_area)
-		print("  Player position: ", player_reference.global_position)
-		print("  NPC position: ", global_position)
-		print("  Distance to player: ", global_position.distance_to(player_reference.global_position))
-	
 	if vision_cone.player_in_area:
 		var in_cone: bool = vision_cone.is_target_in_cone(player_reference.global_position)
 		var los_clear: bool = _has_line_of_sight_to_player()
 		player_detected = in_cone and los_clear
-		
-		if vision_cone.player_in_area and not player_detected:
-			print("  Player in area but NOT detected:")
-			print("    in_cone: ", in_cone)
-			print("    los_clear: ", los_clear)
 	
 	player_in_sight = player_detected
 	
@@ -298,7 +283,6 @@ func _reset_detection() -> void:
 
 func _has_line_of_sight_to_player() -> bool:
 	if not player_reference or not raycast:
-		print("  LOS: Missing player_reference or raycast")
 		return false
 	
 	var to_player := player_reference.global_position - raycast.global_position
@@ -306,11 +290,7 @@ func _has_line_of_sight_to_player() -> bool:
 	raycast.add_exception(self)
 	raycast.force_raycast_update()
 	
-	var result := not raycast.is_colliding() or raycast.get_collider() == player_reference
-	
-	# Line of sight check complete
-	
-	return result
+	return not raycast.is_colliding() or raycast.get_collider() == player_reference
 
 func _on_player_spotted() -> void:
 	current_state = NPCState.CHASE
@@ -490,14 +470,16 @@ func _generate_search_positions() -> void:
 		var offset := Vector3(cos(angle), 0, sin(angle)) * search_radius
 		search_positions.append(base_pos + offset)
 
-func _on_debug_timer_timeout() -> void:
-	if player_reference and vision_cone:
-		print("DEBUG - Vision Cone Status:")
-		print("  ", vision_cone.get_cone_debug_info())
-		print("  player_in_area: ", vision_cone.player_in_area)
-		print("  player_in_sight: ", player_in_sight)
-		var distance = global_position.distance_to(player_reference.global_position)
-		print("  Distance to player: ", distance)
+func _get_vision_check_interval() -> float:
+	# LOD system: check vision less frequently when player is far away
+	if distance_to_player > 15.0:
+		return 0.5  # Very far - check every 0.5 seconds
+	elif distance_to_player > 10.0:
+		return 0.25  # Far - check every 0.25 seconds
+	elif distance_to_player > 5.0:
+		return 0.1  # Medium - check every 0.1 seconds
+	else:
+		return 0.05  # Close - check every 0.05 seconds
 
 # New State Handlers
 func _handle_suspicious_state(delta: float) -> void:
