@@ -80,8 +80,8 @@ func _draw_fps_graph() -> void:
 	var points := PackedVector2Array()
 	
 	# Find min/max for scaling
-	var min_fps := 0.0
-	var max_fps := 60.0
+	var min_fps: float = 0.0
+	var max_fps: float = 60.0
 	for fps in fps_history:
 		max_fps = max(max_fps, fps)
 	
@@ -118,14 +118,14 @@ func _draw_memory_graph() -> void:
 	var points := PackedVector2Array()
 	
 	# Find min/max for scaling
-	var min_memory := memory_history[0]
-	var max_memory := memory_history[0]
+	var min_memory: float = memory_history[0]
+	var max_memory: float = memory_history[0]
 	for mem in memory_history:
 		min_memory = min(min_memory, mem)
 		max_memory = max(max_memory, mem)
 	
 	# Add some padding to the range
-	var memory_range := max_memory - min_memory
+	var memory_range: float = max_memory - min_memory
 	if memory_range < 1.0:  # Minimum 1MB range
 		memory_range = 1.0
 		max_memory = min_memory + memory_range

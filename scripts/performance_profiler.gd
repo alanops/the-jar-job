@@ -113,7 +113,7 @@ func end_cpu_section(section_name: String) -> void:
 		return
 	
 	var end_time := Time.get_ticks_usec()
-	var duration := (end_time - section_start_times[section_name]) / 1000.0  # Convert to ms
+	var duration: float = (end_time - section_start_times[section_name]) / 1000.0  # Convert to ms
 	
 	if not cpu_time_sections.has(section_name):
 		cpu_time_sections[section_name] = []
@@ -194,7 +194,7 @@ func _reset_peaks() -> void:
 func _calculate_average(values: Array) -> float:
 	if values.is_empty():
 		return 0.0
-	var sum := 0.0
+	var sum: float = 0.0
 	for value in values:
 		sum += value
 	return sum / values.size()
@@ -218,7 +218,7 @@ func _calculate_max(values: Array) -> float:
 	return max_val
 
 func _calculate_sum(values: Array) -> float:
-	var sum := 0.0
+	var sum: float = 0.0
 	for value in values:
 		sum += value
 	return sum

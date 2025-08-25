@@ -7,3 +7,8 @@ res://scripts/isometric_camera.gd
 res://scripts/auto_occluder.gd
 res://scripts/vision_cone.gd
 res://scripts/player_controller.gd
+res://scripts/advanced_performance_monitor.gd
+res://scripts/performance_monitor.gd
+res://scripts/performance_profiler.gd
+res://scripts/performance_settings.gd
+res://ui/advanced_performance_monitor.tscn
