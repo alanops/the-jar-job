@@ -45,7 +45,7 @@ func _process(delta: float) -> void:
 func _collect_performance_data() -> void:
 	# Collect performance data using Godot's built-in monitoring
 	var fps = Engine.get_frames_per_second()
-	var memory_mb = OS.get_static_memory_usage_by_type() / 1024.0 / 1024.0
+	var memory_mb = Performance.get_monitor(Performance.MEMORY_STATIC) / 1024.0 / 1024.0
 	
 	# Update history
 	fps_history.append(fps)
@@ -182,7 +182,7 @@ func _update_summary() -> void:
 	text += "• Frame time: %.2fms\n\n" % frame_time
 	
 	# Memory info
-	var memory_mb = OS.get_static_memory_usage_by_type() / 1024.0 / 1024.0
+	var memory_mb = Performance.get_monitor(Performance.MEMORY_STATIC) / 1024.0 / 1024.0
 	text += "[b]Memory Usage:[/b]\n"
 	text += "• Static memory: %.1fMB\n\n" % memory_mb
 	
@@ -215,6 +215,6 @@ func profile_section_end(section_name: String) -> void:
 func log_performance_report() -> void:
 	print("=== Performance Report ===")
 	print("FPS: ", Engine.get_frames_per_second())
-	print("Memory: %.1fMB" % (OS.get_static_memory_usage_by_type() / 1024.0 / 1024.0))
+	print("Memory: %.1fMB" % (Performance.get_monitor(Performance.MEMORY_STATIC) / 1024.0 / 1024.0))
 	print("Active Objects: ", Performance.get_monitor(Performance.OBJECT_COUNT))
 	print("Active Nodes: ", Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
