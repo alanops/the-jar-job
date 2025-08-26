@@ -8,7 +8,6 @@ class_name AdvancedPerformanceMonitor
 var cpu_list: ItemList
 var summary_label: RichTextLabel
 
-var profiler: PerformanceProfiler
 var graph_points: int = 120  # 2 seconds at 60fps
 var update_timer: float = 0.0
 var update_interval: float = 0.1
@@ -18,11 +17,7 @@ var fps_history: Array[float] = []
 var memory_history: Array[float] = []
 
 func _ready() -> void:
-	# Create profiler
-	profiler = PerformanceProfiler.new()
-	add_child(profiler)
-	profiler.frame_data_updated.connect(_on_frame_data_updated)
-	profiler.start_profiling()
+	# Use Godot's built-in performance monitoring
 	
 	# Set up UI
 	z_index = 1000
@@ -45,11 +40,16 @@ func _process(delta: float) -> void:
 	if update_timer >= update_interval:
 		update_timer = 0.0
 		_update_displays()
+		_collect_performance_data()
 
-func _on_frame_data_updated(frame_data: Dictionary) -> void:
+func _collect_performance_data() -> void:
+	# Collect performance data using Godot's built-in monitoring
+	var fps = Engine.get_frames_per_second()
+	var memory_mb = OS.get_static_memory_usage_by_type() / 1024.0 / 1024.0
+	
 	# Update history
-	fps_history.append(frame_data.fps)
-	memory_history.append(frame_data.memory_mb)
+	fps_history.append(fps)
+	memory_history.append(memory_mb)
 	
 	# Limit history size
 	if fps_history.size() > graph_points:
@@ -155,50 +155,41 @@ func _draw_memory_graph() -> void:
 	memory_graph.draw_string(get_theme_default_font(), Vector2(5, graph_size.y - 5), "Range: %.1f-%.1fMB" % [min_memory, max_memory], HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color.WHITE)
 
 func _update_cpu_list() -> void:
-	var summary := profiler.get_performance_summary()
-	if not summary.has("cpu_sections"):
+	if not cpu_list:
 		return
-	
+		
 	cpu_list.clear()
-	var cpu_data = summary["cpu_sections"]
+	# Use Godot's built-in performance monitoring
+	var cpu_time = Performance.get_monitor(Performance.TIME_PROCESS)
+	var physics_time = Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)
+	var render_time = Performance.get_monitor(Performance.TIME_RENDER)
 	
-	# Sort by average time
-	var sections := []
-	for section_name in cpu_data:
-		sections.append([section_name, cpu_data[section_name].avg_ms])
-	sections.sort_custom(func(a, b): return a[1] > b[1])
-	
-	for section_data in sections:
-		var section_name = section_data[0]
-		var data = cpu_data[section_name]
-		var text := "%s: %.2fms (max: %.2fms)" % [section_name, data.avg_ms, data.max_ms]
-		cpu_list.add_item(text)
+	cpu_list.add_item("Process: %.2fms" % (cpu_time * 1000))
+	cpu_list.add_item("Physics: %.2fms" % (physics_time * 1000))
+	cpu_list.add_item("Render: %.2fms" % (render_time * 1000))
 
 func _update_summary() -> void:
-	var summary := profiler.get_performance_summary()
+	if not summary_label:
+		return
+		
 	var text := "[b]Performance Summary[/b]\n\n"
 	
-	if summary.has("frame_times"):
-		var ft = summary["frame_times"]
-		text += "[b]Frame Timing:[/b]\n"
-		text += "• Average: %.1fms (%.1f FPS)\n" % [ft.average_ms, ft.avg_fps]
-		text += "• Min/Max: %.1f/%.1fms\n" % [ft.min_ms, ft.max_ms]
-		text += "• 95th percentile: %.1fms\n" % ft.p95_ms
-		text += "• 99th percentile: %.1fms\n\n" % ft.p99_ms
+	# Frame timing info using built-in monitoring
+	var fps = Engine.get_frames_per_second()
+	var frame_time = 1000.0 / fps if fps > 0 else 0
+	text += "[b]Frame Timing:[/b]\n"
+	text += "• Current FPS: %.1f\n" % fps
+	text += "• Frame time: %.2fms\n\n" % frame_time
 	
-	if summary.has("memory"):
-		var mem = summary["memory"]
-		text += "[b]Memory Usage:[/b]\n"
-		text += "• Current: %.1f MB\n" % mem.current_mb
-		text += "• Peak: %.1f MB\n" % mem.peak_mb
-		text += "• Average: %.1f MB\n\n" % mem.average_mb
+	# Memory info
+	var memory_mb = OS.get_static_memory_usage_by_type() / 1024.0 / 1024.0
+	text += "[b]Memory Usage:[/b]\n"
+	text += "• Static memory: %.1fMB\n\n" % memory_mb
 	
-	if summary.has("rendering"):
-		var rend = summary["rendering"]
-		text += "[b]Rendering:[/b]\n"
-		text += "• Draw calls: %d (peak: %d)\n" % [rend.current_draw_calls, rend.peak_draw_calls]
-		text += "• Peak vertices: %d\n" % rend.peak_vertices
-		text += "• Avg draw calls: %.1f\n\n" % rend.avg_draw_calls
+	# Rendering info using built-in performance monitoring
+	text += "[b]Rendering:[/b]\n"
+	text += "• Render objects: %d\n" % Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)
+	text += "• Render primitives: %d\n\n" % Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)
 	
 	# Additional system info
 	text += "[b]System Info:[/b]\n"
@@ -211,16 +202,19 @@ func _update_summary() -> void:
 
 func toggle_visibility() -> void:
 	visible = !visible
-	if visible:
-		profiler.start_profiling()
-	else:
-		profiler.stop_profiling()
+	# Performance monitoring is always active with built-in system
 
 func profile_section_start(section_name: String) -> void:
-	profiler.start_cpu_section(section_name)
+	# CPU section profiling not available with simplified system
+	pass
 
 func profile_section_end(section_name: String) -> void:
-	profiler.end_cpu_section(section_name)
+	# CPU section profiling not available with simplified system  
+	pass
 
 func log_performance_report() -> void:
-	profiler.log_performance_summary()
+	print("=== Performance Report ===")
+	print("FPS: ", Engine.get_frames_per_second())
+	print("Memory: %.1fMB" % (OS.get_static_memory_usage_by_type() / 1024.0 / 1024.0))
+	print("Active Objects: ", Performance.get_monitor(Performance.OBJECT_COUNT))
+	print("Active Nodes: ", Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
