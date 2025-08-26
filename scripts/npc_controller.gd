@@ -80,11 +80,15 @@ var vision_check_timer: float = 0.0
 var vision_check_interval: float = 0.1  # Check vision every 0.1 seconds
 var distance_to_player: float = 0.0
 
+# Proximity detection
+@export var catch_distance: float = 1.2  # Distance at which NPC catches player
+
 # Performance profiling
 var performance_monitor: AdvancedPerformanceMonitor
 
 # Signals
 signal player_spotted(npc: NPCController)
+signal player_caught(npc: NPCController)
 signal detection_progress_changed(progress: float)
 signal suspicion_changed_debug(level: int)
 signal state_changed_debug(state: String)
@@ -146,9 +150,13 @@ func _physics_process(delta: float) -> void:
 			performance_monitor.profile_section_end("NPC_Physics")
 		return
 	
-	# Calculate distance to player for LOD
+	# Calculate distance to player for LOD and proximity detection
 	if player_reference:
 		distance_to_player = global_position.distance_to(player_reference.global_position)
+		
+		# Check if NPC caught the player
+		if distance_to_player <= catch_distance:
+			_on_player_caught()
 	
 	if performance_monitor:
 		performance_monitor.profile_section_start("NPC_Suspicion")
@@ -347,6 +355,16 @@ func _on_player_spotted() -> void:
 	state_timer.stop()
 	player_spotted.emit(self)
 	GameManager.trigger_game_over("You were spotted by the security guard!")
+
+func _on_player_caught() -> void:
+	# Prevent multiple game over triggers
+	if GameManager.current_state == GameManager.GameState.GAME_OVER:
+		return
+		
+	current_state = NPCState.CHASE
+	state_timer.stop()
+	player_caught.emit(self)
+	GameManager.trigger_game_over("You were caught by the security guard!")
 
 func _on_player_made_noise(noise_position: Vector3, noise_radius: float) -> void:
 	if current_state == NPCState.CHASE:

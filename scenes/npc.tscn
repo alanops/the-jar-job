@@ -52,7 +52,6 @@ target_desired_distance = 0.5
 avoidance_enabled = true
 avoidance_layers = 4
 avoidance_mask = 4
-radius = 0.5
 
 [node name="VisionCone" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
