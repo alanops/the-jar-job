@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://cpvug3wlypb3j"]
+[gd_scene load_steps=14 format=3 uid="uid://cpvug3wlypb3j"]
 
 [ext_resource type="Script" uid="uid://tqth3ioslss2" path="res://scripts/elevator_controller.gd" id="1_elevator"]
 
@@ -14,6 +14,12 @@ roughness = 0.2
 size = Vector3(3, 3, 0.2)
 
 [sub_resource type="BoxMesh" id="BoxMesh_4"]
+size = Vector3(0.2, 3, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3"]
+size = Vector3(3, 3, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4"]
 size = Vector3(0.2, 3, 3)
 
 [sub_resource type="BoxMesh" id="BoxMesh_2"]
@@ -36,14 +42,11 @@ emission_energy_multiplier = 0.5
 [sub_resource type="BoxShape3D" id="BoxShape3D_2"]
 size = Vector3(0.2, 0.5, 0.2)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_3"]
-size = Vector3(3, 3, 0.2)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_4"]
-size = Vector3(0.2, 3, 3)
-
 [sub_resource type="SphereShape3D" id="SphereShape3D_1"]
 radius = 3.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5"]
+size = Vector3(2.5, 2.5, 2.5)
 
 [node name="Elevator" type="StaticBody3D" groups=["exit_door", "interactables"]]
 collision_mask = 0
@@ -114,10 +117,20 @@ collision_mask = 2
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 shape = SubResource("SphereShape3D_1")
 
+[node name="InsideDetection" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InsideDetection"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -0.2)
+shape = SubResource("BoxShape3D_5")
+
 [node name="DoorOpenTimer" type="Timer" parent="."]
 wait_time = 3.0
 one_shot = true
 
 [connection signal="body_entered" from="ProximityDetection" to="." method="_on_proximity_detection_body_entered"]
 [connection signal="body_exited" from="ProximityDetection" to="." method="_on_proximity_detection_body_exited"]
+[connection signal="body_entered" from="InsideDetection" to="." method="_on_inside_detection_body_entered"]
+[connection signal="body_exited" from="InsideDetection" to="." method="_on_inside_detection_body_exited"]
 [connection signal="timeout" from="DoorOpenTimer" to="." method="_on_door_open_timer_timeout"]

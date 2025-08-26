@@ -7,6 +7,7 @@ extends StaticBody3D
 
 var doors_open: bool = false
 var player_nearby: bool = false
+var player_inside: bool = false
 var door_tween: Tween
 
 # Door animation properties
@@ -73,6 +74,17 @@ func _on_proximity_detection_body_exited(body: Node3D) -> void:
 		player_nearby = false
 		# Start timer to close doors after delay
 		door_timer.start()
+
+func _on_inside_detection_body_entered(body: Node3D) -> void:
+	if body.is_in_group("player"):
+		player_inside = true
+		print("Player entered elevator - checking objectives...")
+		_check_exit_conditions()
+
+func _on_inside_detection_body_exited(body: Node3D) -> void:
+	if body.is_in_group("player"):
+		player_inside = false
+		print("Player exited elevator")
 
 func _on_door_open_timer_timeout() -> void:
 	if not player_nearby:
@@ -149,3 +161,26 @@ func toggle_doors() -> void:
 		force_open_doors()
 		# Reset the timer to keep doors open longer
 		door_timer.start()
+
+func _check_exit_conditions() -> void:
+	# Check if player has completed the biscuit jar objective
+	if ObjectiveManager and ObjectiveManager.objectives.has("find_jar"):
+		var jar_objective = ObjectiveManager.objectives["find_jar"]
+		if jar_objective.is_completed:
+			print("All objectives completed! Player can exit.")
+			# Wait a moment, then trigger game completion
+			await get_tree().create_timer(1.0).timeout
+			_trigger_game_exit()
+		else:
+			print("Player needs to find the biscuit jar first!")
+
+func _trigger_game_exit() -> void:
+	print("Congratulations! You successfully stole the biscuit jar and escaped!")
+	
+	# Trigger victory through GameManager
+	if GameManager:
+		GameManager.trigger_victory()
+	else:
+		# Fallback if GameManager is not available
+		await get_tree().create_timer(3.0).timeout
+		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")

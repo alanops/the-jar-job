@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://b7hf5w8nxkgvq"]
+[gd_scene load_steps=27 format=3 uid="uid://b7hf5w8nxkgvq"]
 
 [ext_resource type="Script" uid="uid://dx38cl2wfggri" path="res://scripts/game.gd" id="1_game"]
 [ext_resource type="PackedScene" uid="uid://bxklf5nvt8qh0" path="res://environment/simple_floor.tscn" id="2_simple_floor"]
@@ -44,9 +44,6 @@ tonemap_mode = 2
 vertices = PackedVector3Array(-16, 0.5, -16, -16, 0.5, 16, 16, 0.5, 16, 16, 0.5, -16)
 polygons = [PackedInt32Array(0, 1, 2, 3)]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(0.3, 2, 0.3)
-
 [node name="Game" type="Node3D" groups=["game"]]
 script = ExtResource("1_game")
 
@@ -79,9 +76,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 4)
 
 [node name="WallLeft5" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 8)
-
-[node name="WallTop2" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -4, 0, -11)
 
 [node name="GlassWindowTop1" parent="Office/OuterWalls" instance=ExtResource("18_glass_window")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -11)
