@@ -332,7 +332,8 @@ func _is_player_in_flashlight() -> bool:
 		return false
 	
 	var flashlight_pos = flashlight.global_position
-	var flashlight_forward = -flashlight.global_transform.basis.z  # Flashlight points in -Z
+	# Use NPC forward direction - NPCs face positive Z direction
+	var npc_forward = global_transform.basis.z
 	var player_pos = player_reference.global_position
 	
 	# Check if player is within flashlight range
@@ -341,8 +342,12 @@ func _is_player_in_flashlight() -> bool:
 	if distance > flashlight.spot_range:
 		return false
 	
+	# Skip detection if player is too close (avoid self-intersection)
+	if distance < 0.5:
+		return true  # Always detect if very close
+	
 	# Check if player is within flashlight cone angle
-	var angle_to_player = rad_to_deg(flashlight_forward.angle_to(to_player.normalized()))
+	var angle_to_player = rad_to_deg(npc_forward.angle_to(to_player.normalized()))
 	if angle_to_player > flashlight.spot_angle * 0.5:
 		return false
 	
@@ -360,6 +365,10 @@ func _is_player_in_flashlight() -> bool:
 		if _raycast_to_point(flashlight_pos, point):
 			hits += 1
 	
+	# Debug output to help troubleshoot
+	if distance < 3.0:  # Only debug close encounters
+		print("Debug - Distance: ", distance, " Angle: ", angle_to_player, " Hits: ", hits, "/", hit_points.size())
+	
 	# Player is detected if at least 2 out of 5 rays hit (40% coverage)
 	return hits >= 2
 
@@ -370,6 +379,15 @@ func _raycast_to_point(from: Vector3, to: Vector3) -> bool:
 	query.exclude = [self]
 	
 	var result = space_state.intersect_ray(query)
+	
+	# Debug close range raycasts
+	var distance = from.distance_to(to)
+	if distance < 3.0:
+		print("  Raycast from ", from, " to ", to, " distance: ", distance)
+		if not result.is_empty():
+			print("    Hit: ", result.collider.name if result.has("collider") else "unknown")
+		else:
+			print("    No hit")
 	
 	# Return true if we hit the player, false if we hit a wall or nothing
 	return result.is_empty() or (result.has("collider") and result.collider == player_reference)
