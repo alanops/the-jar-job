@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cpvug3wlypb3j"]
+[gd_scene load_steps=12 format=3 uid="uid://cpvug3wlypb3j"]
 
 [ext_resource type="Script" uid="uid://tqth3ioslss2" path="res://scripts/elevator_controller.gd" id="1_elevator"]
 
@@ -36,8 +36,11 @@ emission_energy_multiplier = 0.5
 [sub_resource type="BoxShape3D" id="BoxShape3D_2"]
 size = Vector3(0.2, 0.5, 0.2)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(3, 0.2, 2)
+[sub_resource type="BoxShape3D" id="BoxShape3D_3"]
+size = Vector3(3, 3, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4"]
+size = Vector3(0.2, 3, 3)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1"]
 radius = 3.0
@@ -66,6 +69,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 1.5, 0)
 mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("StandardMaterial3D_1")
 
+[node name="BackWallCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.4)
+shape = SubResource("BoxShape3D_3")
+
+[node name="LeftWallCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 1.5, 0)
+shape = SubResource("BoxShape3D_4")
+
+[node name="RightWallCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 1.5, 0)
+shape = SubResource("BoxShape3D_4")
+
 [node name="Doors" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 1.4)
 
@@ -90,10 +105,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_3")
 
 [node name="ButtonCollision" type="CollisionShape3D" parent="CallButton"]
 shape = SubResource("BoxShape3D_2")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -0.5)
-shape = SubResource("BoxShape3D_1")
 
 [node name="ProximityDetection" type="Area3D" parent="."]
 collision_layer = 0
