@@ -1,0 +1,92 @@
+[gd_scene load_steps=5 format=3 uid="uid://4x3xm7ljkn51"]
+
+[ext_resource type="Script" path="res://scripts/objectives_panel.gd" id="1_objectives"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0, 0, 0, 0.6)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.4, 0.4, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 16
+font_color = Color(1, 1, 0, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 12
+outline_size = 1
+outline_color = Color(0, 0, 0, 1)
+
+[node name="ObjectivesPanel" type="Control"]
+anchor_right = 0.4
+anchor_bottom = 0.3
+script = ExtResource("1_objectives")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 15
+margin_top = 10
+margin_right = -15
+margin_bottom = -10
+
+[node name="Title" type="Label" parent="Content"]
+layout_mode = 2
+text = "📋 OBJECTIVES"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="HSeparator" type="HSeparator" parent="Content"]
+layout_mode = 2
+
+[node name="ObjectivesList" type="VBoxContainer" parent="Content"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ObjectiveTemplate" type="HBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Icon" type="Label" parent="ObjectiveTemplate"]
+layout_mode = 2
+text = "🍪"
+label_settings = SubResource("LabelSettings_2")
+
+[node name="Details" type="VBoxContainer" parent="ObjectiveTemplate"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="ObjectiveTemplate/Details"]
+layout_mode = 2
+text = "Find the Biscuit Jar"
+label_settings = SubResource("LabelSettings_2")
+
+[node name="Description" type="Label" parent="ObjectiveTemplate/Details"]
+layout_mode = 2
+text = "Locate and steal the precious biscuit jar"
+label_settings = SubResource("LabelSettings_2")
+autowrap_mode = 3
+
+[node name="Status" type="Label" parent="ObjectiveTemplate"]
+layout_mode = 2
+text = "✓"
+label_settings = SubResource("LabelSettings_2")
