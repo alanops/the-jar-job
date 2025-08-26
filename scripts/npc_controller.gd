@@ -58,7 +58,6 @@ var last_known_player_position: Vector3
 var time_since_player_seen: float = 0.0
 var player_in_sight: bool = false
 var previous_player_in_sight: bool = false
-var player_in_area: bool = false
 
 # Investigation
 var investigation_position: Vector3
@@ -125,10 +124,7 @@ func _ready() -> void:
 		player_reference = players[0]
 		player_reference.made_noise.connect(_on_player_made_noise)
 	
-	# Connect vision cone signals
-	if vision_cone:
-		vision_cone.body_entered.connect(_on_vision_cone_body_entered)
-		vision_cone.body_exited.connect(_on_vision_cone_body_exited)
+	# Vision cone area detection no longer needed - using light-based detection
 	
 	# Connect navigation agent avoidance callback
 	if navigation_agent:
@@ -297,21 +293,13 @@ func _handle_return_state(delta: float) -> void:
 		_rotate_towards_direction(direction, delta)
 
 func _check_vision_cone() -> void:
-	if not player_reference or not vision_cone or current_state == NPCState.CHASE:
+	if not player_reference or not flashlight or current_state == NPCState.CHASE:
 		player_in_sight = false
 		_reset_detection()
 		return
 	
-	var player_detected: bool = false
-	
-	# Only do expensive checks if player is in the area
-	if player_in_area:
-		var in_cone: bool = vision_cone.is_target_in_cone(player_reference.global_position)
-		# Only do line of sight check if player is in cone (expensive raycast)
-		if in_cone:
-			var los_clear: bool = _has_line_of_sight_to_player()
-			player_detected = los_clear
-	
+	# Use light-based detection instead of area collision
+	var player_detected: bool = _is_player_in_flashlight()
 	player_in_sight = player_detected
 	
 	# Emit vision change signal if state changed
@@ -339,16 +327,52 @@ func _reset_detection() -> void:
 			vision_cone.set_alert_mode(false)
 		detection_progress_changed.emit(0.0)
 
-func _has_line_of_sight_to_player() -> bool:
-	if not player_reference or not raycast:
+func _is_player_in_flashlight() -> bool:
+	if not player_reference or not flashlight:
 		return false
 	
-	var to_player := player_reference.global_position - raycast.global_position
-	raycast.target_position = to_player
-	raycast.add_exception(self)
-	raycast.force_raycast_update()
+	var flashlight_pos = flashlight.global_position
+	var flashlight_forward = -flashlight.global_transform.basis.z  # Flashlight points in -Z
+	var player_pos = player_reference.global_position
 	
-	return not raycast.is_colliding() or raycast.get_collider() == player_reference
+	# Check if player is within flashlight range
+	var to_player = player_pos - flashlight_pos
+	var distance = to_player.length()
+	if distance > flashlight.spot_range:
+		return false
+	
+	# Check if player is within flashlight cone angle
+	var angle_to_player = rad_to_deg(flashlight_forward.angle_to(to_player.normalized()))
+	if angle_to_player > flashlight.spot_angle * 0.5:
+		return false
+	
+	# Perform multiple raycasts to different parts of the player to simulate light coverage
+	var hit_points = [
+		player_pos,  # Center
+		player_pos + Vector3(0.3, 0, 0),     # Right
+		player_pos + Vector3(-0.3, 0, 0),    # Left  
+		player_pos + Vector3(0, 0.5, 0),     # Top
+		player_pos + Vector3(0, -0.5, 0),    # Bottom
+	]
+	
+	var hits = 0
+	for point in hit_points:
+		if _raycast_to_point(flashlight_pos, point):
+			hits += 1
+	
+	# Player is detected if at least 2 out of 5 rays hit (40% coverage)
+	return hits >= 2
+
+func _raycast_to_point(from: Vector3, to: Vector3) -> bool:
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from, to)
+	query.collision_mask = 3  # Check walls (layer 1) and player (layer 2)
+	query.exclude = [self]
+	
+	var result = space_state.intersect_ray(query)
+	
+	# Return true if we hit the player, false if we hit a wall or nothing
+	return result.is_empty() or (result.has("collider") and result.collider == player_reference)
 
 func _on_player_spotted() -> void:
 	current_state = NPCState.CHASE
@@ -602,18 +626,7 @@ func _handle_search_state(delta: float) -> void:
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
 
-# Vision cone signal handlers
-func _on_vision_cone_body_entered(body: Node3D) -> void:
-	print("Vision cone body entered: ", body.name, " Groups: ", body.get_groups())
-	if body.is_in_group("player"):
-		print("Player entered vision cone area")
-		player_in_area = true
-
-func _on_vision_cone_body_exited(body: Node3D) -> void:
-	print("Vision cone body exited: ", body.name, " Groups: ", body.get_groups()) 
-	if body.is_in_group("player"):
-		print("Player exited vision cone area")
-		player_in_area = false
+# Light-based detection - no need for area collision handlers
 
 func _on_velocity_computed(safe_velocity: Vector3) -> void:
 	# This callback receives the collision-free velocity from NavigationAgent3D

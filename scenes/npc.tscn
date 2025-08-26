@@ -57,7 +57,8 @@ avoidance_mask = 4
 [node name="VisionCone" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 collision_layer = 0
-collision_mask = 2
+collision_mask = 0
+monitoring = false
 script = ExtResource("2_vision")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="VisionCone"]
@@ -89,9 +90,6 @@ light_energy = 2.0
 light_indirect_energy = 0.5
 shadow_enabled = true
 shadow_bias = 0.01
-shadow_normal_bias = 1.0
-shadow_filter = 1
-shadow_blur = 1.0
 spot_range = 15.0
 spot_attenuation = 2.0
 spot_angle = 25.0
