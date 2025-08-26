@@ -95,7 +95,7 @@ func _load_current_settings() -> void:
 	vsync_option.selected = int(current_vsync)
 	
 	# Shadow quality (simplified mapping)
-	var shadow_size := RenderingServer.directional_shadow_atlas_get_size()
+	var shadow_size := 2048  # Default medium shadow size
 	var shadow_quality := 1  # Default medium
 	if shadow_size <= 1024:
 		shadow_quality = 0  # Low
@@ -143,7 +143,7 @@ func _on_max_fps_changed(value: float) -> void:
 
 func _apply_settings() -> void:
 	# Apply VSync
-	var vsync_mode := DisplayServer.VsyncMode(vsync_option.selected)
+	var vsync_mode := vsync_option.selected as DisplayServer.VSyncMode
 	DisplayServer.window_set_vsync_mode(vsync_mode)
 	
 	# Apply shadow quality
@@ -154,7 +154,7 @@ func _apply_settings() -> void:
 	# Apply MSAA
 	var viewport := get_viewport()
 	if viewport:
-		var msaa_mode := Viewport.MSAA(msaa_option.selected)
+		var msaa_mode := msaa_option.selected as Viewport.MSAA
 		viewport.msaa_3d = msaa_mode
 	
 	# Apply FXAA

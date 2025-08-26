@@ -33,8 +33,33 @@ jobs:
           
       - name: Web Build
         run: |
+          set -e  # Exit on error
           mkdir -v -p builds/web
-          godot --headless --export-release "Web" builds/web/index.html 2>&1
+          
+          # Run Godot export and capture output
+          godot --headless --export-release "Web" builds/web/index.html 2>&1 | tee export.log
+          
+          # Check for errors in the log
+          if grep -q "ERROR:" export.log; then
+            echo "❌ Errors found during export:"
+            grep "ERROR:" export.log
+            exit 1
+          fi
+          
+          # Check for script errors
+          if grep -q "SCRIPT ERROR:" export.log; then
+            echo "❌ Script errors found during export:"
+            grep "SCRIPT ERROR:" export.log
+            exit 1
+          fi
+          
+          # Verify the build output exists
+          if [ ! -f "builds/web/index.html" ]; then
+            echo "❌ Build failed: index.html not found"
+            exit 1
+          fi
+          
+          echo "✅ Export completed successfully"
 
       - name: Install Butler
         run: |
