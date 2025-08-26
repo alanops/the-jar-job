@@ -333,7 +333,12 @@ func _calculate_optimal_interception_point(npc: Node3D, predicted_position: Vect
 
 func _is_point_reachable(from: Vector3, to: Vector3) -> bool:
 	# Simple raycast check - could be enhanced with navigation mesh queries
-	var space_state = get_world_3d().direct_space_state
+	# Get world from parent NPC node (which should be a CharacterBody3D)
+	var parent_node = get_parent()
+	if not parent_node or not parent_node.has_method("get_world_3d"):
+		return true  # Assume reachable if no 3D world available
+	
+	var space_state = parent_node.get_world_3d().direct_space_state
 	var query = PhysicsRayQueryParameters3D.create(from, to)
 	query.collision_mask = 1  # Only walls
 	
