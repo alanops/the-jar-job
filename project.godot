@@ -66,6 +66,11 @@ crouch={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194326,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
+run={
+"deadzone": 0.1,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194325,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
 interact={
 "deadzone": 0.1,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":69,"key_label":0,"unicode":101,"location":0,"echo":false,"script":null)
@@ -94,13 +99,13 @@ reset={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-lights_and_shadows/directional_shadow/size=1024
-lights_and_shadows/directional_shadow/soft_shadow_filter_quality=0
-lights_and_shadows/positional_shadow/soft_shadow_filter_quality=0
+lights_and_shadows/directional_shadow/size=2048
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=2
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality=2
+lights_and_shadows/positional_shadow/atlas_size=2048
 textures/default_filters/anisotropic_filtering_level=0
 environment/defaults/default_clear_color=Color(0.85, 0.9, 0.95, 1)
 occlusion_culling/use_occlusion_culling=true
-lights_and_shadows/positional_shadow/atlas_size=1024
 camera/depth_prepass/enable=true
 anti_aliasing/quality/use_fxaa=false
 

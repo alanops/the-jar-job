@@ -44,6 +44,7 @@ enum NPCState {
 @onready var raycast: RayCast3D = $RayCast3D
 @onready var state_label: Label3D = $StateLabel
 @onready var flashlight: SpotLight3D = $Flashlight
+@onready var vision_debug: Node3D = $VisionDebug
 
 # State Management
 var current_state: NPCState = NPCState.PATROL
@@ -58,7 +59,6 @@ var last_known_player_position: Vector3
 var time_since_player_seen: float = 0.0
 var player_in_sight: bool = false
 var previous_player_in_sight: bool = false
-var player_in_area: bool = false
 
 # Investigation
 var investigation_position: Vector3
@@ -73,18 +73,22 @@ var is_investigating: bool = false
 # Memory & Navigation
 var home_position: Vector3
 var detection_time: float = 0.0
-var detection_threshold: float = 1.0
+var detection_threshold: float = 0.5  # Faster detection (was 1.0)
 
 # Performance optimization
 var vision_check_timer: float = 0.0
-var vision_check_interval: float = 0.1  # Check vision every 0.1 seconds
+var vision_check_interval: float = 0.05  # Check vision every 0.05 seconds (more responsive)
 var distance_to_player: float = 0.0
+
+# Proximity detection
+@export var catch_distance: float = 1.2  # Distance at which NPC catches player
 
 # Performance profiling
 var performance_monitor: AdvancedPerformanceMonitor
 
 # Signals
 signal player_spotted(npc: NPCController)
+signal player_caught(npc: NPCController)
 signal detection_progress_changed(progress: float)
 signal suspicion_changed_debug(level: int)
 signal state_changed_debug(state: String)
@@ -121,10 +125,11 @@ func _ready() -> void:
 		player_reference = players[0]
 		player_reference.made_noise.connect(_on_player_made_noise)
 	
-	# Connect vision cone signals
-	if vision_cone:
-		vision_cone.body_entered.connect(_on_vision_cone_body_entered)
-		vision_cone.body_exited.connect(_on_vision_cone_body_exited)
+	# Vision cone area detection no longer needed - using light-based detection
+	
+	# Connect navigation agent avoidance callback
+	if navigation_agent:
+		navigation_agent.velocity_computed.connect(_on_velocity_computed)
 	
 	# Find performance monitor
 	var game_node = get_tree().get_first_node_in_group("game")
@@ -142,9 +147,13 @@ func _physics_process(delta: float) -> void:
 			performance_monitor.profile_section_end("NPC_Physics")
 		return
 	
-	# Calculate distance to player for LOD
+	# Calculate distance to player for LOD and proximity detection
 	if player_reference:
 		distance_to_player = global_position.distance_to(player_reference.global_position)
+		
+		# Check if NPC caught the player
+		if distance_to_player <= catch_distance:
+			_on_player_caught()
 	
 	if performance_monitor:
 		performance_monitor.profile_section_start("NPC_Suspicion")
@@ -211,9 +220,9 @@ func _handle_patrol_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	# Move towards waypoint
-	velocity.x = direction.x * patrol_speed
-	velocity.z = direction.z * patrol_speed
+	# Move towards waypoint with avoidance
+	var desired_velocity = Vector3(direction.x * patrol_speed, 0, direction.z * patrol_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	# Rotate to face movement direction
 	if direction.length() > 0.1:
@@ -228,13 +237,7 @@ func _handle_investigate_state(delta: float) -> void:
 		# Rotate while investigating
 		rotation.y += turn_speed * 0.5 * delta
 		
-		# Update direction arrow to match rotation
-		if direction_arrow:
-			direction_arrow.rotation.y = rotation.y
-		
-		# Update flashlight to match rotation
-		if flashlight:
-			flashlight.rotation.y = rotation.y
+		# Direction arrow and flashlight rotate with parent automatically
 		
 		velocity.x = 0
 		velocity.z = 0
@@ -244,8 +247,8 @@ func _handle_investigate_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	velocity.x = direction.x * patrol_speed
-	velocity.z = direction.z * patrol_speed
+	var desired_velocity = Vector3(direction.x * investigate_speed, 0, direction.z * investigate_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
@@ -267,8 +270,8 @@ func _handle_chase_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	velocity.x = direction.x * chase_speed
-	velocity.z = direction.z * chase_speed
+	var desired_velocity = Vector3(direction.x * chase_speed, 0, direction.z * chase_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
@@ -284,28 +287,20 @@ func _handle_return_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	velocity.x = direction.x * patrol_speed
-	velocity.z = direction.z * patrol_speed
+	var desired_velocity = Vector3(direction.x * patrol_speed, 0, direction.z * patrol_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
 
 func _check_vision_cone() -> void:
-	if not player_reference or not vision_cone or current_state == NPCState.CHASE:
+	if not player_reference or not flashlight or current_state == NPCState.CHASE:
 		player_in_sight = false
 		_reset_detection()
 		return
 	
-	var player_detected: bool = false
-	
-	# Only do expensive checks if player is in the area
-	if player_in_area:
-		var in_cone: bool = vision_cone.is_target_in_cone(player_reference.global_position)
-		# Only do line of sight check if player is in cone (expensive raycast)
-		if in_cone:
-			var los_clear: bool = _has_line_of_sight_to_player()
-			player_detected = los_clear
-	
+	# Use light-based detection instead of area collision
+	var player_detected: bool = _is_player_in_flashlight()
 	player_in_sight = player_detected
 	
 	# Emit vision change signal if state changed
@@ -333,22 +328,93 @@ func _reset_detection() -> void:
 			vision_cone.set_alert_mode(false)
 		detection_progress_changed.emit(0.0)
 
-func _has_line_of_sight_to_player() -> bool:
-	if not player_reference or not raycast:
+func _is_player_in_flashlight() -> bool:
+	if not player_reference or not flashlight:
 		return false
 	
-	var to_player := player_reference.global_position - raycast.global_position
-	raycast.target_position = to_player
-	raycast.add_exception(self)
-	raycast.force_raycast_update()
+	var flashlight_pos = flashlight.global_position
+	# Use NPC forward direction - NPCs face positive Z direction
+	var npc_forward = global_transform.basis.z
+	var player_pos = player_reference.global_position
 	
-	return not raycast.is_colliding() or raycast.get_collider() == player_reference
+	# Check if player is within flashlight range
+	var to_player = player_pos - flashlight_pos
+	var distance = to_player.length()
+	if distance > flashlight.spot_range:
+		return false
+	
+	# Skip detection if player is too close (avoid self-intersection)
+	if distance < 0.5:
+		return true  # Always detect if very close
+	
+	# Check if player is within flashlight cone angle (more generous)
+	var angle_to_player = rad_to_deg(npc_forward.angle_to(to_player.normalized()))
+	if angle_to_player > flashlight.spot_angle * 0.6:  # 60% of cone angle instead of 50%
+		return false
+	
+	# Perform multiple raycasts to different parts of the player - more coverage points
+	var hit_points = [
+		player_pos,  # Center
+		player_pos + Vector3(0.4, 0, 0),     # Right
+		player_pos + Vector3(-0.4, 0, 0),    # Left  
+		player_pos + Vector3(0, 0.8, 0),     # Top (head)
+		player_pos + Vector3(0, -0.8, 0),    # Bottom (feet)
+		player_pos + Vector3(0.3, 0.3, 0),   # Top-right
+		player_pos + Vector3(-0.3, 0.3, 0),  # Top-left
+		player_pos + Vector3(0, 0.3, 0),     # Mid-height
+	]
+	
+	var hits = 0
+	for point in hit_points:
+		if _raycast_to_point(flashlight_pos, point):
+			hits += 1
+	
+	# Visualize detection rays if vision_debug exists
+	if vision_debug and vision_debug.has_method("show_detection_rays"):
+		vision_debug.show_detection_rays(flashlight_pos, hit_points, hits >= 1)
+	
+	# Debug output to help troubleshoot
+	if distance < 5.0:  # Expanded debug range
+		print("Debug - Distance: ", distance, " Angle: ", angle_to_player, " Hits: ", hits, "/", hit_points.size())
+	
+	# Player is detected if at least 1 out of 8 rays hit (much more generous)
+	return hits >= 1
+
+func _raycast_to_point(from: Vector3, to: Vector3) -> bool:
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from, to)
+	query.collision_mask = 3  # Check walls (layer 1) and player (layer 2)
+	query.exclude = [self]
+	
+	var result = space_state.intersect_ray(query)
+	
+	# Debug close range raycasts
+	var distance = from.distance_to(to)
+	if distance < 3.0:
+		print("  Raycast from ", from, " to ", to, " distance: ", distance)
+		if not result.is_empty():
+			print("    Hit: ", result.collider.name if result.has("collider") else "unknown")
+		else:
+			print("    No hit")
+	
+	# Return true if we hit the player, false if we hit a wall or nothing
+	return result.is_empty() or (result.has("collider") and result.collider == player_reference)
 
 func _on_player_spotted() -> void:
 	current_state = NPCState.CHASE
 	state_timer.stop()
 	player_spotted.emit(self)
 	GameManager.trigger_game_over("You were spotted by the security guard!")
+
+func _on_player_caught() -> void:
+	# Prevent multiple game over triggers
+	if GameManager.current_state == GameManager.GameState.GAME_OVER:
+		return
+		
+	current_state = NPCState.CHASE
+	state_timer.stop()
+	player_caught.emit(self)
+	GameManager.trigger_game_over("You were caught by the security guard!")
 
 func _on_player_made_noise(noise_position: Vector3, noise_radius: float) -> void:
 	if current_state == NPCState.CHASE:
@@ -357,7 +423,12 @@ func _on_player_made_noise(noise_position: Vector3, noise_radius: float) -> void
 	var distance_to_noise := global_position.distance_to(noise_position)
 	
 	if distance_to_noise <= noise_radius:
-		_switch_to_investigate_state(noise_position)
+		# If noise radius is large (player is running), chase directly
+		if noise_radius >= 7.0:  # Running noise threshold
+			current_state = NPCState.CHASE
+			state_timer.stop()
+		else:
+			_switch_to_investigate_state(noise_position)
 
 func _switch_to_investigate_state(position: Vector3) -> void:
 	current_state = NPCState.INVESTIGATE
@@ -392,17 +463,21 @@ func _set_next_patrol_target() -> void:
 	navigation_agent.target_position = patrol_waypoints[current_waypoint_index].global_position
 	patrol_point_changed.emit(current_waypoint_index)
 
+func _move_with_avoidance(desired_velocity: Vector3) -> void:
+	# Set the desired velocity for avoidance
+	navigation_agent.set_velocity(desired_velocity)
+	
+	# The actual velocity will be set by the avoidance callback
+	# If avoidance is disabled or no obstacles, use desired velocity
+	if not navigation_agent.avoidance_enabled:
+		velocity.x = desired_velocity.x
+		velocity.z = desired_velocity.z
+
 func _rotate_towards_direction(direction: Vector3, delta: float) -> void:
 	var target_rotation := atan2(direction.x, direction.z)
 	rotation.y = lerp_angle(rotation.y, target_rotation, turn_speed * delta)
 	
-	# Update direction arrow to match NPC rotation
-	if direction_arrow:
-		direction_arrow.rotation.y = rotation.y
-	
-	# Update flashlight to match NPC rotation
-	if flashlight:
-		flashlight.rotation.y = rotation.y
+	# Direction arrow and flashlight rotate with parent automatically
 
 func _on_state_timer_timeout() -> void:
 	match current_state:
@@ -531,15 +606,15 @@ func _generate_search_positions() -> void:
 		search_positions.append(base_pos + offset)
 
 func _get_vision_check_interval() -> float:
-	# LOD system: check vision less frequently when player is far away
+	# More aggressive LOD system for better detection
 	if distance_to_player > 15.0:
-		return 0.5  # Very far - check every 0.5 seconds
+		return 0.2  # Very far - check every 0.2 seconds (was 0.5)
 	elif distance_to_player > 10.0:
-		return 0.25  # Far - check every 0.25 seconds
+		return 0.1  # Far - check every 0.1 seconds (was 0.25)
 	elif distance_to_player > 5.0:
-		return 0.1  # Medium - check every 0.1 seconds
+		return 0.05  # Medium - check every 0.05 seconds (was 0.1)
 	else:
-		return 0.05  # Close - check every 0.05 seconds
+		return 0.02  # Close - check every 0.02 seconds (was 0.05)
 
 # New State Handlers
 func _handle_suspicious_state(delta: float) -> void:
@@ -549,13 +624,7 @@ func _handle_suspicious_state(delta: float) -> void:
 	# Slowly turn around looking for the player
 	rotation.y += turn_speed * 0.3 * delta
 	
-	# Update direction arrow to match rotation
-	if direction_arrow:
-		direction_arrow.rotation.y = rotation.y
-	
-	# Update flashlight to match rotation
-	if flashlight:
-		flashlight.rotation.y = rotation.y
+	# Direction arrow and flashlight rotate with parent automatically
 
 func _handle_search_state(delta: float) -> void:
 	if search_positions.is_empty():
@@ -577,21 +646,15 @@ func _handle_search_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	velocity.x = direction.x * search_speed
-	velocity.z = direction.z * search_speed
+	var desired_velocity = Vector3(direction.x * search_speed, 0, direction.z * search_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
 
-# Vision cone signal handlers
-func _on_vision_cone_body_entered(body: Node3D) -> void:
-	print("Vision cone body entered: ", body.name, " Groups: ", body.get_groups())
-	if body.is_in_group("player"):
-		print("Player entered vision cone area")
-		player_in_area = true
+# Light-based detection - no need for area collision handlers
 
-func _on_vision_cone_body_exited(body: Node3D) -> void:
-	print("Vision cone body exited: ", body.name, " Groups: ", body.get_groups()) 
-	if body.is_in_group("player"):
-		print("Player exited vision cone area")
-		player_in_area = false
+func _on_velocity_computed(safe_velocity: Vector3) -> void:
+	# This callback receives the collision-free velocity from NavigationAgent3D
+	velocity.x = safe_velocity.x
+	velocity.z = safe_velocity.z

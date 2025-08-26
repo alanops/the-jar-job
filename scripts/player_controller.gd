@@ -3,11 +3,13 @@ extends CharacterBody3D
 class_name PlayerController
 
 const WALK_SPEED := 5.0
+const RUN_SPEED := 8.0
 const CROUCH_SPEED := 2.0
 const CROUCH_HEIGHT := 0.9
 const NORMAL_HEIGHT := 1.8
 
 @export var noise_radius_walk: float = 5.0
+@export var noise_radius_run: float = 8.0
 @export var noise_radius_crouch: float = 2.0
 
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
@@ -16,6 +18,7 @@ const NORMAL_HEIGHT := 1.8
 @onready var footstep_timer: Timer = $FootstepTimer
 
 var is_crouching: bool = false
+var is_running: bool = false
 var current_speed: float = WALK_SPEED
 var current_noise_radius: float = noise_radius_walk
 var interactable_object: Node3D = null
@@ -62,6 +65,15 @@ func _physics_process(delta: float) -> void:
 	else:
 		if is_crouching:
 			_stop_crouch()
+	
+	# Handle running (only when not crouching)
+	if not is_crouching:
+		if Input.is_action_pressed("run"):
+			if not is_running:
+				_start_running()
+		else:
+			if is_running:
+				_stop_running()
 	
 	# Get input direction - simple top-down controls
 	var direction := Vector3()
@@ -118,10 +130,25 @@ func _start_crouch() -> void:
 
 func _stop_crouch() -> void:
 	is_crouching = false
+	is_running = false  # Stop running when starting to crouch
 	current_speed = WALK_SPEED
 	current_noise_radius = noise_radius_walk
 	footstep_timer.wait_time = 0.5
 	_update_crouch_state()
+
+func _start_running() -> void:
+	if is_crouching:
+		return  # Can't run while crouching
+	is_running = true
+	current_speed = RUN_SPEED
+	current_noise_radius = noise_radius_run
+	footstep_timer.wait_time = 0.3  # Faster footsteps when running
+
+func _stop_running() -> void:
+	is_running = false
+	current_speed = WALK_SPEED
+	current_noise_radius = noise_radius_walk  
+	footstep_timer.wait_time = 0.5
 
 func _update_crouch_state() -> void:
 	var shape: CapsuleShape3D = collision_shape.shape as CapsuleShape3D

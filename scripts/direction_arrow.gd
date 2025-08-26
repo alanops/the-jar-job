@@ -21,19 +21,19 @@ func _create_arrow_mesh() -> void:
 	var colors := PackedColorArray()
 	var indices := PackedInt32Array()
 	
-	# Arrow pointing forward (positive Z direction)
+	# Arrow pointing forward (positive Z direction to match movement)
 	var shaft_end := arrow_length - head_length
 	
 	# Shaft vertices (rectangular prism)
 	var half_shaft := shaft_width * 0.5
 	
-	# Bottom face of shaft
+	# Bottom face of shaft (at origin)
 	vertices.append(Vector3(-half_shaft, -half_shaft, 0))  # 0
 	vertices.append(Vector3(half_shaft, -half_shaft, 0))   # 1
 	vertices.append(Vector3(half_shaft, half_shaft, 0))    # 2
 	vertices.append(Vector3(-half_shaft, half_shaft, 0))   # 3
 	
-	# Top face of shaft
+	# Top face of shaft (towards positive Z)
 	vertices.append(Vector3(-half_shaft, -half_shaft, shaft_end))  # 4
 	vertices.append(Vector3(half_shaft, -half_shaft, shaft_end))   # 5
 	vertices.append(Vector3(half_shaft, half_shaft, shaft_end))    # 6
@@ -46,7 +46,7 @@ func _create_arrow_mesh() -> void:
 	vertices.append(Vector3(half_head, half_head, shaft_end))      # 10
 	vertices.append(Vector3(-half_head, half_head, shaft_end))     # 11
 	
-	# Arrow tip
+	# Arrow tip (pointing forward in positive Z)
 	vertices.append(Vector3(0, 0, arrow_length))  # 12
 	
 	# Add normals and colors for all vertices
