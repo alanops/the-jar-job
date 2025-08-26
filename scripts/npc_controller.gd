@@ -228,13 +228,7 @@ func _handle_investigate_state(delta: float) -> void:
 		# Rotate while investigating
 		rotation.y += turn_speed * 0.5 * delta
 		
-		# Update direction arrow to match rotation
-		if direction_arrow:
-			direction_arrow.rotation.y = rotation.y
-		
-		# Update flashlight to match rotation
-		if flashlight:
-			flashlight.rotation.y = rotation.y
+		# Direction arrow and flashlight rotate with parent automatically
 		
 		velocity.x = 0
 		velocity.z = 0
@@ -396,13 +390,7 @@ func _rotate_towards_direction(direction: Vector3, delta: float) -> void:
 	var target_rotation := atan2(direction.x, direction.z)
 	rotation.y = lerp_angle(rotation.y, target_rotation, turn_speed * delta)
 	
-	# Update direction arrow to match NPC rotation
-	if direction_arrow:
-		direction_arrow.rotation.y = rotation.y
-	
-	# Update flashlight to match NPC rotation
-	if flashlight:
-		flashlight.rotation.y = rotation.y
+	# Direction arrow and flashlight rotate with parent automatically
 
 func _on_state_timer_timeout() -> void:
 	match current_state:
@@ -549,13 +537,7 @@ func _handle_suspicious_state(delta: float) -> void:
 	# Slowly turn around looking for the player
 	rotation.y += turn_speed * 0.3 * delta
 	
-	# Update direction arrow to match rotation
-	if direction_arrow:
-		direction_arrow.rotation.y = rotation.y
-	
-	# Update flashlight to match rotation
-	if flashlight:
-		flashlight.rotation.y = rotation.y
+	# Direction arrow and flashlight rotate with parent automatically
 
 func _handle_search_state(delta: float) -> void:
 	if search_positions.is_empty():

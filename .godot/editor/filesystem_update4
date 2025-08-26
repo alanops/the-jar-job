@@ -27,3 +27,4 @@ res://scripts/advanced_performance_monitor.gd
 res://scripts/npc_controller.gd
 res://scripts/vision_cone.gd
 res://scripts/isometric_camera.gd
+res://scripts/direction_arrow.gd
