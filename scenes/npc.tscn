@@ -86,12 +86,12 @@ font_size = 24
 
 [node name="Flashlight" type="SpotLight3D" parent="."]
 transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, 0, 1.6, 0)
-light_energy = 2.0
+light_energy = 2.5
 light_indirect_energy = 0.5
 shadow_enabled = true
-shadow_bias = 0.001
-shadow_normal_bias = 0.1
-shadow_blur = 2.0
+shadow_bias = 0.0005
+shadow_normal_bias = 0.05
+shadow_blur = 1.5
 spot_range = 15.0
 spot_attenuation = 2.0
 spot_angle = 25.0
