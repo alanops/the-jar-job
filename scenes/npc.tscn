@@ -26,8 +26,6 @@ shading_mode = 0
 albedo_color = Color(1, 1, 0.8, 0.08)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_1"]
-top_radius = 0.0
-bottom_radius = 2.5
 height = 10.0
 
 [node name="NPC" type="CharacterBody3D" groups=["npc"]]
@@ -59,17 +57,17 @@ collision_mask = 2
 script = ExtResource("2_vision")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="VisionCone"]
-transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, -5)
+transform = Transform3D(1, 0, 0, 0, -0.707107, 0.707107, 0, -0.707107, -0.707107, 0, 0, 5)
 mesh = SubResource("CylinderMesh_1")
 surface_material_override/0 = SubResource("StandardMaterial3D_2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="VisionCone"]
-transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, -5)
+transform = Transform3D(1, 0, 0, 0, -0.707107, 0.707107, 0, -0.707107, -0.707107, 0, 0, 5)
 shape = SubResource("CylinderShape3D_1")
 
 [node name="RayCast3D" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
-target_position = Vector3(0, 0, -5)
+target_position = Vector3(0, 0, 5)
 collision_mask = 3
 
 [node name="StateTimer" type="Timer" parent="."]
@@ -82,7 +80,7 @@ text = "PATROL"
 font_size = 24
 
 [node name="Flashlight" type="SpotLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0.2)
 light_energy = 2.0
 light_indirect_energy = 0.5
 spot_range = 15.0

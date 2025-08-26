@@ -14,12 +14,12 @@ func is_target_in_cone(target_position: Vector3) -> bool:
 	if distance > cone_range:
 		return false
 	
-	# Check if target is in front of the NPC (negative Z in local space)
-	if local_target.z >= 0:
+	# Check if target is in front of the NPC (positive Z in local space)
+	if local_target.z <= 0:
 		return false
 	
-	# Calculate angle from forward direction (-Z axis in local space)
-	var forward := Vector3(0, 0, -1)
+	# Calculate angle from forward direction (+Z axis in local space)
+	var forward := Vector3(0, 0, 1)
 	var to_target := local_target.normalized()
 	var angle := rad_to_deg(forward.angle_to(to_target))
 	
