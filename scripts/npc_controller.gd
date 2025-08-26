@@ -43,6 +43,7 @@ enum NPCState {
 @onready var state_timer: Timer = $StateTimer
 @onready var raycast: RayCast3D = $RayCast3D
 @onready var state_label: Label3D = $StateLabel
+@onready var flashlight: SpotLight3D = $Flashlight
 
 # State Management
 var current_state: NPCState = NPCState.PATROL
@@ -231,6 +232,10 @@ func _handle_investigate_state(delta: float) -> void:
 		if direction_arrow:
 			direction_arrow.rotation.y = rotation.y
 		
+		# Update flashlight to match rotation
+		if flashlight:
+			flashlight.rotation.y = rotation.y
+		
 		velocity.x = 0
 		velocity.z = 0
 		return
@@ -387,6 +392,10 @@ func _rotate_towards_direction(direction: Vector3, delta: float) -> void:
 	# Update direction arrow to match NPC rotation
 	if direction_arrow:
 		direction_arrow.rotation.y = rotation.y
+	
+	# Update flashlight to match NPC rotation
+	if flashlight:
+		flashlight.rotation.y = rotation.y
 
 func _on_state_timer_timeout() -> void:
 	match current_state:
@@ -536,6 +545,10 @@ func _handle_suspicious_state(delta: float) -> void:
 	# Update direction arrow to match rotation
 	if direction_arrow:
 		direction_arrow.rotation.y = rotation.y
+	
+	# Update flashlight to match rotation
+	if flashlight:
+		flashlight.rotation.y = rotation.y
 
 func _handle_search_state(delta: float) -> void:
 	if search_positions.is_empty():
