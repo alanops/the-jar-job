@@ -1,22 +1,22 @@
-[gd_scene load_steps=25 format=3 uid="uid://cnsavghfx5m54"]
+[gd_scene load_steps=25 format=3 uid="uid://dt7j36640iukt"]
 
 [ext_resource type="Script" uid="uid://dx38cl2wfggri" path="res://scripts/game.gd" id="1_game"]
 [ext_resource type="PackedScene" uid="uid://bxklf5nvt8qh0" path="res://environment/simple_floor.tscn" id="2_simple_floor"]
 [ext_resource type="PackedScene" uid="uid://dpq1kvj7fn4hd" path="res://environment/wall.tscn" id="3_wall"]
-[ext_resource type="PackedScene" path="res://environment/cubicle_wall.tscn" id="4_cubicle"]
-[ext_resource type="PackedScene" path="res://environment/office_desk.tscn" id="5_desk"]
-[ext_resource type="PackedScene" path="res://environment/office_chair.tscn" id="6_chair"]
-[ext_resource type="PackedScene" path="res://environment/kitchen_counter.tscn" id="7_counter"]
+[ext_resource type="PackedScene" uid="uid://bn4hh6gpgq8mi" path="res://environment/cubicle_wall.tscn" id="4_cubicle"]
+[ext_resource type="PackedScene" uid="uid://b7gqm3t1xkr5j" path="res://environment/office_desk.tscn" id="5_desk"]
+[ext_resource type="PackedScene" uid="uid://b8nmhsv3cygkq" path="res://environment/office_chair.tscn" id="6_chair"]
+[ext_resource type="PackedScene" uid="uid://dxk1m5oqswbgw" path="res://environment/kitchen_counter.tscn" id="7_counter"]
 [ext_resource type="PackedScene" uid="uid://bvnx4jpyxvhqo" path="res://scenes/player.tscn" id="8_player"]
 [ext_resource type="Script" uid="uid://x0bnonghuli0" path="res://scripts/isometric_camera.gd" id="9_camera"]
 [ext_resource type="PackedScene" uid="uid://cevuj3wqn8kxp" path="res://scenes/npc.tscn" id="10_npc"]
 [ext_resource type="PackedScene" uid="uid://cx6yb7xqiqy8d" path="res://objects/biscuit_jar.tscn" id="11_jar"]
 [ext_resource type="PackedScene" uid="uid://bxphv8gxrykwj" path="res://ui/game_ui.tscn" id="12_ui"]
+[ext_resource type="PackedScene" uid="uid://bndnajx3hqgl5" path="res://environment/invisible_wall.tscn" id="13_invisible"]
 [ext_resource type="PackedScene" uid="uid://cxvh4pqv3n8fb" path="res://ui/performance_monitor.tscn" id="13_performance"]
-[ext_resource type="PackedScene" path="res://environment/invisible_wall.tscn" id="13_invisible"]
-[ext_resource type="PackedScene" path="res://environment/object_label.tscn" id="14_label"]
-[ext_resource type="PackedScene" path="res://environment/computer_monitor.tscn" id="15_monitor"]
-[ext_resource type="PackedScene" path="res://environment/filing_cabinet.tscn" id="16_cabinet"]
+[ext_resource type="PackedScene" uid="uid://clhx8v4d3qy2r" path="res://environment/object_label.tscn" id="14_label"]
+[ext_resource type="PackedScene" uid="uid://dp48qmwjqb6n5" path="res://environment/computer_monitor.tscn" id="15_monitor"]
+[ext_resource type="PackedScene" uid="uid://bxlp8v0jn6q4t" path="res://environment/filing_cabinet.tscn" id="16_cabinet"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.9, 0.9, 0.95, 1)
@@ -59,7 +59,6 @@ environment = SubResource("Environment_1")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, 0.5, -0.5, 0, 0, 0)
 light_energy = 0.4
-shadow_enabled = false
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
 navigation_mesh = SubResource("NavigationMesh_1")

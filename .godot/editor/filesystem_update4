@@ -16,12 +16,9 @@ res://environment/wall_optimized.tscn
 res://scenes/npc.tscn
 res://objects/biscuit_jar.tscn
 res://scenes/player.tscn
-res://scripts/objective_manager.gd
-res://scripts/game.gd
-res://scripts/objectives_panel.gd
 res://environment/elevator.tscn
-res://scripts/player_controller.gd
 res://scenes/game.tscn
-res://scripts/elevator_controller.gd
-res://scripts/minimap.gd
-res://scripts/waypoint_indicator.gd
+res://scenes/game_original.tscn
+res://scenes/game_current_backup.tscn
+res://scenes/game_backup.tscn
+res://scripts/game.gd
