@@ -126,6 +126,10 @@ func _ready() -> void:
 		vision_cone.body_entered.connect(_on_vision_cone_body_entered)
 		vision_cone.body_exited.connect(_on_vision_cone_body_exited)
 	
+	# Connect navigation agent avoidance callback
+	if navigation_agent:
+		navigation_agent.velocity_computed.connect(_on_velocity_computed)
+	
 	# Find performance monitor
 	var game_node = get_tree().get_first_node_in_group("game")
 	if game_node and game_node.has_method("get") and game_node.advanced_performance_monitor:
@@ -211,9 +215,9 @@ func _handle_patrol_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	# Move towards waypoint
-	velocity.x = direction.x * patrol_speed
-	velocity.z = direction.z * patrol_speed
+	# Move towards waypoint with avoidance
+	var desired_velocity = Vector3(direction.x * patrol_speed, 0, direction.z * patrol_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	# Rotate to face movement direction
 	if direction.length() > 0.1:
@@ -238,8 +242,8 @@ func _handle_investigate_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	velocity.x = direction.x * patrol_speed
-	velocity.z = direction.z * patrol_speed
+	var desired_velocity = Vector3(direction.x * patrol_speed, 0, direction.z * patrol_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
@@ -261,8 +265,8 @@ func _handle_chase_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	velocity.x = direction.x * chase_speed
-	velocity.z = direction.z * chase_speed
+	var desired_velocity = Vector3(direction.x * chase_speed, 0, direction.z * chase_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
@@ -278,8 +282,8 @@ func _handle_return_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	velocity.x = direction.x * patrol_speed
-	velocity.z = direction.z * patrol_speed
+	var desired_velocity = Vector3(direction.x * patrol_speed, 0, direction.z * patrol_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
@@ -385,6 +389,16 @@ func _set_next_patrol_target() -> void:
 	current_waypoint_index = (current_waypoint_index + 1) % patrol_waypoints.size()
 	navigation_agent.target_position = patrol_waypoints[current_waypoint_index].global_position
 	patrol_point_changed.emit(current_waypoint_index)
+
+func _move_with_avoidance(desired_velocity: Vector3) -> void:
+	# Set the desired velocity for avoidance
+	navigation_agent.set_velocity(desired_velocity)
+	
+	# The actual velocity will be set by the avoidance callback
+	# If avoidance is disabled or no obstacles, use desired velocity
+	if not navigation_agent.avoidance_enabled:
+		velocity.x = desired_velocity.x
+		velocity.z = desired_velocity.z
 
 func _rotate_towards_direction(direction: Vector3, delta: float) -> void:
 	var target_rotation := atan2(direction.x, direction.z)
@@ -559,8 +573,8 @@ func _handle_search_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	velocity.x = direction.x * search_speed
-	velocity.z = direction.z * search_speed
+	var desired_velocity = Vector3(direction.x * search_speed, 0, direction.z * search_speed)
+	_move_with_avoidance(desired_velocity)
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
@@ -577,3 +591,8 @@ func _on_vision_cone_body_exited(body: Node3D) -> void:
 	if body.is_in_group("player"):
 		print("Player exited vision cone area")
 		player_in_area = false
+
+func _on_velocity_computed(safe_velocity: Vector3) -> void:
+	# This callback receives the collision-free velocity from NavigationAgent3D
+	velocity.x = safe_velocity.x
+	velocity.z = safe_velocity.z
