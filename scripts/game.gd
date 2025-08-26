@@ -52,10 +52,7 @@ func _ready() -> void:
 		security_guard2.connect("player_spotted", _on_player_spotted)
 		security_guard2.connect("detection_progress_changed", _on_detection_progress_changed)
 	
-	# Initialize objectives
-	if biscuit_jar and exit_elevator:
-		ObjectiveManager.add_objective("Find the biscuit jar", biscuit_jar.global_position)
-		ObjectiveManager.add_objective("Escape through the lift", exit_elevator.global_position)
+	# Objectives are automatically initialized by ObjectiveManager
 	
 	# Connect timer for game start
 	$GameStart/Timer.timeout.connect(_on_game_start_timer_timeout)
