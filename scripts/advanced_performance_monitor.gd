@@ -159,14 +159,13 @@ func _update_cpu_list() -> void:
 		return
 		
 	cpu_list.clear()
-	# Use Godot's built-in performance monitoring
-	var cpu_time = Performance.get_monitor(Performance.TIME_PROCESS)
+	# Use Godot's built-in performance monitoring with correct constants
+	var process_time = Performance.get_monitor(Performance.TIME_PROCESS)
 	var physics_time = Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)
-	var render_time = Performance.get_monitor(Performance.TIME_RENDER)
 	
-	cpu_list.add_item("Process: %.2fms" % (cpu_time * 1000))
+	cpu_list.add_item("Process: %.2fms" % (process_time * 1000))
 	cpu_list.add_item("Physics: %.2fms" % (physics_time * 1000))
-	cpu_list.add_item("Render: %.2fms" % (render_time * 1000))
+	cpu_list.add_item("FPS: %.1f" % Engine.get_frames_per_second())
 
 func _update_summary() -> void:
 	if not summary_label:
