@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bt585qnsv7v8" path="res://scripts/npc_controller.gd" id="1_8qxkr"]
 [ext_resource type="Script" uid="uid://c6b0ku4en0d66" path="res://scripts/vision_cone.gd" id="2_vision"]
 [ext_resource type="Script" uid="uid://fa7ueo3q0ur3" path="res://scripts/direction_arrow.gd" id="3_arrow"]
-[ext_resource type="Script" path="res://scripts/vision_debug.gd" id="4_debug"]
+[ext_resource type="Script" uid="uid://cxv2ekoln4cbb" path="res://scripts/vision_debug.gd" id="4_debug"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
 height = 1.8
@@ -27,8 +27,6 @@ shading_mode = 0
 albedo_color = Color(1, 1, 0.8, 0.08)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_1"]
-top_radius = 0.0
-bottom_radius = 3.35
 height = 15.0
 
 [node name="NPC" type="CharacterBody3D" groups=["npc"]]
@@ -89,13 +87,15 @@ font_size = 24
 transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, 0, 1.6, 0)
 light_energy = 2.0
 light_indirect_energy = 0.5
+shadow_enabled = true
+shadow_bias = 0.01
+shadow_normal_bias = 1.0
+shadow_filter = 1
+shadow_blur = 1.0
 spot_range = 15.0
 spot_attenuation = 2.0
 spot_angle = 25.0
 spot_angle_attenuation = 2.0
-shadow_enabled = true
-shadow_bias = 0.1
-shadow_normal_bias = 2.0
 
 [node name="VisionDebug" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
