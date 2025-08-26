@@ -80,7 +80,7 @@ text = "PATROL"
 font_size = 24
 
 [node name="Flashlight" type="SpotLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0.2)
+transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, 0, 1.6, 0)
 light_energy = 2.0
 light_indirect_energy = 0.5
 spot_range = 15.0
