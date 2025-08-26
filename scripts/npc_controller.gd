@@ -411,7 +411,7 @@ func _is_player_in_flashlight() -> bool:
 		return true  # Always detect if very close
 	
 	# Check if player is within flashlight cone angle (more generous)
-	var angle_to_player = rad_to_deg(npc_forward.angle_to(to_player.normalized()))
+	var angle_to_player: float = rad_to_deg(npc_forward.angle_to(to_player.normalized()))
 	if angle_to_player > flashlight.spot_angle * 0.6:  # 60% of cone angle instead of 50%
 		return false
 	
