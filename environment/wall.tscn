@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://dpq1kvj7fn4hd"]
 
-[ext_resource type="Script" uid="uid://dff1h67qiw0bf" path="res://scripts/fadeable_wall.gd" id="1_4xqwe"]
+[ext_resource type="Script" path="res://scripts/fadeable_wall.gd" id="1_4xqwe"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_2"]
 size = Vector3(4.1, 3.1, 0.25)
