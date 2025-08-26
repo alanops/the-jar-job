@@ -73,11 +73,11 @@ var is_investigating: bool = false
 # Memory & Navigation
 var home_position: Vector3
 var detection_time: float = 0.0
-var detection_threshold: float = 1.0
+var detection_threshold: float = 0.5  # Faster detection (was 1.0)
 
 # Performance optimization
 var vision_check_timer: float = 0.0
-var vision_check_interval: float = 0.1  # Check vision every 0.1 seconds
+var vision_check_interval: float = 0.05  # Check vision every 0.05 seconds (more responsive)
 var distance_to_player: float = 0.0
 
 # Proximity detection
@@ -347,18 +347,21 @@ func _is_player_in_flashlight() -> bool:
 	if distance < 0.5:
 		return true  # Always detect if very close
 	
-	# Check if player is within flashlight cone angle
+	# Check if player is within flashlight cone angle (more generous)
 	var angle_to_player = rad_to_deg(npc_forward.angle_to(to_player.normalized()))
-	if angle_to_player > flashlight.spot_angle * 0.5:
+	if angle_to_player > flashlight.spot_angle * 0.6:  # 60% of cone angle instead of 50%
 		return false
 	
-	# Perform multiple raycasts to different parts of the player to simulate light coverage
+	# Perform multiple raycasts to different parts of the player - more coverage points
 	var hit_points = [
 		player_pos,  # Center
-		player_pos + Vector3(0.3, 0, 0),     # Right
-		player_pos + Vector3(-0.3, 0, 0),    # Left  
-		player_pos + Vector3(0, 0.5, 0),     # Top
-		player_pos + Vector3(0, -0.5, 0),    # Bottom
+		player_pos + Vector3(0.4, 0, 0),     # Right
+		player_pos + Vector3(-0.4, 0, 0),    # Left  
+		player_pos + Vector3(0, 0.8, 0),     # Top (head)
+		player_pos + Vector3(0, -0.8, 0),    # Bottom (feet)
+		player_pos + Vector3(0.3, 0.3, 0),   # Top-right
+		player_pos + Vector3(-0.3, 0.3, 0),  # Top-left
+		player_pos + Vector3(0, 0.3, 0),     # Mid-height
 	]
 	
 	var hits = 0
@@ -368,14 +371,14 @@ func _is_player_in_flashlight() -> bool:
 	
 	# Visualize detection rays if vision_debug exists
 	if vision_debug and vision_debug.has_method("show_detection_rays"):
-		vision_debug.show_detection_rays(flashlight_pos, hit_points, hits >= 2)
+		vision_debug.show_detection_rays(flashlight_pos, hit_points, hits >= 1)
 	
 	# Debug output to help troubleshoot
-	if distance < 3.0:  # Only debug close encounters
+	if distance < 5.0:  # Expanded debug range
 		print("Debug - Distance: ", distance, " Angle: ", angle_to_player, " Hits: ", hits, "/", hit_points.size())
 	
-	# Player is detected if at least 2 out of 5 rays hit (40% coverage)
-	return hits >= 2
+	# Player is detected if at least 1 out of 8 rays hit (much more generous)
+	return hits >= 1
 
 func _raycast_to_point(from: Vector3, to: Vector3) -> bool:
 	var space_state = get_world_3d().direct_space_state
@@ -603,15 +606,15 @@ func _generate_search_positions() -> void:
 		search_positions.append(base_pos + offset)
 
 func _get_vision_check_interval() -> float:
-	# LOD system: check vision less frequently when player is far away
+	# More aggressive LOD system for better detection
 	if distance_to_player > 15.0:
-		return 0.5  # Very far - check every 0.5 seconds
+		return 0.2  # Very far - check every 0.2 seconds (was 0.5)
 	elif distance_to_player > 10.0:
-		return 0.25  # Far - check every 0.25 seconds
+		return 0.1  # Far - check every 0.1 seconds (was 0.25)
 	elif distance_to_player > 5.0:
-		return 0.1  # Medium - check every 0.1 seconds
+		return 0.05  # Medium - check every 0.05 seconds (was 0.1)
 	else:
-		return 0.05  # Close - check every 0.05 seconds
+		return 0.02  # Close - check every 0.02 seconds (was 0.05)
 
 # New State Handlers
 func _handle_suspicious_state(delta: float) -> void:
