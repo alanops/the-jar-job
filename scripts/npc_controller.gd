@@ -585,9 +585,13 @@ func _handle_search_state(delta: float) -> void:
 
 # Vision cone signal handlers
 func _on_vision_cone_body_entered(body: Node3D) -> void:
+	print("Vision cone body entered: ", body.name, " Groups: ", body.get_groups())
 	if body.is_in_group("player"):
+		print("Player entered vision cone area")
 		player_in_area = true
 
 func _on_vision_cone_body_exited(body: Node3D) -> void:
+	print("Vision cone body exited: ", body.name, " Groups: ", body.get_groups()) 
 	if body.is_in_group("player"):
+		print("Player exited vision cone area")
 		player_in_area = false
