@@ -323,8 +323,9 @@ func _check_vision_cone() -> void:
 		_reset_detection()
 
 func _reset_detection() -> void:
-	detection_time = 0.0
-	detection_progress_changed.emit(0.0)
+	if detection_time > 0.0:
+		detection_time = 0.0
+		detection_progress_changed.emit(0.0)
 
 func _has_line_of_sight_to_player() -> bool:
 	if not player_reference or not raycast:
