@@ -7,7 +7,7 @@ extends Node3D
 @onready var patrol_waypoints: Node3D = $PatrolWaypoints
 @onready var patrol_waypoints2: Node3D = $PatrolWaypoints2
 @onready var biscuit_jar: StaticBody3D = $BiscuitJar
-@onready var exit_elevator: Area3D = $ExitElevator
+@onready var exit_elevator: StaticBody3D = $ExitElevator
 @onready var game_ui: Control = $GameUI
 @onready var performance_monitor: PerformanceMonitor = $PerformanceMonitor
 
