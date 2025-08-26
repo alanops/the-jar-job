@@ -76,3 +76,35 @@ func update_parameters(angle: float, range_val: float):
 	cone_range = range_val
 	if show_debug_rays:
 		_create_debug_rays()
+
+var detection_rays: Array[MeshInstance3D] = []
+
+func show_detection_rays(from_pos: Vector3, target_points: Array, is_detecting: bool):
+	# Clear existing detection rays
+	for ray in detection_rays:
+		if ray:
+			ray.queue_free()
+	detection_rays.clear()
+	
+	# Create material based on detection state
+	var material = StandardMaterial3D.new()
+	if is_detecting:
+		material.albedo_color = Color(1, 0, 0, 0.8)  # Red when detecting
+	else:
+		material.albedo_color = Color(0, 1, 0, 0.5)  # Green when not detecting
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.vertex_color_use_as_albedo = true
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	
+	# Create lines for each detection ray
+	for target in target_points:
+		var local_from = to_local(from_pos)
+		var local_to = to_local(target)
+		
+		var line_mesh = _create_line_mesh(local_from, local_to)
+		var ray_instance = MeshInstance3D.new()
+		ray_instance.mesh = line_mesh
+		ray_instance.material_override = material
+		
+		add_child(ray_instance)
+		detection_rays.append(ray_instance)

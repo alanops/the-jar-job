@@ -44,6 +44,7 @@ enum NPCState {
 @onready var raycast: RayCast3D = $RayCast3D
 @onready var state_label: Label3D = $StateLabel
 @onready var flashlight: SpotLight3D = $Flashlight
+@onready var vision_debug: Node3D = $VisionDebug
 
 # State Management
 var current_state: NPCState = NPCState.PATROL
@@ -364,6 +365,10 @@ func _is_player_in_flashlight() -> bool:
 	for point in hit_points:
 		if _raycast_to_point(flashlight_pos, point):
 			hits += 1
+	
+	# Visualize detection rays if vision_debug exists
+	if vision_debug and vision_debug.has_method("show_detection_rays"):
+		vision_debug.show_detection_rays(flashlight_pos, hit_points, hits >= 2)
 	
 	# Debug output to help troubleshoot
 	if distance < 3.0:  # Only debug close encounters
