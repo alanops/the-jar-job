@@ -148,8 +148,10 @@ func _apply_settings() -> void:
 	
 	# Apply shadow quality
 	var shadow_sizes := [1024, 2048, 4096]
-	var shadow_size := shadow_sizes[int(shadow_quality_slider.value)]
-	RenderingServer.directional_shadow_atlas_set_size(shadow_size, true)
+	if shadow_quality_slider:
+		var shadow_index := clampi(int(shadow_quality_slider.value), 0, shadow_sizes.size() - 1)
+		var shadow_size: int = shadow_sizes[shadow_index]
+		RenderingServer.directional_shadow_atlas_set_size(shadow_size, true)
 	
 	# Apply MSAA
 	var viewport := get_viewport()
