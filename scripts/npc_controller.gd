@@ -724,7 +724,7 @@ func _generate_search_positions() -> void:
 			num_positions = 6
 		
 		for i in range(num_positions):
-			var angle := (i * PI * 2.0 / num_positions) + randf() * PI * 0.25
+			var angle: float = (i * PI * 2.0 / num_positions) + randf() * PI * 0.25
 			var offset := Vector3(cos(angle), 0, sin(angle)) * (search_radius * (0.5 + randf() * 0.5))
 			search_positions.append(base_pos + offset)
 
