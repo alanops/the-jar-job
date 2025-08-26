@@ -26,12 +26,12 @@ func _create_debug_rays():
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	
 	# Calculate half angle in radians
-	var half_angle_rad = deg_to_rad(cone_angle * 0.5)
+	var half_angle_rad: float = deg_to_rad(cone_angle * 0.5)
 	
 	# Create rays at different angles
 	for i in range(num_rays):
-		var angle_ratio = float(i) / float(num_rays - 1) if num_rays > 1 else 0.0
-		var current_angle = -half_angle_rad + (angle_ratio * half_angle_rad * 2.0)
+		var angle_ratio: float = float(i) / float(num_rays - 1) if num_rays > 1 else 0.0
+		var current_angle: float = -half_angle_rad + (angle_ratio * half_angle_rad * 2.0)
 		
 		# Create ray direction (rotate around Y axis)
 		var direction = Vector3(sin(current_angle), 0, cos(current_angle))
