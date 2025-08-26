@@ -1,0 +1,121 @@
+[gd_scene load_steps=8 format=3 uid="uid://bdxk5nvt8qh0m"]
+
+[ext_resource type="Script" path="res://scripts/minimap.gd" id="1_minimap"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_1"]
+viewport_path = NodePath("ViewportContainer/Viewport")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.1, 0.1, 0.1, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.3, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_1"]
+colors = PackedColorArray(0, 0, 0, 0.5, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_1"]
+gradient = SubResource("Gradient_1")
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+radial_center = Vector2(0.5, 0.5)
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 12
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Minimap" type="Control"]
+anchor_left = 0.85
+anchor_right = 1.0
+anchor_bottom = 0.25
+script = ExtResource("1_minimap")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_minimum_size = Vector2(200, 200)
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="ViewportContainer" type="ViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10
+margin_top = 10
+margin_right = -10
+margin_bottom = -10
+
+[node name="Viewport" type="SubViewport" parent="ViewportContainer"]
+size = Vector2i(180, 180)
+render_target_update_mode = 4
+
+[node name="MinimapCamera" type="Camera3D" parent="ViewportContainer/Viewport"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 30, 0)
+projection = 1
+size = 40.0
+far = 50.0
+
+[node name="MapOverlay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="PlayerIndicator" type="TextureRect" parent="MapOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+pivot_offset = Vector2(10, 10)
+texture = SubResource("GradientTexture2D_1")
+
+[node name="PlayerArrow" type="Label" parent="MapOverlay/PlayerIndicator"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -15.0
+offset_top = -15.0
+offset_right = 15.0
+offset_bottom = 15.0
+text = "▲"
+label_settings = SubResource("LabelSettings_1")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ObjectiveMarkers" type="Control" parent="MapOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Border" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2")
