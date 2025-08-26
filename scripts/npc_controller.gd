@@ -86,6 +86,30 @@ var distance_to_player: float = 0.0
 # Performance profiling
 var performance_monitor: AdvancedPerformanceMonitor
 
+# Communication System
+var communication_manager: NPCCommunicationManager
+var received_alerts: Array = []
+var shared_search_targets: Array[Vector3] = []
+var coordination_enabled: bool = true
+
+# Enhanced AI Properties
+@export var personality_alertness: float = 1.0  # 0.5 = lazy, 2.0 = very alert
+@export var personality_persistence: float = 1.0  # How long they search
+@export var communication_range: float = 15.0
+@export var help_call_threshold: float = 2.0  # Seconds before calling for help
+
+# Memory and Learning System
+var memory_system: NPCMemorySystem
+var learning_enabled: bool = true
+var last_player_route_position: Vector3 = Vector3.ZERO
+var route_tracking_timer: float = 0.0
+
+# Predictive AI System
+var predictive_ai: NPCPredictiveAI
+var use_predictive_movement: bool = true
+var predicted_player_position: Vector3 = Vector3.ZERO
+var prediction_confidence: float = 0.0
+
 # Signals
 signal player_spotted(npc: NPCController)
 signal player_caught(npc: NPCController)
@@ -104,6 +128,34 @@ func _ready() -> void:
 	
 	# Store home position
 	home_position = global_position
+	
+	# Find and register with communication manager
+	await get_tree().process_frame
+	communication_manager = get_tree().get_first_node_in_group("npc_communication_manager")
+	if communication_manager:
+		communication_manager.register_npc(self)
+	else:
+		print("Warning: No NPCCommunicationManager found for ", name)
+	
+	# Initialize memory system
+	if learning_enabled:
+		memory_system = NPCMemorySystem.new()
+		memory_system.name = name + "_Memory"
+		add_child(memory_system)
+		
+		# Connect memory system signals
+		memory_system.pattern_learned.connect(_on_pattern_learned)
+		memory_system.behavior_adapted.connect(_on_behavior_adapted)
+	
+	# Initialize predictive AI system
+	if use_predictive_movement:
+		predictive_ai = NPCPredictiveAI.new()
+		predictive_ai.name = name + "_PredictiveAI"
+		add_child(predictive_ai)
+		
+		# Connect predictive AI signals
+		predictive_ai.prediction_updated.connect(_on_prediction_updated)
+		predictive_ai.interception_route_calculated.connect(_on_interception_route_calculated)
 	
 	# Initialize state label
 	if state_label:
@@ -160,6 +212,7 @@ func _physics_process(delta: float) -> void:
 	# Update suspicion and player tracking
 	_update_suspicion_system(delta)
 	_update_player_tracking(delta)
+	_update_memory_system(delta)
 	if performance_monitor:
 		performance_monitor.profile_section_end("NPC_Suspicion")
 	
@@ -210,6 +263,9 @@ func _handle_idle_state(_delta: float) -> void:
 	velocity.z = 0
 
 func _handle_patrol_state(delta: float) -> void:
+	# Check if we should adapt patrol based on predictions
+	adapt_patrol_to_prediction()
+	
 	if navigation_agent.is_navigation_finished():
 		# Reached waypoint, wait then move to next
 		if state_timer.is_stopped():
@@ -220,8 +276,15 @@ func _handle_patrol_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
+	# Adjust patrol speed based on predictive confidence
+	var speed_multiplier = 1.0
+	if prediction_confidence > 0.7:
+		speed_multiplier = 1.3  # Move faster when we have high confidence prediction
+	elif prediction_confidence > 0.4:
+		speed_multiplier = 1.1  # Slightly faster with medium confidence
+	
 	# Move towards waypoint with avoidance
-	var desired_velocity = Vector3(direction.x * patrol_speed, 0, direction.z * patrol_speed)
+	var desired_velocity = Vector3(direction.x * patrol_speed * speed_multiplier, 0, direction.z * patrol_speed * speed_multiplier)
 	_move_with_avoidance(desired_velocity)
 	
 	# Rotate to face movement direction
@@ -401,6 +464,18 @@ func _raycast_to_point(from: Vector3, to: Vector3) -> bool:
 	return result.is_empty() or (result.has("collider") and result.collider == player_reference)
 
 func _on_player_spotted() -> void:
+	# Record sighting in memory system
+	if memory_system and learning_enabled:
+		memory_system.add_memory(NPCMemorySystem.MemoryType.PLAYER_SIGHTING, player_reference.global_position, {
+			"detection_duration": detection_time,
+			"distance": distance_to_player,
+			"npc_state": current_state
+		})
+	
+	# Alert other NPCs before changing state
+	if communication_manager:
+		communication_manager.raise_alert(NPCCommunicationManager.AlertLevel.HIGH, player_reference.global_position, self)
+	
 	current_state = NPCState.CHASE
 	state_timer.stop()
 	player_spotted.emit(self)
@@ -423,6 +498,11 @@ func _on_player_made_noise(noise_position: Vector3, noise_radius: float) -> void
 	var distance_to_noise := global_position.distance_to(noise_position)
 	
 	if distance_to_noise <= noise_radius:
+		# Share noise information with nearby NPCs
+		if communication_manager:
+			var alert_level = NPCCommunicationManager.AlertLevel.MEDIUM if noise_radius >= 7.0 else NPCCommunicationManager.AlertLevel.LOW
+			communication_manager.raise_alert(alert_level, noise_position, self)
+		
 		# If noise radius is large (player is running), chase directly
 		if noise_radius >= 7.0:  # Running noise threshold
 			current_state = NPCState.CHASE
@@ -597,13 +677,56 @@ func _on_state_entered(state: NPCState) -> void:
 
 func _generate_search_positions() -> void:
 	search_positions.clear()
-	var base_pos := last_known_player_position
-	var search_radius := 3.0
 	
-	for i in range(4):
-		var angle := (i * PI * 0.5) + randf() * PI * 0.25
-		var offset := Vector3(cos(angle), 0, sin(angle)) * search_radius
-		search_positions.append(base_pos + offset)
+	# Use memory system for intelligent search if available
+	var base_pos := last_known_player_position
+	if memory_system and learning_enabled:
+		var predicted_pos = memory_system.get_predicted_player_location()
+		if predicted_pos != Vector3.ZERO:
+			base_pos = predicted_pos
+		
+		# Add known hiding spots to search list
+		var hiding_spots = memory_system.get_pattern_data("effective_hiding_spots")
+		if hiding_spots.has("effective_hiding_spots"):
+			for spot in hiding_spots["effective_hiding_spots"]:
+				if base_pos.distance_to(spot.position) <= 10.0:  # Within reasonable distance
+					search_positions.append(spot.position)
+		
+		# Add common route positions
+		var routes = memory_system.get_pattern_data("common_routes")
+		if routes.has("common_routes"):
+			for route in routes["common_routes"]:
+				if base_pos.distance_to(route.center) <= 8.0:  # Near current search area
+					search_positions.append(route.center)
+	
+	# Use communication manager for coordinated search if available
+	if communication_manager and coordination_enabled:
+		var coordinated_pos = communication_manager.request_search_coordination(self)
+		if coordinated_pos != Vector3.ZERO:
+			search_positions.append(coordinated_pos)
+	
+	# Use shared information to improve search
+	if communication_manager:
+		var shared_positions = communication_manager.get_last_known_positions()
+		if not shared_positions.is_empty():
+			# Use most recent shared position if we don't have better intel
+			if search_positions.is_empty():
+				base_pos = communication_manager.get_most_likely_player_position()
+	
+	# Generate search positions around the base position if we don't have specific targets
+	if search_positions.is_empty():
+		var search_radius := 3.0 * personality_persistence
+		var num_positions = 4
+		
+		# More thorough search if memory suggests this area has hiding spots
+		if should_search_thoroughly_here(base_pos):
+			search_radius *= 1.5
+			num_positions = 6
+		
+		for i in range(num_positions):
+			var angle := (i * PI * 2.0 / num_positions) + randf() * PI * 0.25
+			var offset := Vector3(cos(angle), 0, sin(angle)) * (search_radius * (0.5 + randf() * 0.5))
+			search_positions.append(base_pos + offset)
 
 func _get_vision_check_interval() -> float:
 	# More aggressive LOD system for better detection
@@ -651,6 +774,281 @@ func _handle_search_state(delta: float) -> void:
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
+
+# ===================== COMMUNICATION SYSTEM =====================
+
+func receive_communication(message: Dictionary) -> void:
+	# Handle messages from other NPCs
+	match message.type:
+		"alert":
+			_handle_received_alert(message)
+		"request_help":
+			_handle_help_request(message)
+		"share_position":
+			_handle_shared_position(message)
+		"coordinate_search":
+			_handle_coordinate_search(message)
+
+func _handle_received_alert(message: Dictionary) -> void:
+	var alert_level = message.level
+	var alert_position = message.position
+	var distance_to_alert = global_position.distance_to(alert_position)
+	
+	# React based on alert level and distance
+	match alert_level:
+		NPCCommunicationManager.AlertLevel.HIGH:
+			# High alert - move to assist immediately
+			if current_state != NPCState.CHASE and distance_to_alert <= communication_range * 2:
+				_switch_to_investigate_state(alert_position)
+				suspicion_level = investigate_threshold * 0.8  # Boost suspicion
+		
+		NPCCommunicationManager.AlertLevel.MEDIUM:
+			# Medium alert - investigate if nearby
+			if current_state == NPCState.PATROL and distance_to_alert <= communication_range:
+				_switch_to_investigate_state(alert_position)
+		
+		NPCCommunicationManager.AlertLevel.LOW:
+			# Low alert - increase suspicion
+			if distance_to_alert <= communication_range * 0.5:
+				suspicion_level += suspicious_threshold * 0.3
+
+func _handle_help_request(message: Dictionary) -> void:
+	var help_position = message.position
+	var distance = global_position.distance_to(help_position)
+	
+	# Respond to help requests from nearby NPCs
+	if distance <= communication_range and current_state != NPCState.CHASE:
+		_switch_to_investigate_state(help_position)
+
+func _handle_shared_position(message: Dictionary) -> void:
+	# Update our knowledge with shared position information
+	var shared_pos = message.position
+	var confidence = message.get("confidence", 0.5)
+	
+	# Use shared information to improve our search
+	if current_state == NPCState.SEARCH or current_state == NPCState.INVESTIGATE:
+		last_known_player_position = shared_pos
+
+func _handle_coordinate_search(message: Dictionary) -> void:
+	# Coordinate search patterns with other NPCs
+	var search_area = message.get("search_area", Vector3.ZERO)
+	if search_area != Vector3.ZERO:
+		shared_search_targets.append(search_area)
+
+func receive_alert_cleared() -> void:
+	# React to alert being cleared
+	if current_state in [NPCState.INVESTIGATE, NPCState.SEARCH]:
+		# Gradually return to normal patrol
+		suspicion_level *= 0.5
+
+func call_for_backup() -> void:
+	# Call nearby NPCs for help
+	if communication_manager:
+		var nearby_npcs = communication_manager.get_nearby_npcs(global_position, communication_range)
+		for npc in nearby_npcs:
+			if npc != self and npc.has_method("receive_communication"):
+				var message = {
+					"type": "request_help",
+					"position": global_position,
+					"source": self,
+					"timestamp": Time.get_time_dict_from_system()["unix"]
+				}
+				npc.receive_communication(message)
+
+# ===================== MEMORY & LEARNING SYSTEM =====================
+
+func _update_memory_system(delta: float):
+	if not memory_system or not learning_enabled or not player_reference:
+		return
+	
+	# Track player routes
+	route_tracking_timer += delta
+	if route_tracking_timer >= 2.0:  # Sample player position every 2 seconds
+		route_tracking_timer = 0.0
+		var current_player_pos = player_reference.global_position
+		
+		# Only track if player moved significantly
+		if last_player_route_position.distance_to(current_player_pos) > 3.0:
+			# Check if we can see the player's route (indirect tracking)
+			var space_state = get_world_3d().direct_space_state
+			var query = PhysicsRayQueryParameters3D.create(global_position, current_player_pos)
+			query.collision_mask = 1  # Only walls
+			var result = space_state.intersect_ray(query)
+			
+			if result.is_empty():  # Clear line of sight to player area
+				memory_system.add_memory(NPCMemorySystem.MemoryType.PLAYER_ROUTE, current_player_pos, {
+					"timestamp": Time.get_time_dict_from_system()["unix"],
+					"frequency": 1
+				})
+			
+			last_player_route_position = current_player_pos
+	
+	# Apply behavioral adaptations
+	_apply_memory_based_adaptations()
+
+func _apply_memory_based_adaptations():
+	if not memory_system:
+		return
+	
+	# Adjust detection parameters based on learned behavior
+	var vision_multiplier = memory_system.get_behavioral_adjustment("vision_range_multiplier")
+	var suspicion_multiplier = memory_system.get_behavioral_adjustment("suspicion_sensitivity")
+	var search_multiplier = memory_system.get_behavioral_adjustment("search_thoroughness")
+	
+	# Apply vision range adjustment
+	if flashlight:
+		var base_range = 15.0
+		flashlight.spot_range = base_range * vision_multiplier
+	
+	# Apply suspicion sensitivity
+	suspicion_gain_rate = 25.0 * suspicion_multiplier
+	
+	# Apply search thoroughness
+	search_time = 5.0 * search_multiplier
+
+func _on_pattern_learned(pattern_type: String, pattern_data: Dictionary):
+	print("NPC ", name, " learned pattern: ", pattern_type, " - ", pattern_data)
+	
+	match pattern_type:
+		"common_route":
+			# Adapt patrol to cover common player routes
+			_adapt_patrol_for_route(pattern_data.center)
+		
+		"hiding_spot":
+			# Check hiding spots more thoroughly
+			memory_system.adapt_behavior("search_thoroughness", 0.3)
+		
+		"timing_pattern":
+			# Adjust alertness based on player activity times
+			var current_hour = Time.get_time_dict_from_system().hour
+			if current_hour == pattern_data.get("peak_hour", 12):
+				memory_system.adapt_behavior("suspicion_sensitivity", 0.2)
+
+func _on_behavior_adapted(adaptation_type: String, old_value: float, new_value: float):
+	print("NPC ", name, " adapted ", adaptation_type, " from ", old_value, " to ", new_value)
+	
+	# Update state label to show adaptation
+	if state_label and abs(new_value - 1.0) > 0.2:  # Show if significantly different from default
+		var adaptation_text = ""
+		match adaptation_type:
+			"vision_range_multiplier":
+				adaptation_text = " [Enhanced Vision]" if new_value > 1.2 else " [Reduced Vision]"
+			"suspicion_sensitivity":
+				adaptation_text = " [Paranoid]" if new_value > 1.5 else " [Relaxed]"
+			"search_thoroughness":
+				adaptation_text = " [Thorough]" if new_value > 1.3 else ""
+		
+		if adaptation_text != "":
+			state_label.text = _get_state_name(current_state) + adaptation_text
+
+func _adapt_patrol_for_route(route_position: Vector3):
+	# Add new patrol waypoint near common player route
+	if patrol_waypoints.size() > 0:
+		# Find closest existing waypoint
+		var closest_waypoint = patrol_waypoints[0]
+		var closest_distance = route_position.distance_to(closest_waypoint.global_position)
+		var closest_index = 0
+		
+		for i in range(1, patrol_waypoints.size()):
+			var distance = route_position.distance_to(patrol_waypoints[i].global_position)
+			if distance < closest_distance:
+				closest_distance = distance
+				closest_waypoint = patrol_waypoints[i]
+				closest_index = i
+		
+		# If route is far from existing waypoints, suggest adding a new one
+		if closest_distance > 8.0:
+			print("NPC ", name, " suggests adding waypoint near ", route_position, " to cover player route")
+
+func record_noise_event(noise_position: Vector3, noise_volume: float):
+	if memory_system and learning_enabled:
+		memory_system.add_memory(NPCMemorySystem.MemoryType.NOISE_EVENT, noise_position, {
+			"volume": noise_volume,
+			"timestamp": Time.get_time_dict_from_system()["unix"]
+		})
+
+func record_environmental_change(position: Vector3, change_type: String, player_caused: bool = false):
+	if memory_system and learning_enabled:
+		memory_system.add_memory(NPCMemorySystem.MemoryType.ENVIRONMENTAL_CHANGE, position, {
+			"change_type": change_type,
+			"player_caused": player_caused,
+			"timestamp": Time.get_time_dict_from_system()["unix"]
+		})
+
+func get_predicted_search_location() -> Vector3:
+	if memory_system and learning_enabled:
+		var predicted = memory_system.get_predicted_player_location()
+		if predicted != Vector3.ZERO:
+			return predicted
+	
+	# Fallback to last known position
+	return last_known_player_position
+
+func should_search_thoroughly_here(position: Vector3) -> bool:
+	if memory_system and learning_enabled:
+		return memory_system.should_check_area_more_thoroughly(position)
+	return false
+
+# ===================== PREDICTIVE AI INTEGRATION =====================
+
+func _on_prediction_updated(predicted_position: Vector3, confidence: float):
+	predicted_player_position = predicted_position
+	prediction_confidence = confidence
+	
+	# Update investigation target if we're actively searching
+	if current_state == NPCState.INVESTIGATE and confidence > 0.7:
+		# High confidence prediction - redirect investigation
+		navigation_agent.target_position = predicted_position
+		investigation_position = predicted_position
+
+func _on_interception_route_calculated(waypoints: Array[Vector3]):
+	# Use interception points for patrol adaptation
+	if current_state == NPCState.PATROL and waypoints.size() > 0:
+		var closest_interception = waypoints[0]
+		var closest_distance = global_position.distance_to(closest_interception)
+		
+		for waypoint in waypoints:
+			var distance = global_position.distance_to(waypoint)
+			if distance < closest_distance:
+				closest_distance = distance
+				closest_interception = waypoint
+		
+		# If interception point is reasonable distance, consider it
+		if closest_distance <= 10.0 and prediction_confidence > 0.6:
+			print("NPC ", name, " considering interception at ", closest_interception)
+
+func get_predictive_search_position() -> Vector3:
+	if predictive_ai and use_predictive_movement:
+		var prediction = predictive_ai.get_current_prediction()
+		if prediction != Vector3.ZERO and predictive_ai.get_prediction_confidence() > 0.5:
+			return prediction
+	return get_predicted_search_location()
+
+func use_predictive_patrolling() -> bool:
+	# Use predictive patrolling when confidence is high
+	return predictive_ai and prediction_confidence > 0.8
+
+func adapt_patrol_to_prediction():
+	if not use_predictive_patrolling():
+		return
+	
+	# Temporarily modify patrol target to intercept predicted player position
+	if predicted_player_position != Vector3.ZERO:
+		# Find if predicted position is near any patrol waypoint
+		var nearest_waypoint_index = -1
+		var nearest_distance = float("inf")
+		
+		for i in range(patrol_waypoints.size()):
+			var distance = patrol_waypoints[i].global_position.distance_to(predicted_player_position)
+			if distance < nearest_distance:
+				nearest_distance = distance
+				nearest_waypoint_index = i
+		
+		# If prediction is reasonably close to a waypoint, prioritize it
+		if nearest_distance < 8.0 and nearest_waypoint_index != current_waypoint_index:
+			current_waypoint_index = nearest_waypoint_index
+			navigation_agent.target_position = patrol_waypoints[current_waypoint_index].global_position
+			print("NPC ", name, " adapting patrol to intercept predicted player at waypoint ", nearest_waypoint_index)
 
 # Light-based detection - no need for area collision handlers
 

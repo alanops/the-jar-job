@@ -23,6 +23,7 @@ config/icon="res://icon.webp"
 
 GameManager="*res://scripts/game_manager.gd"
 ObjectiveManager="*res://scripts/objective_manager.gd"
+NPCCommunication="*res://scripts/npc_communication_manager.gd"
 
 [debug]
 
