@@ -30,6 +30,6 @@ func set_alert_mode(alert: bool) -> void:
 	if mesh_instance and mesh_instance.get_surface_override_material(0):
 		var material = mesh_instance.get_surface_override_material(0) as StandardMaterial3D
 		if alert:
-			material.albedo_color = Color(1, 0.5, 0, 0.25)  # Orange when alert
+			material.albedo_color = Color(1, 0.3, 0, 0.2)  # Orange when alert
 		else:
-			material.albedo_color = Color(1, 0, 0, 0.15)    # Red when normal
+			material.albedo_color = Color(1, 1, 0.8, 0.08)    # Warm white when normal
