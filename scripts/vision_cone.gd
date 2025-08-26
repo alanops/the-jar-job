@@ -1,8 +1,8 @@
 extends Area3D
 class_name VisionCone
 
-@export var cone_angle: float = 60.0  # Total cone angle in degrees
-@export var cone_range: float = 10.0  # Maximum detection range
+@export var cone_angle: float = 25.0  # Total cone angle in degrees (matches SpotLight3D)
+@export var cone_range: float = 15.0  # Maximum detection range (matches SpotLight3D)
 
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
 
