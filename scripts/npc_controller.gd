@@ -250,7 +250,7 @@ func _handle_investigate_state(delta: float) -> void:
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
 	
-	var desired_velocity = Vector3(direction.x * patrol_speed, 0, direction.z * patrol_speed)
+	var desired_velocity = Vector3(direction.x * investigate_speed, 0, direction.z * investigate_speed)
 	_move_with_avoidance(desired_velocity)
 	
 	if direction.length() > 0.1:
@@ -373,7 +373,12 @@ func _on_player_made_noise(noise_position: Vector3, noise_radius: float) -> void
 	var distance_to_noise := global_position.distance_to(noise_position)
 	
 	if distance_to_noise <= noise_radius:
-		_switch_to_investigate_state(noise_position)
+		# If noise radius is large (player is running), chase directly
+		if noise_radius >= 7.0:  # Running noise threshold
+			current_state = NPCState.CHASE
+			state_timer.stop()
+		else:
+			_switch_to_investigate_state(noise_position)
 
 func _switch_to_investigate_state(position: Vector3) -> void:
 	current_state = NPCState.INVESTIGATE
