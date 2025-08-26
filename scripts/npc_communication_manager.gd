@@ -104,7 +104,7 @@ func raise_alert(level: AlertLevel, position: Vector3, source: NPCController):
 		current_alert_level = level
 		alert_position = position
 		alert_source = source
-		alert_start_time = Time.get_time_dict_from_system()["unix"]
+		alert_start_time = Time.get_unix_time_from_system()
 		
 		print("NPCCommunicationManager: Alert raised to ", AlertLevel.keys()[level], " at ", position)
 		global_alert_raised.emit(level, position, source)
@@ -130,7 +130,7 @@ func clear_alert():
 func _update_alert_system(delta: float):
 	# Gradually reduce alert level over time
 	if current_alert_level > AlertLevel.NONE:
-		var time_since_alert = Time.get_time_dict_from_system()["unix"] - alert_start_time
+		var time_since_alert = Time.get_unix_time_from_system() - alert_start_time
 		
 		match current_alert_level:
 			AlertLevel.HIGH:
@@ -164,14 +164,14 @@ func _broadcast_alert_to_npcs(level: AlertLevel, position: Vector3, source: NPCC
 					"level": level,
 					"position": position,
 					"source": source,
-					"timestamp": Time.get_time_dict_from_system()["unix"]
+					"timestamp": Time.get_unix_time_from_system()
 				}
 				npc.receive_communication(message)
 
 # ===================== SHARED MEMORY SYSTEM =====================
 
 func _add_known_position(position: Vector3, confidence: float):
-	var timestamp = Time.get_time_dict_from_system()["unix"]
+	var timestamp = Time.get_unix_time_from_system()
 	var position_data = {
 		"position": position,
 		"timestamp": timestamp,
@@ -197,7 +197,7 @@ func get_most_likely_player_position() -> Vector3:
 		return Vector3.ZERO
 	
 	# Weight recent positions more heavily
-	var current_time = Time.get_time_dict_from_system()["unix"]
+	var current_time = Time.get_unix_time_from_system()
 	var weighted_position = Vector3.ZERO
 	var total_weight = 0.0
 	
@@ -240,7 +240,7 @@ func request_search_coordination(requesting_npc: NPCController) -> Vector3:
 		
 		# Check if this area was recently searched
 		var last_search_time = shared_memory.search_coverage.get(grid_key, 0.0)
-		var current_time = Time.get_time_dict_from_system()["unix"]
+		var current_time = Time.get_unix_time_from_system()
 		var time_since_search = current_time - last_search_time
 		
 		# Priority based on suspicion level and time since last search
@@ -257,7 +257,7 @@ func request_search_coordination(requesting_npc: NPCController) -> Vector3:
 	# Mark this area as being searched
 	if search_position != Vector3.ZERO:
 		var grid_key = str(int(search_position.x / 4.0)) + "," + str(int(search_position.z / 4.0))
-		shared_memory.search_coverage[grid_key] = Time.get_time_dict_from_system()["unix"]
+		shared_memory.search_coverage[grid_key] = Time.get_unix_time_from_system()
 	
 	return search_position
 
@@ -280,7 +280,7 @@ func record_player_detection(position: Vector3, detection_time: float):
 	var detection_record = {
 		"position": position,
 		"time": detection_time,
-		"timestamp": Time.get_time_dict_from_system()["unix"]
+		"timestamp": Time.get_unix_time_from_system()
 	}
 	player_behavior_data.detection_history.append(detection_record)
 	
@@ -304,7 +304,7 @@ func _on_npc_state_changed(npc: NPCController, state_name: String):
 	pass
 
 func _cleanup_old_data():
-	var current_time = Time.get_time_dict_from_system()["unix"]
+	var current_time = Time.get_unix_time_from_system()
 	var cutoff_time = current_time - 300  # 5 minutes
 	
 	# Clean up old position data

@@ -851,7 +851,7 @@ func call_for_backup() -> void:
 					"type": "request_help",
 					"position": global_position,
 					"source": self,
-					"timestamp": Time.get_time_dict_from_system()["unix"]
+					"timestamp": Time.get_unix_time_from_system()
 				}
 				npc.receive_communication(message)
 
@@ -877,7 +877,7 @@ func _update_memory_system(delta: float):
 			
 			if result.is_empty():  # Clear line of sight to player area
 				memory_system.add_memory(NPCMemorySystem.MemoryType.PLAYER_ROUTE, current_player_pos, {
-					"timestamp": Time.get_time_dict_from_system()["unix"],
+					"timestamp": Time.get_unix_time_from_system(),
 					"frequency": 1
 				})
 			
@@ -920,7 +920,7 @@ func _on_pattern_learned(pattern_type: String, pattern_data: Dictionary):
 		
 		"timing_pattern":
 			# Adjust alertness based on player activity times
-			var current_hour = Time.get_time_dict_from_system().hour
+			var current_hour = Time.get_datetime_dict_from_system().hour
 			if current_hour == pattern_data.get("peak_hour", 12):
 				memory_system.adapt_behavior("suspicion_sensitivity", 0.2)
 
@@ -964,7 +964,7 @@ func record_noise_event(noise_position: Vector3, noise_volume: float):
 	if memory_system and learning_enabled:
 		memory_system.add_memory(NPCMemorySystem.MemoryType.NOISE_EVENT, noise_position, {
 			"volume": noise_volume,
-			"timestamp": Time.get_time_dict_from_system()["unix"]
+			"timestamp": Time.get_unix_time_from_system()
 		})
 
 func record_environmental_change(position: Vector3, change_type: String, player_caused: bool = false):
@@ -972,7 +972,7 @@ func record_environmental_change(position: Vector3, change_type: String, player_
 		memory_system.add_memory(NPCMemorySystem.MemoryType.ENVIRONMENTAL_CHANGE, position, {
 			"change_type": change_type,
 			"player_caused": player_caused,
-			"timestamp": Time.get_time_dict_from_system()["unix"]
+			"timestamp": Time.get_unix_time_from_system()
 		})
 
 func get_predicted_search_location() -> Vector3:

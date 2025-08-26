@@ -65,7 +65,7 @@ func _ready():
 func add_memory(type: MemoryType, position: Vector3, context: Dictionary = {}):
 	var memory_entry = {
 		"position": position,
-		"timestamp": Time.get_time_dict_from_system()["unix"],
+		"timestamp": Time.get_unix_time_from_system(),
 		"context": context,
 		"importance": _calculate_importance(type, context),
 		"decay_rate": _get_decay_rate(type)
@@ -350,7 +350,7 @@ func should_check_area_more_thoroughly(position: Vector3) -> bool:
 # ===================== CLEANUP =====================
 
 func _cleanup_old_memories():
-	var current_time = Time.get_time_dict_from_system()["unix"]
+	var current_time = Time.get_unix_time_from_system()
 	
 	for memory_type in memories.keys():
 		var updated_memories: Array = []

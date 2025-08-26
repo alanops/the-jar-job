@@ -66,7 +66,7 @@ func _collect_player_data(delta: float):
 	if not player:
 		return
 	
-	var current_time = Time.get_time_dict_from_system()["unix"]
+	var current_time = Time.get_unix_time_from_system()
 	var current_position = player.global_position
 	
 	# Add to position history
@@ -352,7 +352,7 @@ func _validate_predictions():
 	if player_position_history.size() < 2:
 		return
 	
-	var current_time = Time.get_time_dict_from_system()["unix"]
+	var current_time = Time.get_unix_time_from_system()
 	
 	# Find predictions made prediction_time_horizon ago
 	for accuracy_entry in prediction_accuracy_history:
