@@ -271,7 +271,7 @@ func _calculate_path_curvature(positions: Array) -> float:
 		var v1 = (p2 - p1).normalized()
 		var v2 = (p3 - p2).normalized()
 		
-		var angle = v1.angle_to(v2)
+		var angle: float = v1.angle_to(v2)
 		curvature += angle
 	
 	return curvature / (positions.size() - 2)

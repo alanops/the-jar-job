@@ -262,7 +262,7 @@ func request_search_coordination(requesting_npc: NPCController) -> Vector3:
 	return search_position
 
 func get_nearby_npcs(position: Vector3, radius: float) -> Array[NPCController]:
-	var nearby = []
+	var nearby: Array[NPCController] = []
 	for npc in registered_npcs:
 		if is_instance_valid(npc) and position.distance_to(npc.global_position) <= radius:
 			nearby.append(npc)

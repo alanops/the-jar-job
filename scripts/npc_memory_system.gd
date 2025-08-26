@@ -303,9 +303,9 @@ func get_behavioral_adjustment(adaptation_type: String) -> float:
 # ===================== QUERY SYSTEM =====================
 
 func get_memories_near_position(position: Vector3, radius: float, type: MemoryType = -1) -> Array:
-	var nearby_memories = []
+	var nearby_memories: Array = []
 	
-	var memory_types = [type] if type != -1 else MemoryType.values()
+	var memory_types: Array = [type] if type != -1 else MemoryType.values()
 	
 	for memory_type in memory_types:
 		if memories.has(memory_type):
@@ -353,7 +353,7 @@ func _cleanup_old_memories():
 	var current_time = Time.get_time_dict_from_system()["unix"]
 	
 	for memory_type in memories.keys():
-		var updated_memories = []
+		var updated_memories: Array = []
 		
 		for memory in memories[memory_type]:
 			var age = current_time - memory.timestamp
