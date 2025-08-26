@@ -7,8 +7,6 @@ height = 1.8
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.2, 0.8, 0.2, 1)
-metallic = 0.0
-roughness = 1.0
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.3
@@ -40,4 +38,3 @@ shape = SubResource("SphereShape3D_1")
 
 [node name="FootstepTimer" type="Timer" parent="."]
 wait_time = 0.5
-one_shot = false

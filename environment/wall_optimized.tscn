@@ -7,10 +7,7 @@ size = Vector3(4, 3, 0.2)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.3, 0.6, 0.9, 1)
-metallic = 0.0
-roughness = 1.0
 rim_enabled = true
-rim = 1.0
 rim_tint = 0.0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]

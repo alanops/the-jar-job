@@ -1,22 +1,27 @@
-[gd_scene load_steps=25 format=3 uid="uid://b7hf5w8nxkgvq"]
+[gd_scene load_steps=29 format=3 uid="uid://b7hf5w8nxkgvq"]
 
 [ext_resource type="Script" uid="uid://dx38cl2wfggri" path="res://scripts/game.gd" id="1_game"]
 [ext_resource type="PackedScene" uid="uid://bxklf5nvt8qh0" path="res://environment/simple_floor.tscn" id="2_simple_floor"]
 [ext_resource type="PackedScene" uid="uid://dpq1kvj7fn4hd" path="res://environment/wall.tscn" id="3_wall"]
-[ext_resource type="PackedScene" path="res://environment/cubicle_wall.tscn" id="4_cubicle"]
-[ext_resource type="PackedScene" path="res://environment/office_desk.tscn" id="5_desk"]
-[ext_resource type="PackedScene" path="res://environment/office_chair.tscn" id="6_chair"]
-[ext_resource type="PackedScene" path="res://environment/kitchen_counter.tscn" id="7_counter"]
+[ext_resource type="PackedScene" uid="uid://bn4hh6gpgq8mi" path="res://environment/cubicle_wall.tscn" id="4_cubicle"]
+[ext_resource type="PackedScene" uid="uid://b7gqm3t1xkr5j" path="res://environment/office_desk.tscn" id="5_desk"]
+[ext_resource type="PackedScene" uid="uid://b8nmhsv3cygkq" path="res://environment/office_chair.tscn" id="6_chair"]
+[ext_resource type="PackedScene" uid="uid://dxk1m5oqswbgw" path="res://environment/kitchen_counter.tscn" id="7_counter"]
 [ext_resource type="PackedScene" uid="uid://bvnx4jpyxvhqo" path="res://scenes/player.tscn" id="8_player"]
 [ext_resource type="Script" uid="uid://x0bnonghuli0" path="res://scripts/isometric_camera.gd" id="9_camera"]
 [ext_resource type="PackedScene" uid="uid://cevuj3wqn8kxp" path="res://scenes/npc.tscn" id="10_npc"]
 [ext_resource type="PackedScene" uid="uid://cx6yb7xqiqy8d" path="res://objects/biscuit_jar.tscn" id="11_jar"]
 [ext_resource type="PackedScene" uid="uid://bxphv8gxrykwj" path="res://ui/game_ui.tscn" id="12_ui"]
+[ext_resource type="PackedScene" uid="uid://bndnajx3hqgl5" path="res://environment/invisible_wall.tscn" id="13_invisible"]
 [ext_resource type="PackedScene" uid="uid://cxvh4pqv3n8fb" path="res://ui/performance_monitor.tscn" id="13_performance"]
-[ext_resource type="PackedScene" path="res://environment/invisible_wall.tscn" id="13_invisible"]
-[ext_resource type="PackedScene" path="res://environment/object_label.tscn" id="14_label"]
-[ext_resource type="PackedScene" path="res://environment/computer_monitor.tscn" id="15_monitor"]
-[ext_resource type="PackedScene" path="res://environment/filing_cabinet.tscn" id="16_cabinet"]
+[ext_resource type="PackedScene" uid="uid://clhx8v4d3qy2r" path="res://environment/object_label.tscn" id="14_label"]
+[ext_resource type="PackedScene" uid="uid://dp48qmwjqb6n5" path="res://environment/computer_monitor.tscn" id="15_monitor"]
+[ext_resource type="PackedScene" uid="uid://bxlp8v0jn6q4t" path="res://environment/filing_cabinet.tscn" id="16_cabinet"]
+[ext_resource type="PackedScene" uid="uid://cpvug3wlypb3j" path="res://environment/elevator.tscn" id="17_elevator"]
+[ext_resource type="PackedScene" path="res://environment/glass_window.tscn" id="18_glass_window"]
+[ext_resource type="PackedScene" path="res://ui/minimap.tscn" id="19_minimap"]
+[ext_resource type="PackedScene" path="res://ui/objectives_panel.tscn" id="20_objectives"]
+[ext_resource type="PackedScene" path="res://ui/waypoint_indicator.tscn" id="21_waypoint"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.9, 0.9, 0.95, 1)
@@ -59,7 +64,6 @@ environment = SubResource("Environment_1")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, 0.5, -0.5, 0, 0, 0)
 light_energy = 0.4
-shadow_enabled = false
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
 navigation_mesh = SubResource("NavigationMesh_1")
@@ -87,10 +91,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 8)
 [node name="WallTop2" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -4, 0, -11)
 
-[node name="WallTop3" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
+[node name="GlassWindowTop1" parent="Office/OuterWalls" instance=ExtResource("18_glass_window")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -11)
 
-[node name="WallTop4" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
+[node name="GlassWindowTop2" parent="Office/OuterWalls" instance=ExtResource("18_glass_window")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 4, 0, -11)
 
 [node name="WallTop5" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
@@ -99,10 +103,10 @@ transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 8, 0, 
 [node name="WallRight1" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -8)
 
-[node name="WallRight2" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
+[node name="GlassWindowRight1" parent="Office/OuterWalls" instance=ExtResource("18_glass_window")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -4)
 
-[node name="WallRight3" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
+[node name="GlassWindowRight2" parent="Office/OuterWalls" instance=ExtResource("18_glass_window")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 0)
 
 [node name="WallRight4" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
@@ -285,6 +289,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -2)
 [node name="FilingCabinet3" parent="Office/OfficeDecorations" instance=ExtResource("16_cabinet")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 0, 10)
 
+[node name="Elevator" type="Node3D" parent="Office"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -9)
+
+[node name="ElevatorScene" parent="Office/Elevator" instance=ExtResource("17_elevator")]
+
+[node name="ElevatorLabel" parent="Office/Elevator" instance=ExtResource("14_label")]
+label_text = "🔽 LIFT"
+show_distance = 6.0
+
 [node name="Player" parent="." instance=ExtResource("8_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.1, 0)
 
@@ -325,6 +338,33 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 4)
 [node name="Waypoint6" type="Marker3D" parent="PatrolWaypoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 4)
 
+[node name="SecurityGuard2" parent="." instance=ExtResource("10_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.1, 6)
+
+[node name="GuardLabel2" parent="SecurityGuard2" instance=ExtResource("14_label")]
+label_text = "👮 GUARD 2"
+show_distance = 8.0
+
+[node name="PatrolWaypoints2" type="Node3D" parent="."]
+
+[node name="Guard2Waypoint1" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -3)
+
+[node name="Guard2Waypoint2" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -3)
+
+[node name="Guard2Waypoint3" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 3)
+
+[node name="Guard2Waypoint4" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 6)
+
+[node name="Guard2Waypoint5" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 6)
+
+[node name="Guard2Waypoint6" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 3)
+
 [node name="BiscuitJar" parent="." instance=ExtResource("11_jar")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1, 9)
 
@@ -350,6 +390,12 @@ label_text = "🚪 EXIT"
 show_always = true
 
 [node name="GameUI" parent="." instance=ExtResource("12_ui")]
+
+[node name="Minimap" parent="GameUI" instance=ExtResource("19_minimap")]
+
+[node name="ObjectivesPanel" parent="GameUI" instance=ExtResource("20_objectives")]
+
+[node name="WaypointIndicator" parent="GameUI" instance=ExtResource("21_waypoint")]
 
 [node name="PerformanceMonitor" parent="." instance=ExtResource("13_performance")]
 visible = false

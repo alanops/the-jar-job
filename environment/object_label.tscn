@@ -1,15 +1,14 @@
 [gd_scene load_steps=2 format=3 uid="uid://clhx8v4d3qy2r"]
 
-[ext_resource type="Script" uid="uid://ct8yc4kxwb4rt" path="res://scripts/object_label.gd" id="1_label"]
+[ext_resource type="Script" uid="uid://7s3rgxu4afks" path="res://scripts/object_label.gd" id="1_label"]
 
 [node name="ObjectLabel" type="Node3D"]
 script = ExtResource("1_label")
 
 [node name="Label3D" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-text = "Object"
-font_size = 32
-outline_size = 3
+billboard = 1
 modulate = Color(0, 0, 0, 1)
 outline_modulate = Color(1, 1, 1, 0.8)
-billboard = 1
+text = "Object"
+outline_size = 3

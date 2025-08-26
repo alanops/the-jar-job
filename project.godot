@@ -22,6 +22,7 @@ config/icon="res://icon.webp"
 [autoload]
 
 GameManager="*res://scripts/game_manager.gd"
+ObjectiveManager="*res://scripts/objective_manager.gd"
 
 [debug]
 

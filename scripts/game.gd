@@ -3,7 +3,11 @@ extends Node3D
 @onready var player: PlayerController = $Player
 @onready var camera_rig: IsometricCamera = $CameraRig
 @onready var security_guard: NPCController = $SecurityGuard
+@onready var security_guard2: NPCController = $SecurityGuard2
 @onready var patrol_waypoints: Node3D = $PatrolWaypoints
+@onready var patrol_waypoints2: Node3D = $PatrolWaypoints2
+@onready var biscuit_jar: RigidBody3D = $BiscuitJar
+@onready var exit_elevator: Area3D = $ExitElevator
 @onready var game_ui: Control = $GameUI
 @onready var performance_monitor: PerformanceMonitor = $PerformanceMonitor
 
@@ -35,6 +39,23 @@ func _ready() -> void:
 		security_guard.connect("player_in_vision_changed", _on_player_in_vision_changed)
 		security_guard.connect("last_seen_position_changed", _on_last_seen_position_changed)
 		security_guard.connect("patrol_point_changed", _on_patrol_point_changed)
+	
+	# Set up second NPC patrol waypoints
+	var waypoints2: Array[Node3D] = []
+	for child in patrol_waypoints2.get_children():
+		if child is Marker3D:
+			waypoints2.append(child)
+	
+	if security_guard2:
+		security_guard2.patrol_waypoints = waypoints2
+		# Connect similar signals for second guard
+		security_guard2.connect("player_spotted", _on_player_spotted)
+		security_guard2.connect("detection_progress_changed", _on_detection_progress_changed)
+	
+	# Initialize objectives
+	if biscuit_jar and exit_elevator:
+		ObjectiveManager.add_objective("Find the biscuit jar", biscuit_jar.global_position)
+		ObjectiveManager.add_objective("Escape through the lift", exit_elevator.global_position)
 	
 	# Connect timer for game start
 	$GameStart/Timer.timeout.connect(_on_game_start_timer_timeout)

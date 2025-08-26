@@ -1,33 +1,21 @@
-[gd_scene load_steps=6 format=3 uid="uid://cevuj3wqn8kxp"]
+[gd_scene load_steps=7 format=3 uid="uid://cevuj3wqn8kxp"]
 
 [ext_resource type="Script" uid="uid://bt585qnsv7v8" path="res://scripts/npc_controller.gd" id="1_8qxkr"]
 [ext_resource type="Script" uid="uid://3ft4p55d5klw" path="res://scripts/vision_cone.gd" id="2_v8xgw"]
-[ext_resource type="Script" uid="uid://bvypqn5mj7s2r" path="res://scripts/direction_arrow.gd" id="3_arrow"]
+[ext_resource type="Script" uid="uid://fa7ueo3q0ur3" path="res://scripts/direction_arrow.gd" id="3_arrow"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
 height = 1.8
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.9, 0.2, 0.2, 1)
-metallic = 0.0
-roughness = 1.0
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.35
 height = 1.8
 
-[sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(0.1, 0.1, 0.8)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2"]
-albedo_color = Color(1, 1, 0, 1)
-emission_enabled = true
-emission = Color(1, 1, 0, 1)
-emission_energy = 0.5
-
 [node name="NPC" type="CharacterBody3D" groups=["npc"]]
 collision_layer = 4
-collision_mask = 1
 script = ExtResource("1_8qxkr")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
