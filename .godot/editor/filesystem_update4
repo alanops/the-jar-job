@@ -22,3 +22,4 @@ res://scenes/game_original.tscn
 res://scenes/game_current_backup.tscn
 res://scenes/game_backup.tscn
 res://scripts/game.gd
+res://scripts/elevator_controller.gd
