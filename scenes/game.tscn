@@ -339,7 +339,6 @@ show_always = true
 [node name="GameUI" parent="." instance=ExtResource("12_ui")]
 
 [node name="Minimap" parent="GameUI" instance=ExtResource("19_minimap")]
-anchors_preset = 0
 
 [node name="ObjectivesPanel" parent="GameUI" instance=ExtResource("20_objectives")]
 anchors_preset = 0
