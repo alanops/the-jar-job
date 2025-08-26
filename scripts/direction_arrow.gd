@@ -21,33 +21,33 @@ func _create_arrow_mesh() -> void:
 	var colors := PackedColorArray()
 	var indices := PackedInt32Array()
 	
-	# Arrow pointing forward (positive Z direction)
+	# Arrow pointing forward (negative Z direction in Godot)
 	var shaft_end := arrow_length - head_length
 	
 	# Shaft vertices (rectangular prism)
 	var half_shaft := shaft_width * 0.5
 	
-	# Bottom face of shaft
+	# Bottom face of shaft (at origin)
 	vertices.append(Vector3(-half_shaft, -half_shaft, 0))  # 0
 	vertices.append(Vector3(half_shaft, -half_shaft, 0))   # 1
 	vertices.append(Vector3(half_shaft, half_shaft, 0))    # 2
 	vertices.append(Vector3(-half_shaft, half_shaft, 0))   # 3
 	
-	# Top face of shaft
-	vertices.append(Vector3(-half_shaft, -half_shaft, shaft_end))  # 4
-	vertices.append(Vector3(half_shaft, -half_shaft, shaft_end))   # 5
-	vertices.append(Vector3(half_shaft, half_shaft, shaft_end))    # 6
-	vertices.append(Vector3(-half_shaft, half_shaft, shaft_end))   # 7
+	# Top face of shaft (towards negative Z)
+	vertices.append(Vector3(-half_shaft, -half_shaft, -shaft_end))  # 4
+	vertices.append(Vector3(half_shaft, -half_shaft, -shaft_end))   # 5
+	vertices.append(Vector3(half_shaft, half_shaft, -shaft_end))    # 6
+	vertices.append(Vector3(-half_shaft, half_shaft, -shaft_end))   # 7
 	
 	# Arrow head base (wider)
 	var half_head := head_width * 0.5
-	vertices.append(Vector3(-half_head, -half_head, shaft_end))    # 8
-	vertices.append(Vector3(half_head, -half_head, shaft_end))     # 9
-	vertices.append(Vector3(half_head, half_head, shaft_end))      # 10
-	vertices.append(Vector3(-half_head, half_head, shaft_end))     # 11
+	vertices.append(Vector3(-half_head, -half_head, -shaft_end))    # 8
+	vertices.append(Vector3(half_head, -half_head, -shaft_end))     # 9
+	vertices.append(Vector3(half_head, half_head, -shaft_end))      # 10
+	vertices.append(Vector3(-half_head, half_head, -shaft_end))     # 11
 	
-	# Arrow tip
-	vertices.append(Vector3(0, 0, arrow_length))  # 12
+	# Arrow tip (pointing forward in negative Z)
+	vertices.append(Vector3(0, 0, -arrow_length))  # 12
 	
 	# Add normals and colors for all vertices
 	for i in range(vertices.size()):

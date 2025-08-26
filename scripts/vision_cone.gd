@@ -9,20 +9,13 @@ class_name VisionCone
 func is_target_in_cone(target_position: Vector3) -> bool:
 	var local_target := to_local(target_position)
 	
-	# Debug output
-	print("Checking vision - Target pos: ", target_position, " Local: ", local_target)
-	
 	# Check if target is within range
 	var distance := local_target.length()
-	print("Distance: ", distance, " Range: ", cone_range)
 	if distance > cone_range:
-		print("Out of range")
 		return false
 	
 	# Check if target is in front of the NPC (negative Z in local space)
-	print("Local Z: ", local_target.z)
 	if local_target.z >= 0:
-		print("Behind NPC")
 		return false
 	
 	# Calculate angle from forward direction (-Z axis in local space)
@@ -30,12 +23,8 @@ func is_target_in_cone(target_position: Vector3) -> bool:
 	var to_target := local_target.normalized()
 	var angle := rad_to_deg(forward.angle_to(to_target))
 	
-	print("Angle: ", angle, " Max angle: ", cone_angle * 0.5)
-	
 	# Check if within cone angle (half angle on each side)
-	var in_cone := angle <= cone_angle * 0.5
-	print("In cone: ", in_cone)
-	return in_cone
+	return angle <= cone_angle * 0.5
 
 func set_alert_mode(alert: bool) -> void:
 	if mesh_instance and mesh_instance.get_surface_override_material(0):

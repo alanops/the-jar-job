@@ -23,3 +23,7 @@ res://scenes/game_current_backup.tscn
 res://scenes/game_backup.tscn
 res://scripts/game.gd
 res://scripts/elevator_controller.gd
+res://scripts/advanced_performance_monitor.gd
+res://scripts/npc_controller.gd
+res://scripts/vision_cone.gd
+res://scripts/isometric_camera.gd
