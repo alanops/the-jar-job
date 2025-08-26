@@ -310,9 +310,6 @@ func _check_vision_cone() -> void:
 	
 	if player_detected:
 		detection_time += get_process_delta_time()
-		# Only set alert mode if not already alert (avoid redundant calls)
-		if not vision_cone.is_alert:
-			vision_cone.set_alert_mode(true)
 		detection_progress_changed.emit(detection_time / detection_threshold)
 		
 		if detection_time >= detection_threshold:
@@ -322,9 +319,6 @@ func _check_vision_cone() -> void:
 
 func _reset_detection() -> void:
 	detection_time = 0.0
-	# Only reset alert mode if currently alert (avoid redundant calls)
-	if vision_cone and vision_cone.is_alert:
-		vision_cone.set_alert_mode(false)
 	detection_progress_changed.emit(0.0)
 
 func _has_line_of_sight_to_player() -> bool:
