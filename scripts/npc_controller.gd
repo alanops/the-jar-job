@@ -57,6 +57,7 @@ var last_known_player_position: Vector3
 var time_since_player_seen: float = 0.0
 var player_in_sight: bool = false
 var previous_player_in_sight: bool = false
+var player_in_area: bool = false
 
 # Investigation
 var investigation_position: Vector3
@@ -118,6 +119,11 @@ func _ready() -> void:
 	if players.size() > 0:
 		player_reference = players[0]
 		player_reference.made_noise.connect(_on_player_made_noise)
+	
+	# Connect vision cone signals
+	if vision_cone:
+		vision_cone.body_entered.connect(_on_vision_cone_body_entered)
+		vision_cone.body_exited.connect(_on_vision_cone_body_exited)
 	
 	# Find performance monitor
 	var game_node = get_tree().get_first_node_in_group("game")
@@ -288,7 +294,7 @@ func _check_vision_cone() -> void:
 	var player_detected: bool = false
 	
 	# Only do expensive checks if player is in the area
-	if vision_cone.player_in_area:
+	if player_in_area:
 		var in_cone: bool = vision_cone.is_target_in_cone(player_reference.global_position)
 		# Only do line of sight check if player is in cone (expensive raycast)
 		if in_cone:
@@ -562,3 +568,12 @@ func _handle_search_state(delta: float) -> void:
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
+
+# Vision cone signal handlers
+func _on_vision_cone_body_entered(body: Node3D) -> void:
+	if body.is_in_group("player"):
+		player_in_area = true
+
+func _on_vision_cone_body_exited(body: Node3D) -> void:
+	if body.is_in_group("player"):
+		player_in_area = false
