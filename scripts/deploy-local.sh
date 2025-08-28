@@ -102,11 +102,24 @@ deploy_to_itch() {
     echo ""
     echo "☁️  Deploying to itch.io..."
     
-    # Check Butler login
+    # Load API key from .env file if it exists
+    if [ -f ".env" ]; then
+        source .env
+    fi
+    
+    # Check if API key is set
+    if [ -z "$BUTLER_API_KEY" ]; then
+        echo -e "${RED}❌ BUTLER_API_KEY not set${NC}"
+        echo "   Create a .env file with: BUTLER_API_KEY=your_key"
+        echo "   Or run: export BUTLER_API_KEY=your_key"
+        exit 1
+    fi
+    
+    # Verify authentication
     if ! butler status "$ITCH_USER/$ITCH_GAME" &> /dev/null; then
-        echo -e "${YELLOW}🔑 Butler authentication required${NC}"
-        echo "   Running 'butler login'..."
-        butler login
+        echo -e "${RED}❌ Butler authentication failed${NC}"
+        echo "   API key may be invalid or expired"
+        exit 1
     fi
     
     # Push to itch.io

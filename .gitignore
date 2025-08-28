@@ -1,0 +1,28 @@
+# Godot 4+ specific ignores
+.godot/
+*.uid
+
+# Environment variables (contains API keys)
+.env
+
+# Local build artifacts
+builds/
+test_build/
+export.log
+test_export.log
+
+# Backup files
+*.tmp
+*.temp
+*.backup
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Editor specific
+.vscode/
+.idea/
+
+# Local notes
+local_notes.md
