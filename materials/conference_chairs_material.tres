@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://models/niko/ConferenceChairs + Textures/Textures/Albedo(BaseColour).png" id="1_albedo"]
+[ext_resource type="Texture2D" path="res://models/niko/ConferenceChairs + Textures/Textures/Metallic.png" id="2_metallic"]
+[ext_resource type="Texture2D" path="res://models/niko/ConferenceChairs + Textures/Textures/Roughness.png" id="3_roughness"]
+[ext_resource type="Texture2D" path="res://models/niko/ConferenceChairs + Textures/Textures/Normal.png" id="4_normal"]
+
+[resource]
+albedo_texture = ExtResource("1_albedo")
+metallic_texture = ExtResource("2_metallic")
+roughness_texture = ExtResource("3_roughness")
+normal_texture = ExtResource("4_normal")

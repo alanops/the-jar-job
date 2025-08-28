@@ -168,6 +168,26 @@ func play_detected():
 		sfx_player.stream = detected_sound
 		sfx_player.play()
 
+func play_game_over():
+	# Stop all other audio
+	stop_all_audio()
+	# Play detected sound as game over sound
+	if detected_sound and sfx_player:
+		sfx_player.stream = detected_sound
+		sfx_player.play()
+
+func stop_all_audio():
+	if music_player:
+		music_player.stop()
+	if ambient_player:
+		ambient_player.stop()
+	if sfx_player:
+		sfx_player.stop()
+	if ui_player:
+		ui_player.stop()
+	is_music_playing = false
+	is_ambient_playing = false
+
 # Volume controls
 func set_master_volume(volume: float):
 	master_volume = clamp(volume, 0.0, 1.0)

@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://cjw6k3xn5b8yr"]
+
+[ext_resource type="Mesh" uid="uid://bgesnx58u6gkk" path="res://models/ConferenceTable.obj" id="1_table"]
+[ext_resource type="Material" path="res://materials/conference_table_material.tres" id="2_material"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(2.5, 0.8, 1.2)
+
+[node name="ConferenceTable" type="StaticBody3D" groups=["furniture", "obstacles"]]
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = ExtResource("1_table")
+surface_material_override/0 = ExtResource("2_material")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("BoxShape3D_1")
+
+[node name="ObjectLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+text = "Conference Table"
+billboard = 1
+modulate = Color(1, 1, 1, 0.7)
