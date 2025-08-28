@@ -111,8 +111,9 @@ func open_doors() -> void:
 	# Change button color to indicate active state
 	call_button.material_override = button_material_active
 	
-	# Play sound effect (if you have one)
-	# AudioManager.play_sound("elevator_ding")
+	# Play door opening sound
+	if AudioManager:
+		AudioManager.play_button_click()  # Using button click as elevator ding
 
 func close_doors() -> void:
 	if not doors_open:
@@ -135,8 +136,9 @@ func close_doors() -> void:
 	# Change button back to normal color
 	call_button.material_override = button_material_normal
 	
-	# Play sound effect (if you have one)
-	# AudioManager.play_sound("elevator_close")
+	# Play door closing sound
+	if AudioManager:
+		AudioManager.play_button_click()  # Using button click as elevator sound
 
 func force_open_doors() -> void:
 	# Public method to force doors open (e.g., when interacting with button)

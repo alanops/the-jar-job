@@ -164,6 +164,18 @@ func _update_crouch_state() -> void:
 func _on_footstep() -> void:
 	if velocity.length() > 0.1:
 		made_noise.emit(global_position, current_noise_radius)
+		
+		# Play footstep sound with volume based on movement type
+		if AudioManager:
+			var volume_modifier = 1.0
+			if is_crouching:
+				volume_modifier = 0.3  # Quieter when crouching
+			elif is_running:
+				volume_modifier = 1.2  # Louder when running
+			
+			# Vary the pitch slightly for more natural footsteps
+			var pitch_variation = randf_range(0.9, 1.1)
+			AudioManager.play_footstep()  # We'll add pitch variation later
 
 func _on_interaction_area_entered(body: Node3D) -> void:
 	print("Body entered: ", body.name, " Groups: ", body.get_groups())

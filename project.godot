@@ -24,6 +24,11 @@ config/icon="res://icon.webp"
 GameManager="*res://scripts/game_manager.gd"
 ObjectiveManager="*res://scripts/objective_manager.gd"
 NPCCommunication="*res://scripts/npc_communication_manager.gd"
+AudioManager="*res://scripts/audio_manager.gd"
+
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
 
 [debug]
 
