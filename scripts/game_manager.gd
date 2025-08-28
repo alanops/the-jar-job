@@ -26,7 +26,25 @@ func start_game() -> void:
 	has_jar = false
 	game_timer = 0.0
 	score = 0
+	
+	# Reset NPC systems if they exist
+	_reset_npc_systems()
+	
 	game_started.emit()
+
+func _reset_npc_systems():
+	"""Reset all NPC-related systems"""
+	# Find NPC Manager in the scene
+	var npc_manager = _find_npc_manager()
+	if npc_manager and npc_manager.has_method("reset_all_systems"):
+		npc_manager.reset_all_systems()
+
+func _find_npc_manager() -> Node:
+	"""Find NPCManager in the current scene"""
+	var current_scene = get_tree().current_scene
+	if current_scene:
+		return current_scene.find_child("NPCManager", true, false)
+	return null
 
 func collect_jar() -> void:
 	if current_state != GameState.PLAYING:
@@ -69,6 +87,8 @@ func get_time_string() -> String:
 	return "%02d:%02d" % [minutes, seconds]
 
 func reset_game() -> void:
+	# Reset systems before reloading scene
+	_reset_npc_systems()
 	get_tree().reload_current_scene()
 
 func return_to_menu() -> void:

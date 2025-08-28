@@ -80,11 +80,72 @@ var vision_check_timer: float = 0.0
 var vision_check_interval: float = 0.05  # Check vision every 0.05 seconds (more responsive)
 var distance_to_player: float = 0.0
 
+# Peripheral vision state
+var peripheral_reaction_timer: float = 0.0
+var peripheral_reaction_duration: float = 0.8  # How long to keep turning
+var is_reacting_to_peripheral: bool = false
+
 # Proximity detection
 @export var catch_distance: float = 1.2  # Distance at which NPC catches player
 
 # Performance profiling
 var performance_monitor: AdvancedPerformanceMonitor
+
+# NPC Manager integration
+var npc_manager_alerts: Array = []
+
+func reset_npc_state():
+	"""Reset all NPC state to initial values"""
+	# Reset core state
+	current_state = NPCState.PATROL
+	previous_state = NPCState.PATROL
+	
+	# Reset detection
+	detection_time = 0.0
+	player_in_sight = false
+	previous_player_in_sight = false
+	
+	# Reset suspicion system
+	suspicion_level = 0.0
+	is_suspicious = false
+	is_investigating = false
+	
+	# Reset tracking
+	last_known_player_position = Vector3.ZERO
+	investigation_position = Vector3.ZERO
+	time_since_player_seen = 0.0
+	
+	# Reset peripheral vision
+	is_reacting_to_peripheral = false
+	peripheral_reaction_timer = 0.0
+	
+	# Reset waypoints
+	current_waypoint_index = 0
+	
+	# Reset vision systems
+	if vision_cone:
+		vision_cone.set_alert_mode(false)
+	
+	# Reset GOAP system
+	if goap_system:
+		goap_system.stuck_timer = 0.0
+		goap_system.stuck_position = Vector3.ZERO
+		goap_system.search_start_time = 0.0
+		goap_system.current_plan.clear()
+		goap_system.current_goal = null
+		goap_system.current_action_index = 0
+		goap_system._initialize_world_state()
+	
+	# Clear alerts
+	npc_manager_alerts.clear()
+	received_alerts.clear()
+	shared_search_targets.clear()
+	
+	# Reset state label
+	if state_label:
+		state_label.text = "PATROL"
+	
+	print("NPCController(", name, "): State reset to initial values")
 
 # Communication System
 var communication_manager: NPCCommunicationManager
@@ -97,6 +158,10 @@ var coordination_enabled: bool = true
 @export var personality_persistence: float = 1.0  # How long they search
 @export var communication_range: float = 15.0
 @export var help_call_threshold: float = 2.0  # Seconds before calling for help
+
+# GOAP System
+@export var use_goap: bool = true
+var goap_system: GOAPSystem
 
 # Memory and Learning System
 var memory_system: NPCMemorySystem
@@ -112,7 +177,9 @@ var prediction_confidence: float = 0.0
 
 # Signals
 signal player_spotted(npc: NPCController)
+signal player_lost(npc: NPCController)
 signal player_caught(npc: NPCController)
+signal suspicion_raised(npc: NPCController, level: float)
 signal detection_progress_changed(progress: float)
 signal suspicion_changed_debug(level: int)
 signal state_changed_debug(state: String)
@@ -121,8 +188,18 @@ signal last_seen_position_changed(position: Vector3)
 signal patrol_point_changed(point: int)
 
 func _ready() -> void:
+	# Check if navigation agent exists
+	if not navigation_agent:
+		print("NPCController ERROR: NavigationAgent3D node not found!")
+		return
+	
+	print("NPCController: Initializing ", name, " at position ", global_position)
 	navigation_agent.path_desired_distance = 0.5
 	navigation_agent.target_desired_distance = 0.5
+	navigation_agent.avoidance_enabled = true
+	navigation_agent.radius = 0.5
+	navigation_agent.height = 1.8
+	navigation_agent.max_speed = 5.0
 	
 	state_timer.timeout.connect(_on_state_timer_timeout)
 	
@@ -157,15 +234,30 @@ func _ready() -> void:
 		predictive_ai.prediction_updated.connect(_on_prediction_updated)
 		predictive_ai.interception_route_calculated.connect(_on_interception_route_calculated)
 	
+	# Initialize GOAP system
+	if use_goap:
+		goap_system = GOAPSystem.new(self)
+		goap_system.name = name + "_GOAPSystem"
+		add_child(goap_system)
+		print("NPCController: GOAP system initialized for ", name)
+	
 	# Initialize state label
 	if state_label:
 		state_label.text = "PATROL"
 		state_label.modulate = Color.WHITE
 	
+	# Wait for navigation to be ready
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
 	# Start patrolling if waypoints exist
 	if patrol_waypoints.size() > 0:
+		print("NPCController: Starting patrol with ", patrol_waypoints.size(), " waypoints")
+		for i in range(patrol_waypoints.size()):
+			print("  Waypoint ", i, ": ", patrol_waypoints[i].global_position)
 		_set_next_patrol_target()
 	else:
+		print("NPCController: No waypoints found, entering IDLE state")
 		current_state = NPCState.IDLE
 		if state_label:
 			state_label.text = "IDLE"
@@ -203,6 +295,13 @@ func _physics_process(delta: float) -> void:
 	if player_reference:
 		distance_to_player = global_position.distance_to(player_reference.global_position)
 		
+		# Handle peripheral vision reaction timer
+		if is_reacting_to_peripheral:
+			peripheral_reaction_timer += delta
+			if peripheral_reaction_timer >= peripheral_reaction_duration:
+				is_reacting_to_peripheral = false
+				print("Debug - Peripheral reaction ended")
+		
 		# Check if NPC caught the player
 		if distance_to_player <= catch_distance:
 			_on_player_caught()
@@ -218,22 +317,28 @@ func _physics_process(delta: float) -> void:
 	
 	if performance_monitor:
 		performance_monitor.profile_section_start("NPC_StateMachine")
-	# Handle current state
-	match current_state:
-		NPCState.IDLE:
-			_handle_idle_state(delta)
-		NPCState.PATROL:
-			_handle_patrol_state(delta)
-		NPCState.SUSPICIOUS:
-			_handle_suspicious_state(delta)
-		NPCState.INVESTIGATE:
-			_handle_investigate_state(delta)
-		NPCState.SEARCH:
-			_handle_search_state(delta)
-		NPCState.CHASE:
-			_handle_chase_state(delta)
-		NPCState.RETURN_TO_PATROL:
-			_handle_return_state(delta)
+	
+	# Use GOAP system if enabled, otherwise use traditional state machine
+	if use_goap and goap_system:
+		_handle_goap_system(delta)
+	else:
+		# Handle current state using traditional state machine
+		match current_state:
+			NPCState.IDLE:
+				_handle_idle_state(delta)
+			NPCState.PATROL:
+				_handle_patrol_state(delta)
+			NPCState.SUSPICIOUS:
+				_handle_suspicious_state(delta)
+			NPCState.INVESTIGATE:
+				_handle_investigate_state(delta)
+			NPCState.SEARCH:
+				_handle_search_state(delta)
+			NPCState.CHASE:
+				_handle_chase_state(delta)
+			NPCState.RETURN_TO_PATROL:
+				_handle_return_state(delta)
+	
 	if performance_monitor:
 		performance_monitor.profile_section_end("NPC_StateMachine")
 	
@@ -266,15 +371,31 @@ func _handle_patrol_state(delta: float) -> void:
 	# Check if we should adapt patrol based on predictions
 	adapt_patrol_to_prediction()
 	
+	# Check if navigation agent is working, if not use fallback
+	if not navigation_agent or not navigation_agent.is_inside_tree():
+		_handle_fallback_patrol(delta)
+		return
+	
+	# Fallback to direct movement if navigation isn't working
+	if not navigation_agent.is_navigation_finished() and navigation_agent.get_next_path_position().distance_to(global_position) < 0.1:
+		print("NPCController: Navigation seems stuck, using fallback movement")
+		_handle_fallback_patrol(delta)
+		return
+	
 	if navigation_agent.is_navigation_finished():
 		# Reached waypoint, wait then move to next
 		if state_timer.is_stopped():
 			state_timer.start(wait_time_at_waypoint)
+			print("NPCController: Reached waypoint, waiting...")
 		return
 	
 	var current_position := global_position
 	var next_position := navigation_agent.get_next_path_position()
 	var direction := (next_position - current_position).normalized()
+	
+	# Debug output
+	if current_position.distance_to(next_position) > 0.5:
+		print("NPCController: Moving from ", current_position, " to ", next_position)
 	
 	# Adjust patrol speed based on predictive confidence
 	var speed_multiplier = 1.0
@@ -292,6 +413,11 @@ func _handle_patrol_state(delta: float) -> void:
 		_rotate_towards_direction(direction, delta)
 
 func _handle_investigate_state(delta: float) -> void:
+	# Check if navigation agent is working, if not use fallback
+	if not navigation_agent or not navigation_agent.is_inside_tree():
+		_handle_fallback_investigate(delta)
+		return
+	
 	if navigation_agent.is_navigation_finished():
 		# Reached investigation point, look around
 		if state_timer.is_stopped():
@@ -321,8 +447,19 @@ func _handle_chase_state(delta: float) -> void:
 		_switch_to_return_state()
 		return
 	
+	# Check if navigation agent is working, if not use fallback
+	if not navigation_agent or not navigation_agent.is_inside_tree():
+		_handle_fallback_chase(delta)
+		return
+	
 	# Update target to player's current position
 	navigation_agent.target_position = player_reference.global_position
+	
+	# If navigation seems stuck, use fallback
+	if not navigation_agent.is_navigation_finished() and navigation_agent.get_next_path_position().distance_to(global_position) < 0.1:
+		print("NPCController: Chase navigation stuck, using fallback")
+		_handle_fallback_chase(delta)
+		return
 	
 	if navigation_agent.is_navigation_finished():
 		# Lost the player
@@ -335,6 +472,8 @@ func _handle_chase_state(delta: float) -> void:
 	
 	var desired_velocity = Vector3(direction.x * chase_speed, 0, direction.z * chase_speed)
 	_move_with_avoidance(desired_velocity)
+	
+	print("NPCController: Chasing player via navigation - distance: ", current_position.distance_to(player_reference.global_position))
 	
 	if direction.length() > 0.1:
 		_rotate_towards_direction(direction, delta)
@@ -357,7 +496,13 @@ func _handle_return_state(delta: float) -> void:
 		_rotate_towards_direction(direction, delta)
 
 func _check_vision_cone() -> void:
-	if not player_reference or not flashlight or current_state == NPCState.CHASE:
+	if not player_reference or not flashlight:
+		player_in_sight = false
+		_reset_detection()
+		return
+	
+	# Skip vision checking if game is over to prevent stuck states
+	if GameManager.current_state == GameManager.GameState.GAME_OVER:
 		player_in_sight = false
 		_reset_detection()
 		return
@@ -390,58 +535,120 @@ func _reset_detection() -> void:
 		if vision_cone:
 			vision_cone.set_alert_mode(false)
 		detection_progress_changed.emit(0.0)
+		
+		# Emit player lost signal for NPC Manager
+		if player_in_sight:
+			player_lost.emit(self)
+	
+	# Reset peripheral reaction state when detection is lost
+	is_reacting_to_peripheral = false
+	peripheral_reaction_timer = 0.0
 
 func _is_player_in_flashlight() -> bool:
 	if not player_reference or not flashlight:
 		return false
 	
+	var npc_pos = global_position
 	var flashlight_pos = flashlight.global_position
 	# Use NPC forward direction - NPCs face positive Z direction
 	var npc_forward = global_transform.basis.z
 	var player_pos = player_reference.global_position
 	
-	# Check if player is within flashlight range
-	var to_player = player_pos - flashlight_pos
+	var to_player = player_pos - npc_pos
 	var distance = to_player.length()
+	var angle_to_player: float = rad_to_deg(npc_forward.angle_to(to_player.normalized()))
+	
+	# 1. Close-range detection (always detect if very close)
+	if distance < 2.0:
+		return _check_line_of_sight(npc_pos, player_pos, "close")
+	
+	# 2. Peripheral vision (wide angle, shorter range)
+	if distance < 6.0 and angle_to_player < 60.0:  # 120-degree peripheral vision
+		var peripheral_detected = _check_line_of_sight(npc_pos, player_pos, "peripheral")
+		if peripheral_detected:
+			# Turn towards player when spotted in peripheral vision
+			_turn_towards_player(player_pos)
+			return true
+		return false
+	
+	# 3. Flashlight cone detection (narrow angle, long range)
 	if distance > flashlight.spot_range:
 		return false
 	
-	# Skip detection if player is too close (avoid self-intersection)
-	if distance < 0.5:
-		return true  # Always detect if very close
-	
-	# Check if player is within flashlight cone angle (more generous)
-	var angle_to_player: float = rad_to_deg(npc_forward.angle_to(to_player.normalized()))
-	if angle_to_player > flashlight.spot_angle * 0.6:  # 60% of cone angle instead of 50%
+	if angle_to_player > flashlight.spot_angle * 0.6:  # 60% of cone angle
 		return false
 	
-	# Perform multiple raycasts to different parts of the player - more coverage points
-	var hit_points = [
-		player_pos,  # Center
-		player_pos + Vector3(0.4, 0, 0),     # Right
-		player_pos + Vector3(-0.4, 0, 0),    # Left  
-		player_pos + Vector3(0, 0.8, 0),     # Top (head)
-		player_pos + Vector3(0, -0.8, 0),    # Bottom (feet)
-		player_pos + Vector3(0.3, 0.3, 0),   # Top-right
-		player_pos + Vector3(-0.3, 0.3, 0),  # Top-left
-		player_pos + Vector3(0, 0.3, 0),     # Mid-height
-	]
+	# Enhanced flashlight detection with multiple raycast points
+	return _check_line_of_sight(flashlight_pos, player_pos, "flashlight")
+
+func _check_line_of_sight(from_pos: Vector3, to_pos: Vector3, detection_type: String) -> bool:
+	"""Check line of sight with multiple raycast points"""
+	var hit_points = []
+	
+	# Different raycast patterns based on detection type
+	match detection_type:
+		"close":
+			# Simple center check for close range
+			hit_points = [to_pos]
+		"peripheral":
+			# Basic visibility check for peripheral vision
+			hit_points = [
+				to_pos,  # Center
+				to_pos + Vector3(0, 0.5, 0),   # Head
+				to_pos + Vector3(0, -0.5, 0)   # Feet
+			]
+		"flashlight":
+			# Comprehensive check for flashlight
+			hit_points = [
+				to_pos,  # Center
+				to_pos + Vector3(0.4, 0, 0),     # Right
+				to_pos + Vector3(-0.4, 0, 0),    # Left  
+				to_pos + Vector3(0, 0.8, 0),     # Top (head)
+				to_pos + Vector3(0, -0.8, 0),    # Bottom (feet)
+				to_pos + Vector3(0.3, 0.3, 0),   # Top-right
+				to_pos + Vector3(-0.3, 0.3, 0),  # Top-left
+				to_pos + Vector3(0, 0.3, 0),     # Mid-height
+			]
 	
 	var hits = 0
 	for point in hit_points:
-		if _raycast_to_point(flashlight_pos, point):
+		if _raycast_to_point(from_pos, point):
 			hits += 1
 	
 	# Visualize detection rays if vision_debug exists
 	if vision_debug and vision_debug.has_method("show_detection_rays"):
-		vision_debug.show_detection_rays(flashlight_pos, hit_points, hits >= 1)
+		vision_debug.show_detection_rays(from_pos, hit_points, hits >= 1)
 	
-	# Debug output to help troubleshoot
-	if distance < 5.0:  # Expanded debug range
-		print("Debug - Distance: ", distance, " Angle: ", angle_to_player, " Hits: ", hits, "/", hit_points.size())
+	# Debug output only when player detected
+	if (detection_type == "close" and hits >= 1) or (detection_type == "peripheral" and hits >= 2) or (detection_type == "flashlight" and hits >= 1):
+		print("Debug - ", detection_type, " detection: hits=", hits, "/", hit_points.size())
 	
-	# Player is detected if at least 1 out of 8 rays hit (much more generous)
-	return hits >= 1
+	# Detection threshold varies by type
+	match detection_type:
+		"close":
+			return hits >= 1  # Any hit for close range
+		"peripheral": 
+			return hits >= 2  # Need 2/3 hits for peripheral
+		"flashlight":
+			return hits >= 1  # Any hit for flashlight
+		_:
+			return false
+
+func _turn_towards_player(player_pos: Vector3):
+	"""Smoothly turn NPC towards player when spotted in peripheral vision"""
+	if not is_reacting_to_peripheral:
+		is_reacting_to_peripheral = true
+		peripheral_reaction_timer = 0.0
+		print("Debug - Peripheral vision: Starting to turn towards player")
+	
+	var to_player = (player_pos - global_position).normalized()
+	var target_angle = atan2(to_player.x, to_player.z)
+	
+	# Use a fast turn speed for peripheral vision reactions
+	var turn_delta = get_process_delta_time()
+	var fast_turn_speed = turn_speed * 2.5  # 2.5x faster than normal
+	
+	rotation.y = lerp_angle(rotation.y, target_angle, fast_turn_speed * turn_delta)
 
 func _raycast_to_point(from: Vector3, to: Vector3) -> bool:
 	var space_state = get_world_3d().direct_space_state
@@ -537,10 +744,19 @@ func _switch_to_return_state() -> void:
 
 func _set_next_patrol_target() -> void:
 	if patrol_waypoints.size() == 0:
+		print("NPCController: No patrol waypoints available!")
 		return
 	
 	current_waypoint_index = (current_waypoint_index + 1) % patrol_waypoints.size()
-	navigation_agent.target_position = patrol_waypoints[current_waypoint_index].global_position
+	var target_pos = patrol_waypoints[current_waypoint_index].global_position
+	
+	# Try navigation agent first, fall back to direct movement
+	if navigation_agent and navigation_agent.is_inside_tree():
+		navigation_agent.target_position = target_pos
+		print("NPCController: NavigationAgent moving to waypoint ", current_waypoint_index, " at position ", target_pos)
+	else:
+		print("NPCController: NavigationAgent not available, will use fallback movement")
+	
 	patrol_point_changed.emit(current_waypoint_index)
 
 func _move_with_avoidance(desired_velocity: Vector3) -> void:
@@ -558,6 +774,113 @@ func _rotate_towards_direction(direction: Vector3, delta: float) -> void:
 	rotation.y = lerp_angle(rotation.y, target_rotation, turn_speed * delta)
 	
 	# Direction arrow and flashlight rotate with parent automatically
+
+func _handle_fallback_patrol(delta: float) -> void:
+	if patrol_waypoints.size() == 0:
+		return
+	
+	var target_waypoint = patrol_waypoints[current_waypoint_index]
+	var target_pos = target_waypoint.global_position
+	var current_pos = global_position
+	
+	# Check if reached waypoint
+	var distance_to_waypoint = current_pos.distance_to(target_pos)
+	if distance_to_waypoint < 0.8:
+		# Reached waypoint, wait then move to next
+		if state_timer.is_stopped():
+			state_timer.start(wait_time_at_waypoint)
+			print("NPCController: Fallback reached waypoint, waiting...")
+		return
+	
+	# Direct movement towards waypoint
+	var direction = (target_pos - current_pos).normalized()
+	velocity.x = direction.x * patrol_speed
+	velocity.z = direction.z * patrol_speed
+	
+	# Rotate to face movement direction
+	if direction.length() > 0.1:
+		_rotate_towards_direction(direction, delta)
+	
+	print("NPCController: Fallback moving to waypoint ", current_waypoint_index, " at ", target_pos)
+
+func _handle_fallback_chase(delta: float) -> void:
+	if not player_reference:
+		_switch_to_return_state()
+		return
+	
+	var target_pos = player_reference.global_position
+	var current_pos = global_position
+	var distance_to_player = current_pos.distance_to(target_pos)
+	
+	# Check if caught the player
+	if distance_to_player <= catch_distance:
+		_on_player_caught()
+		return
+	
+	# Direct movement towards player
+	var direction = (target_pos - current_pos).normalized()
+	velocity.x = direction.x * chase_speed
+	velocity.z = direction.z * chase_speed
+	
+	# Rotate to face player
+	if direction.length() > 0.1:
+		_rotate_towards_direction(direction, delta)
+	
+	print("NPCController: Fallback chasing player - distance: ", distance_to_player)
+
+func _handle_fallback_investigate(delta: float) -> void:
+	var target_pos = investigation_position
+	var current_pos = global_position
+	var distance_to_target = current_pos.distance_to(target_pos)
+	
+	# Check if reached investigation point
+	if distance_to_target < 0.8:
+		# Reached investigation point, look around
+		if state_timer.is_stopped():
+			state_timer.start(investigation_time)
+		
+		# Rotate while investigating
+		rotation.y += turn_speed * 0.5 * delta
+		velocity.x = 0
+		velocity.z = 0
+		return
+	
+	# Direct movement towards investigation point
+	var direction = (target_pos - current_pos).normalized()
+	velocity.x = direction.x * investigate_speed
+	velocity.z = direction.z * investigate_speed
+	
+	# Rotate to face movement direction
+	if direction.length() > 0.1:
+		_rotate_towards_direction(direction, delta)
+
+func _handle_goap_system(delta: float) -> void:
+	"""Handle NPC behavior using GOAP system"""
+	if not goap_system:
+		return
+	
+	# Update world state based on current sensors
+	goap_system.update_sensors()
+	
+	# Execute current plan
+	var current_action = goap_system.execute_plan(delta)
+	
+	# Update state label to show current GOAP action
+	if state_label:
+		state_label.text = "GOAP: " + current_action.to_upper()
+	
+	# Emit state change for debug console
+	state_changed_debug.emit("GOAP: " + current_action)
+	
+	# Apply gravity (GOAP actions set velocity directly)
+	if not is_on_floor():
+		velocity.y -= 9.8 * delta
+	else:
+		velocity.y = 0
+	
+	# The GOAP actions have already set velocity.x and velocity.z
+	# Now we just need to apply the movement
+	move_and_slide()
 
 func _on_state_timer_timeout() -> void:
 	match current_state:
@@ -586,6 +909,10 @@ func _update_suspicion_system(delta: float) -> void:
 	
 	if abs(old_suspicion - suspicion_level) > 1.0:
 		suspicion_changed_debug.emit(int(suspicion_level))
+		
+		# Emit suspicion raised signal for NPC Manager when suspicion increases significantly
+		if suspicion_level > old_suspicion and suspicion_level > suspicious_threshold:
+			suspicion_raised.emit(self, suspicion_level)
 	
 	_check_suspicion_state_changes()
 
@@ -776,6 +1103,28 @@ func _handle_search_state(delta: float) -> void:
 		_rotate_towards_direction(direction, delta)
 
 # ===================== COMMUNICATION SYSTEM =====================
+
+func receive_alert(alert_message: Dictionary) -> void:
+	"""Receive alert from NPC Manager"""
+	npc_manager_alerts.append(alert_message)
+	
+	# Process different alert types
+	match alert_message.get("type", ""):
+		"PLAYER_SPOTTED":
+			if alert_message.has("position"):
+				last_known_player_position = alert_message["position"]
+				investigation_position = alert_message["position"]
+				suspicion_level = min(max_suspicion, suspicion_level + 30.0)
+				
+		"PLAYER_LOST":
+			if alert_message.has("position"):
+				investigation_position = alert_message["position"]
+				suspicion_level = min(max_suspicion, suspicion_level + 15.0)
+				
+		"SUSPICIOUS_ACTIVITY":
+			suspicion_level = min(max_suspicion, suspicion_level + 10.0)
+	
+	print("NPCController(", name, "): Received ", alert_message.get("type", "UNKNOWN"), " alert")
 
 func receive_communication(message: Dictionary) -> void:
 	# Handle messages from other NPCs

@@ -1,27 +1,16 @@
-[gd_scene load_steps=27 format=3 uid="uid://b7hf5w8nxkgvq"]
+[gd_scene load_steps=19 format=3 uid="uid://b7hf5w8nxkgvq"]
 
 [ext_resource type="Script" uid="uid://dx38cl2wfggri" path="res://scripts/game.gd" id="1_game"]
-[ext_resource type="PackedScene" uid="uid://bxklf5nvt8qh0" path="res://environment/simple_floor.tscn" id="2_simple_floor"]
-[ext_resource type="PackedScene" uid="uid://dpq1kvj7fn4hd" path="res://environment/wall.tscn" id="3_wall"]
-[ext_resource type="PackedScene" uid="uid://bn4hh6gpgq8mi" path="res://environment/cubicle_wall.tscn" id="4_cubicle"]
-[ext_resource type="PackedScene" uid="uid://b7gqm3t1xkr5j" path="res://environment/office_desk.tscn" id="5_desk"]
-[ext_resource type="PackedScene" uid="uid://b8nmhsv3cygkq" path="res://environment/office_chair.tscn" id="6_chair"]
-[ext_resource type="PackedScene" uid="uid://dxk1m5oqswbgw" path="res://environment/kitchen_counter.tscn" id="7_counter"]
 [ext_resource type="PackedScene" uid="uid://bvnx4jpyxvhqo" path="res://scenes/player.tscn" id="8_player"]
 [ext_resource type="Script" uid="uid://x0bnonghuli0" path="res://scripts/isometric_camera.gd" id="9_camera"]
 [ext_resource type="PackedScene" uid="uid://cevuj3wqn8kxp" path="res://scenes/npc.tscn" id="10_npc"]
 [ext_resource type="PackedScene" uid="uid://cx6yb7xqiqy8d" path="res://objects/biscuit_jar.tscn" id="11_jar"]
 [ext_resource type="PackedScene" uid="uid://bxphv8gxrykwj" path="res://ui/game_ui.tscn" id="12_ui"]
-[ext_resource type="PackedScene" uid="uid://bndnajx3hqgl5" path="res://environment/invisible_wall.tscn" id="13_invisible"]
 [ext_resource type="PackedScene" uid="uid://cxvh4pqv3n8fb" path="res://ui/performance_monitor.tscn" id="13_performance"]
 [ext_resource type="PackedScene" uid="uid://clhx8v4d3qy2r" path="res://environment/object_label.tscn" id="14_label"]
-[ext_resource type="PackedScene" uid="uid://dp48qmwjqb6n5" path="res://environment/computer_monitor.tscn" id="15_monitor"]
-[ext_resource type="PackedScene" uid="uid://bxlp8v0jn6q4t" path="res://environment/filing_cabinet.tscn" id="16_cabinet"]
 [ext_resource type="PackedScene" uid="uid://cpvug3wlypb3j" path="res://environment/elevator.tscn" id="17_elevator"]
-[ext_resource type="PackedScene" uid="uid://bi4xwna4dtl0s" path="res://environment/glass_window.tscn" id="18_glass_window"]
-[ext_resource type="PackedScene" uid="uid://bdxk5nvt8qh0m" path="res://ui/minimap.tscn" id="19_minimap"]
-[ext_resource type="PackedScene" uid="uid://4x3xm7ljkn51" path="res://ui/objectives_panel.tscn" id="20_objectives"]
-[ext_resource type="PackedScene" uid="uid://qppch7dyso62" path="res://ui/waypoint_indicator.tscn" id="21_waypoint"]
+[ext_resource type="PackedScene" uid="uid://cfappif73htlf" path="res://models/floorplan.blend" id="17_floorplan"]
+[ext_resource type="PackedScene" uid="uid://bwb8c5rgdmn1l" path="res://models/floor.blend" id="18_floor"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.9, 0.9, 0.95, 1)
@@ -37,12 +26,23 @@ background_mode = 2
 sky = SubResource("Sky_1")
 ambient_light_source = 3
 ambient_light_color = Color(0.95, 0.95, 1, 1)
-ambient_light_energy = 0.2
+ambient_light_energy = 0.8
 tonemap_mode = 2
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_1"]
 vertices = PackedVector3Array(-16, 0.5, -16, -16, 0.5, 16, 16, 0.5, 16, 16, 0.5, -16)
 polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(0.3, 2, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0, 0.8, 0, 1)
+emission_enabled = true
+emission = Color(0, 0.5, 0, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(0.3, 2, 0.3)
 
 [node name="Game" type="Node3D" groups=["game"]]
 script = ExtResource("1_game")
@@ -51,219 +51,16 @@ script = ExtResource("1_game")
 environment = SubResource("Environment_1")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, 0.5, -0.5, 0, 0, 0)
-light_energy = 0.1
+transform = Transform3D(-0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, 0.5, -0.5, 0, 0.704432, 4.01052)
+light_energy = 0.4
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.71735, 0, -0.904255)
+visible = false
 navigation_mesh = SubResource("NavigationMesh_1")
 
-[node name="Office" type="Node3D" parent="."]
-
-[node name="Floor" type="Node3D" parent="Office"]
-
-[node name="SimpleFloor" parent="Office/Floor" instance=ExtResource("2_simple_floor")]
-
-[node name="OuterWalls" type="Node3D" parent="Office"]
-
-[node name="WallLeft2" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, -4)
-
-[node name="WallLeft3" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 0)
-
-[node name="WallLeft4" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 4)
-
-[node name="WallLeft5" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 8)
-
-[node name="GlassWindowTop1" parent="Office/OuterWalls" instance=ExtResource("18_glass_window")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -11)
-
-[node name="GlassWindowTop2" parent="Office/OuterWalls" instance=ExtResource("18_glass_window")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 4, 0, -11)
-
-[node name="WallTop5" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 8, 0, -11)
-
-[node name="WallRight1" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -8)
-
-[node name="GlassWindowRight1" parent="Office/OuterWalls" instance=ExtResource("18_glass_window")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -4)
-
-[node name="GlassWindowRight2" parent="Office/OuterWalls" instance=ExtResource("18_glass_window")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 0)
-
-[node name="WallRight4" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 4)
-
-[node name="WallRight5" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 8)
-
-[node name="WallBottom1" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -8, 0, 11)
-
-[node name="WallBottom2" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -4, 0, 11)
-
-[node name="WallBottom3" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 11)
-
-[node name="WallBottom4" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 4, 0, 11)
-
-[node name="WallBottom5" parent="Office/OuterWalls" instance=ExtResource("3_wall")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 8, 0, 11)
-
-[node name="BoundaryWalls" type="Node3D" parent="Office"]
-
-[node name="InvisibleWallLeft" parent="Office/BoundaryWalls" instance=ExtResource("13_invisible")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
-
-[node name="InvisibleWallRight" parent="Office/BoundaryWalls" instance=ExtResource("13_invisible")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
-
-[node name="InvisibleWallTop" parent="Office/BoundaryWalls" instance=ExtResource("13_invisible")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -12)
-
-[node name="InvisibleWallBottom" parent="Office/BoundaryWalls" instance=ExtResource("13_invisible")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 12)
-
-[node name="Cubicles" type="Node3D" parent="Office"]
-
-[node name="Cubicle1" type="Node3D" parent="Office/Cubicles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8)
-
-[node name="Cubicle2" type="Node3D" parent="Office/Cubicles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -8)
-
-[node name="CubicleWall" parent="Office/Cubicles/Cubicle2" instance=ExtResource("4_cubicle")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
-
-[node name="CubicleWall2" parent="Office/Cubicles/Cubicle2" instance=ExtResource("4_cubicle")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-
-[node name="CubicleWall3" parent="Office/Cubicles/Cubicle2" instance=ExtResource("4_cubicle")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -1)
-
-[node name="CubicleWall4" parent="Office/Cubicles/Cubicle2" instance=ExtResource("4_cubicle")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 1)
-
-[node name="OfficeDesk" parent="Office/Cubicles/Cubicle2" instance=ExtResource("5_desk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
-
-[node name="OfficeChair" parent="Office/Cubicles/Cubicle2" instance=ExtResource("6_chair")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)
-
-[node name="ComputerMonitor2" parent="Office/Cubicles/Cubicle2" instance=ExtResource("15_monitor")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.8, 0)
-
-[node name="Cubicle3" type="Node3D" parent="Office/Cubicles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
-
-[node name="CubicleWall" parent="Office/Cubicles/Cubicle3" instance=ExtResource("4_cubicle")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
-
-[node name="CubicleWall2" parent="Office/Cubicles/Cubicle3" instance=ExtResource("4_cubicle")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-
-[node name="CubicleWall3" parent="Office/Cubicles/Cubicle3" instance=ExtResource("4_cubicle")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -1)
-
-[node name="CubicleWall4" parent="Office/Cubicles/Cubicle3" instance=ExtResource("4_cubicle")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 1)
-
-[node name="OfficeDesk" parent="Office/Cubicles/Cubicle3" instance=ExtResource("5_desk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
-
-[node name="OfficeChair" parent="Office/Cubicles/Cubicle3" instance=ExtResource("6_chair")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)
-
-[node name="ComputerMonitor3" parent="Office/Cubicles/Cubicle3" instance=ExtResource("15_monitor")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.8, 0)
-
-[node name="Cubicle4" type="Node3D" parent="Office/Cubicles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -8)
-
-[node name="CubicleWall" parent="Office/Cubicles/Cubicle4" instance=ExtResource("4_cubicle")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
-
-[node name="CubicleWall2" parent="Office/Cubicles/Cubicle4" instance=ExtResource("4_cubicle")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-
-[node name="CubicleWall3" parent="Office/Cubicles/Cubicle4" instance=ExtResource("4_cubicle")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -1)
-
-[node name="CubicleWall4" parent="Office/Cubicles/Cubicle4" instance=ExtResource("4_cubicle")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 1)
-
-[node name="OfficeDesk" parent="Office/Cubicles/Cubicle4" instance=ExtResource("5_desk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
-
-[node name="OfficeChair" parent="Office/Cubicles/Cubicle4" instance=ExtResource("6_chair")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)
-
-[node name="Cubicle5" type="Node3D" parent="Office/Cubicles"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -8)
-
-[node name="CubicleWall" parent="Office/Cubicles/Cubicle5" instance=ExtResource("4_cubicle")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -1)
-
-[node name="CubicleWall2" parent="Office/Cubicles/Cubicle5" instance=ExtResource("4_cubicle")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 1)
-
-[node name="CubicleWall3" parent="Office/Cubicles/Cubicle5" instance=ExtResource("4_cubicle")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-
-[node name="OfficeDesk" parent="Office/Cubicles/Cubicle5" instance=ExtResource("5_desk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)
-
-[node name="OfficeChair" parent="Office/Cubicles/Cubicle5" instance=ExtResource("6_chair")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0)
-
-[node name="Kitchen" type="Node3D" parent="Office"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 8)
-
-[node name="KitchenWall1" parent="Office/Kitchen" instance=ExtResource("3_wall")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
-
-[node name="KitchenWall2" parent="Office/Kitchen" instance=ExtResource("3_wall")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -4, 0, 0)
-
-[node name="KitchenCounter" parent="Office/Kitchen" instance=ExtResource("7_counter")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 1)
-
-[node name="KitchenCounter2" parent="Office/Kitchen" instance=ExtResource("7_counter")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -1, 0, -1.5)
-
-[node name="KitchenLabel" parent="Office/Kitchen" instance=ExtResource("14_label")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
-label_text = "☕ KITCHEN"
-show_distance = 6.0
-
-[node name="OfficeDecorations" type="Node3D" parent="Office"]
-
-[node name="FilingCabinet1" parent="Office/OfficeDecorations" instance=ExtResource("16_cabinet")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 2)
-
-[node name="CabinetLabel1" parent="Office/OfficeDecorations/FilingCabinet1" instance=ExtResource("14_label")]
-label_text = "📁 Filing Cabinet"
-show_distance = 4.0
-
-[node name="FilingCabinet2" parent="Office/OfficeDecorations" instance=ExtResource("16_cabinet")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -2)
-
-[node name="FilingCabinet3" parent="Office/OfficeDecorations" instance=ExtResource("16_cabinet")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 0, 10)
-
-[node name="Elevator" type="Node3D" parent="Office"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -9)
-
-[node name="ElevatorScene" parent="Office/Elevator" instance=ExtResource("17_elevator")]
-
 [node name="Player" parent="." instance=ExtResource("8_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.9566, 0.1, -9.54785)
 
 [node name="CameraRig" type="Node3D" parent="."]
 script = ExtResource("9_camera")
@@ -276,76 +73,105 @@ size = 20.0
 [node name="FadeRaycast" type="RayCast3D" parent="CameraRig"]
 
 [node name="SecurityGuard" parent="." instance=ExtResource("10_npc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.37958, 0.1, 1.67393)
 
 [node name="GuardLabel" parent="SecurityGuard" instance=ExtResource("14_label")]
-label_text = "👮 GUARD"
+label_text = "👮 GUARD 1"
 show_distance = 8.0
 
-[node name="PatrolWaypoints" type="Node3D" parent="."]
-
-[node name="Waypoint1" type="Marker3D" parent="PatrolWaypoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -4)
-
-[node name="Waypoint2" type="Marker3D" parent="PatrolWaypoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -4)
-
-[node name="Waypoint3" type="Marker3D" parent="PatrolWaypoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -4)
-
-[node name="Waypoint4" type="Marker3D" parent="PatrolWaypoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 4)
-
-[node name="Waypoint5" type="Marker3D" parent="PatrolWaypoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 4)
-
-[node name="Waypoint6" type="Marker3D" parent="PatrolWaypoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 4)
-
 [node name="SecurityGuard2" parent="." instance=ExtResource("10_npc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.1, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0.1, -8.5)
 
 [node name="GuardLabel2" parent="SecurityGuard2" instance=ExtResource("14_label")]
 label_text = "👮 GUARD 2"
 show_distance = 8.0
 
+[node name="SecurityGuard3" parent="." instance=ExtResource("10_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.1, -5)
+
+[node name="GuardLabel3" parent="SecurityGuard3" instance=ExtResource("14_label")]
+label_text = "👮 GUARD 3"
+show_distance = 8.0
+
+[node name="PatrolWaypoints" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.89232, 0, 4.40795)
+
+[node name="Waypoint1" type="Marker3D" parent="PatrolWaypoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.71735, 0, -13.0573)
+
+[node name="Waypoint2" type="Marker3D" parent="PatrolWaypoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.71735, 0, -2.90425)
+
+[node name="Waypoint3" type="Marker3D" parent="PatrolWaypoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.6601, 0, 0.0957451)
+
+[node name="Waypoint4" type="Marker3D" parent="PatrolWaypoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.9506, 0, 1.09574)
+
+[node name="Waypoint5" type="Marker3D" parent="PatrolWaypoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.71735, 0, 1.09574)
+
+[node name="Waypoint6" type="Marker3D" parent="PatrolWaypoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.6585, 0, -12.6189)
+
 [node name="PatrolWaypoints2" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -8.5)
 
-[node name="Guard2Waypoint1" type="Marker3D" parent="PatrolWaypoints2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -3)
+[node name="Waypoint1" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
 
-[node name="Guard2Waypoint2" type="Marker3D" parent="PatrolWaypoints2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -3)
+[node name="Waypoint2" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -5)
 
-[node name="Guard2Waypoint3" type="Marker3D" parent="PatrolWaypoints2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 3)
+[node name="Waypoint3" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -12)
 
-[node name="Guard2Waypoint4" type="Marker3D" parent="PatrolWaypoints2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 6)
+[node name="Waypoint4" type="Marker3D" parent="PatrolWaypoints2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -10)
 
-[node name="Guard2Waypoint5" type="Marker3D" parent="PatrolWaypoints2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 6)
+[node name="PatrolWaypoints3" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -5)
 
-[node name="Guard2Waypoint6" type="Marker3D" parent="PatrolWaypoints2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 3)
+[node name="Waypoint1" type="Marker3D" parent="PatrolWaypoints3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 8)
+
+[node name="Waypoint2" type="Marker3D" parent="PatrolWaypoints3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 5)
+
+[node name="Waypoint3" type="Marker3D" parent="PatrolWaypoints3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -3)
+
+[node name="Waypoint4" type="Marker3D" parent="PatrolWaypoints3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+
+[node name="Waypoint5" type="Marker3D" parent="PatrolWaypoints3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -8)
 
 [node name="BiscuitJar" parent="." instance=ExtResource("11_jar")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1, 9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5029, 1, -8.32094)
 
 [node name="BiscuitJarLabel" parent="BiscuitJar" instance=ExtResource("14_label")]
 label_text = "🍪 BISCUIT JAR"
 show_always = true
 
+[node name="ExitElevator" type="StaticBody3D" parent="." groups=["exit_door", "interactables"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.914, 0, -9.71927)
+collision_layer = 8
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ExitElevator"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.7011, 1, -8.55648)
+mesh = SubResource("BoxMesh_1")
+surface_material_override/0 = SubResource("StandardMaterial3D_1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ExitElevator"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_1")
+
+[node name="ExitLabel" parent="ExitElevator" instance=ExtResource("14_label")]
+label_text = "🚪 EXIT"
+show_always = true
+
 [node name="GameUI" parent="." instance=ExtResource("12_ui")]
-
-[node name="Minimap" parent="GameUI" instance=ExtResource("19_minimap")]
-anchors_preset = 0
-
-[node name="ObjectivesPanel" parent="GameUI" instance=ExtResource("20_objectives")]
-anchors_preset = 0
-
-[node name="WaypointIndicator" parent="GameUI" instance=ExtResource("21_waypoint")]
-anchors_preset = 0
 
 [node name="PerformanceMonitor" parent="." instance=ExtResource("13_performance")]
 visible = false
@@ -356,5 +182,14 @@ visible = false
 wait_time = 0.1
 one_shot = true
 autostart = true
+
+[node name="walls" parent="." instance=ExtResource("17_floorplan")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0352497, 0, -0.0537515)
+
+[node name="floor" parent="." instance=ExtResource("18_floor")]
+visible = false
+
+[node name="Elevator" parent="." instance=ExtResource("17_elevator")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.4257, -0.100002, -10.1742)
 
 [connection signal="timeout" from="GameStart/Timer" to="." method="_on_game_start_timer_timeout"]
