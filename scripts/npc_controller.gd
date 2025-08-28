@@ -982,11 +982,17 @@ func _on_state_entered(state: NPCState) -> void:
 		NPCState.SUSPICIOUS:
 			state_timer.start(suspicious_time)
 			velocity = Vector3.ZERO
+			# Play alert sound
+			if AudioManager:
+				AudioManager.play_alert()
 		
 		NPCState.INVESTIGATE:
 			investigation_position = last_known_player_position
 			navigation_agent.target_position = investigation_position
 			state_timer.start(investigation_time)
+			# Play higher alert sound
+			if AudioManager:
+				AudioManager.play_alert()
 		
 		NPCState.SEARCH:
 			_generate_search_positions()
@@ -997,6 +1003,9 @@ func _on_state_entered(state: NPCState) -> void:
 		
 		NPCState.CHASE:
 			state_timer.stop()
+			# Play chase/danger sound
+			if AudioManager:
+				AudioManager.play_alert()
 		
 		NPCState.RETURN_TO_PATROL:
 			_set_next_patrol_target()

@@ -53,6 +53,11 @@ func collect_jar() -> void:
 	has_jar = true
 	score += 1000
 	jar_collected.emit()
+	
+	# Play pickup sound
+	if AudioManager:
+		AudioManager.play_item_pickup()
+	
 	print("Biscuit jar collected! Now escape!")
 
 func trigger_game_over(reason: String = "You were spotted!") -> void:
@@ -61,6 +66,11 @@ func trigger_game_over(reason: String = "You were spotted!") -> void:
 	
 	current_state = GameState.GAME_OVER
 	game_over.emit(reason)
+	
+	# Play game over sound
+	if AudioManager:
+		AudioManager.play_game_over()
+	
 	print("Game Over: ", reason)
 
 func trigger_victory() -> void:
@@ -71,6 +81,11 @@ func trigger_victory() -> void:
 	var time_bonus: int = max(0, 1000 - int(game_timer * 10))
 	score += time_bonus
 	game_won.emit()
+	
+	# Play victory sound
+	if AudioManager:
+		AudioManager.play_victory()
+	
 	print("Victory! Final score: ", score)
 
 func _process(delta: float) -> void:
