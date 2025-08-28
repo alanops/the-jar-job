@@ -115,12 +115,10 @@ deploy_to_itch() {
         exit 1
     fi
     
-    # Verify authentication
-    if ! butler status "$ITCH_USER/$ITCH_GAME" &> /dev/null; then
-        echo -e "${RED}❌ Butler authentication failed${NC}"
-        echo "   API key may be invalid or expired"
-        exit 1
-    fi
+    # Export API key for Butler to use
+    export BUTLER_API_KEY
+    
+    echo "🔑 Using API key for Butler authentication"
     
     # Push to itch.io
     echo "Pushing to $ITCH_USER/$ITCH_GAME:$ITCH_CHANNEL..."
