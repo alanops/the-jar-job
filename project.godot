@@ -21,6 +21,11 @@ config/icon="res://icon.webp"
 
 [autoload]
 
+DebugLogger="*res://scripts/debug_logger.gd"
+GameConfig="*res://scripts/game_config.gd"
+VisionSystem="*res://scripts/vision_system.gd"
+PerformanceOptimizer="*res://scripts/performance_optimizer.gd"
+ErrorHandler="*res://scripts/error_handler.gd"
 GameManager="*res://scripts/game_manager.gd"
 ObjectiveManager="*res://scripts/objective_manager.gd"
 NPCCommunication="*res://scripts/npc_communication_manager.gd"

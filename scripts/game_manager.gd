@@ -17,9 +17,11 @@ var current_state: GameState = GameState.MENU
 var has_jar: bool = false
 var game_timer: float = 0.0
 var score: int = 0
+var reset_delay: float
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	reset_delay = GameConfig.game_reset_delay
 
 func start_game() -> void:
 	current_state = GameState.PLAYING
@@ -30,7 +32,13 @@ func start_game() -> void:
 	# Reset NPC systems if they exist
 	_reset_npc_systems()
 	
+	# Clear vision detection cache
+	var vision_system = get_node_or_null("/root/VisionSystem")
+	if vision_system and vision_system.has_method("clear_cache"):
+		vision_system.clear_cache()
+	
 	game_started.emit()
+	DebugLogger.info("Game started", "GameManager")
 
 func _reset_npc_systems():
 	"""Reset all NPC-related systems"""
@@ -51,14 +59,14 @@ func collect_jar() -> void:
 		return
 	
 	has_jar = true
-	score += 1000
+	score += GameConfig.score_jar_collection
 	jar_collected.emit()
 	
 	# Play pickup sound
 	if AudioManager:
 		AudioManager.play_item_pickup()
 	
-	print("Biscuit jar collected! Now escape!")
+	DebugLogger.info("Biscuit jar collected! Score: %d" % score, "GameManager")
 
 func trigger_game_over(reason: String = "You were spotted!") -> void:
 	if current_state != GameState.PLAYING:
@@ -71,14 +79,14 @@ func trigger_game_over(reason: String = "You were spotted!") -> void:
 	if AudioManager:
 		AudioManager.play_game_over()
 	
-	print("Game Over: ", reason)
+	DebugLogger.info("Game Over: %s" % reason, "GameManager")
 
 func trigger_victory() -> void:
 	if current_state != GameState.PLAYING or not has_jar:
 		return
 	
 	current_state = GameState.VICTORY
-	var time_bonus: int = max(0, 1000 - int(game_timer * 10))
+	var time_bonus: int = max(0, GameConfig.score_jar_collection - int(game_timer * GameConfig.score_time_bonus_multiplier))
 	score += time_bonus
 	game_won.emit()
 	
@@ -86,7 +94,7 @@ func trigger_victory() -> void:
 	if AudioManager:
 		AudioManager.play_victory()
 	
-	print("Victory! Final score: ", score)
+	DebugLogger.info("Victory! Final score: %d (Time bonus: %d)" % [score, time_bonus], "GameManager")
 
 func _process(delta: float) -> void:
 	if current_state == GameState.PLAYING:
@@ -104,6 +112,13 @@ func get_time_string() -> String:
 func reset_game() -> void:
 	# Reset systems before reloading scene
 	_reset_npc_systems()
+	
+	# Clear vision detection cache
+	var vision_system = get_node_or_null("/root/VisionSystem")
+	if vision_system and vision_system.has_method("clear_cache"):
+		vision_system.clear_cache()
+	
+	DebugLogger.info("Resetting game scene", "GameManager")
 	get_tree().reload_current_scene()
 
 func return_to_menu() -> void:

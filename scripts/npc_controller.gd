@@ -980,19 +980,27 @@ func _get_state_name(state: NPCState) -> String:
 func _on_state_entered(state: NPCState) -> void:
 	match state:
 		NPCState.SUSPICIOUS:
+			DebugLogger.info("NPC entering SUSPICIOUS state", "NPCController")
 			state_timer.start(suspicious_time)
 			velocity = Vector3.ZERO
 			# Play suspicious alert sound
 			if AudioManager:
+				DebugLogger.info("Calling AudioManager.play_alert_suspicious()", "NPCController")
 				AudioManager.play_alert_suspicious()
+			else:
+				DebugLogger.warning("AudioManager not found when trying to play suspicious alert", "NPCController")
 		
 		NPCState.INVESTIGATE:
+			DebugLogger.info("NPC entering INVESTIGATE state", "NPCController")
 			investigation_position = last_known_player_position
 			navigation_agent.target_position = investigation_position
 			state_timer.start(investigation_time)
 			# Play investigation alert sound
 			if AudioManager:
+				DebugLogger.info("Calling AudioManager.play_alert_suspicious() for investigation", "NPCController")
 				AudioManager.play_alert_suspicious()
+			else:
+				DebugLogger.warning("AudioManager not found when trying to play investigation alert", "NPCController")
 		
 		NPCState.SEARCH:
 			_generate_search_positions()
@@ -1002,10 +1010,14 @@ func _on_state_entered(state: NPCState) -> void:
 			state_timer.start(search_time)
 		
 		NPCState.CHASE:
+			DebugLogger.info("NPC entering CHASE state", "NPCController")
 			state_timer.stop()
 			# Play chase alert sound
 			if AudioManager:
+				DebugLogger.info("Calling AudioManager.play_alert_chase()", "NPCController")
 				AudioManager.play_alert_chase()
+			else:
+				DebugLogger.warning("AudioManager not found when trying to play chase alert", "NPCController")
 		
 		NPCState.RETURN_TO_PATROL:
 			_set_next_patrol_target()
