@@ -69,15 +69,9 @@ godot
 #### 5. Audio System
 - **AudioManager Singleton**: Centralized audio control with automatic initialization
 - **Multi-Bus Architecture**: Separate audio buses for Music, Ambient, SFX, and UI sounds
-- **Dynamic Volume Control**: Individual volume controls with master volume override
-- **Audio Categories**:
-  - Background music with fade in/out capabilities
-  - Ambient environmental sounds (looping)
-  - Sound effects (footsteps, interactions, alerts)
-  - UI sounds (button clicks, menu navigation)
 - **Contextual Audio**: Different sounds for walking/crouching, detection states
-- **Audio Library Integration**: Supports OGG Vorbis format from `/assets/audio/`
 - **Persistent Settings**: Audio preferences saved to user configuration
+- **Detailed Documentation**: See [Audio System Documentation](docs/AUDIO_SYSTEM.md)
 
 #### 6. Performance Features
 - Advanced performance monitoring system
@@ -93,66 +87,9 @@ godot
 
 ## Key Implementation Details
 
-### Audio System Architecture
+### Audio System
 
-The game uses a comprehensive audio system built around the `AudioManager` singleton (`scripts/audio_manager.gd`). This system provides:
-
-#### Audio Bus Configuration
-```gdscript
-# Four separate audio buses for optimal mixing
-music_player.bus = "Music"      # Background music
-ambient_player.bus = "Ambient"  # Environmental sounds
-sfx_player.bus = "SFX"         # Game sound effects
-ui_player.bus = "UI"           # User interface sounds
-```
-
-#### Audio Categories and Usage
-- **Background Music** (`background_music.ogg`)
-  - Fade in/out capabilities for smooth transitions
-  - Automatically stops during game over sequences
-  - Volume: 60% of master by default
-  
-- **Ambient Sounds** (`ambient.ogg`)
-  - Continuous environmental audio
-  - Loops automatically when started
-  - Volume: 40% of master by default
-  
-- **Sound Effects**
-  - `footstep.ogg` - Triggered by player movement with volume based on movement type
-  - `detected.ogg` - Played when NPCs spot the player
-  - `alert.ogg` - Warning sounds for heightened security states
-  - `item_pickup.ogg` - Item collection feedback
-  - `victory.ogg` - Success state audio
-  - `door.ogg` - Interaction with doors/elevators
-  
-- **UI Sounds**
-  - `button_click.ogg` - Menu navigation and button presses
-
-#### Integration Points
-- **Player Controller** (`player_controller.gd:164`): Footstep audio with contextual volume
-  ```gdscript
-  var volume_modifier = 1.0
-  if is_crouching:
-      volume_modifier = 0.3  # Quieter when crouching
-  elif is_running:
-      volume_modifier = 1.2  # Louder when running
-  ```
-  
-- **Game Manager**: Victory and game over audio sequences
-- **NPC System**: Alert and detection audio feedback
-- **UI System**: Button click audio for all interactive elements
-
-#### Audio File Requirements
-- Format: OGG Vorbis (`.ogg` files)
-- Location: `/assets/audio/` directory
-- Automatic loading via `load_audio_resources()` function
-- Web-compatible compression settings
-
-#### Volume Control System
-- **Master Volume**: Global audio level control
-- **Category Volumes**: Individual control for Music, SFX, and Ambient
-- **Persistent Settings**: Audio preferences saved to `user://audio_settings.cfg`
-- **Dynamic Adjustment**: Volume can be changed during gameplay
+The game features a comprehensive audio system built around the `AudioManager` singleton. For complete documentation including API reference, integration points, and technical specifications, see [docs/AUDIO_SYSTEM.md](docs/AUDIO_SYSTEM.md).
 
 ### Scene Flow
 1. Main Menu (`ui/main_menu.tscn`)
