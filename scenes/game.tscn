@@ -74,10 +74,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.6747, 0.1, -9.46572)
 [node name="CameraRig" type="Node3D" parent="."]
 script = ExtResource("9_camera")
 
-[node name="Camera3D" type="Camera3D" parent="CameraRig"]
-transform = Transform3D(0.707107, -0.866025, 0.5, 0, 0.5, 0.866025, -0.707107, -0.612372, 0.353553, 0, 20, 10)
+[node name="CameraTopDown" type="Camera3D" parent="CameraRig"]
+transform = Transform3D(1, 0, 0, 0, 6.12323e-17, 1, 0, -1, 6.12323e-17, 0, 20, 0.1)
 projection = 1
 size = 20.0
+
+[node name="CameraIsometric" type="Camera3D" parent="CameraRig"]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 5, 12, 19)
+projection = 1
+size = 16.0
+
+[node name="CameraFirstPerson" type="Camera3D" parent="CameraRig"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0.1)
+fov = 75.0
 
 [node name="FadeRaycast" type="RayCast3D" parent="CameraRig"]
 

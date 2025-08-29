@@ -31,22 +31,46 @@ class_name IsometricCamera
 var current_camera_view: int = 0  # 0 = top-down, 1 = isometric, 2 = first person
 var camera_views: Array[Dictionary] = []
 
-@onready var camera: Camera3D = $Camera3D
+@onready var camera_topdown: Camera3D = $CameraTopDown
+@onready var camera_isometric: Camera3D = $CameraIsometric
+@onready var camera_firstperson: Camera3D = $CameraFirstPerson
 @onready var fade_raycast: RayCast3D = $FadeRaycast
+
+var active_camera: Camera3D
 
 var target: Node3D
 var faded_objects: Dictionary = {}
 
 func _ready() -> void:
-	# Build camera views from export variables
-	_build_camera_views()
+	# Set up cameras
+	_setup_cameras()
 	
-	# Set up initial camera view
-	_apply_camera_view(current_camera_view)
+	# Set initial camera
+	_switch_to_camera(current_camera_view)
 	
 	# Set up fade raycast
 	fade_raycast.target_position = Vector3(0, -20, -20)
 	fade_raycast.collision_mask = 1  # Only check world layer
+
+func _setup_cameras() -> void:
+	# Configure camera properties
+	if camera_topdown:
+		camera_topdown.projection = Camera3D.PROJECTION_ORTHOGONAL
+		camera_topdown.size = topdown_size
+		camera_topdown.near = 0.1
+		camera_topdown.far = 100.0
+		
+	if camera_isometric:
+		camera_isometric.projection = Camera3D.PROJECTION_ORTHOGONAL
+		camera_isometric.size = iso_size
+		camera_isometric.near = 0.1
+		camera_isometric.far = 100.0
+		
+	if camera_firstperson:
+		camera_firstperson.projection = Camera3D.PROJECTION_PERSPECTIVE
+		camera_firstperson.fov = fps_fov
+		camera_firstperson.near = 0.01
+		camera_firstperson.far = 100.0
 
 func _build_camera_views() -> void:
 	# Build camera view configurations from export variables
@@ -133,17 +157,42 @@ func _apply_camera_view(view_index: int) -> void:
 	print("Camera switched to: ", view.name)
 
 func toggle_camera_view() -> void:
-	current_camera_view = (current_camera_view + 1) % camera_views.size()
-	_apply_camera_view(current_camera_view)
+	current_camera_view = (current_camera_view + 1) % 3
+	_switch_to_camera(current_camera_view)
+
+func _switch_to_camera(index: int) -> void:
+	# Disable all cameras
+	if camera_topdown:
+		camera_topdown.current = false
+	if camera_isometric:
+		camera_isometric.current = false
+	if camera_firstperson:
+		camera_firstperson.current = false
+	
+	# Enable selected camera
+	match index:
+		0:
+			if camera_topdown:
+				camera_topdown.current = true
+				active_camera = camera_topdown
+				print("Switched to Top Down camera")
+		1:
+			if camera_isometric:
+				camera_isometric.current = true
+				active_camera = camera_isometric
+				print("Switched to Isometric camera")
+		2:
+			if camera_firstperson:
+				camera_firstperson.current = true
+				active_camera = camera_firstperson
+				print("Switched to First Person camera")
 
 func _physics_process(delta: float) -> void:
-	if not target:
+	if not target or not active_camera:
 		return
 	
-	var view = camera_views[current_camera_view]
-	
-	if view.is_first_person:
-		# First person mode - camera follows player exactly
+	if current_camera_view == 2:  # First person
+		# Camera rig follows player exactly
 		global_position = target.global_position
 		
 		# Match player rotation for first person view
@@ -155,7 +204,7 @@ func _physics_process(delta: float) -> void:
 		global_position = global_position.lerp(target_pos, follow_speed * delta)
 	
 	# Wall fade system (only for non-first person views)
-	if not view.is_first_person:
+	if current_camera_view != 2:
 		_update_wall_fade()
 
 func _update_wall_fade() -> void:
