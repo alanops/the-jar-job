@@ -23,6 +23,7 @@ var current_speed: float = WALK_SPEED
 var current_noise_radius: float = noise_radius_walk
 var interactable_object: Node3D = null
 var game_ui: Control
+var camera_rig: Node3D
 
 signal made_noise(position: Vector3, radius: float)
 
@@ -39,7 +40,7 @@ func _ready() -> void:
 	
 	GameManager.game_started.connect(_on_game_started)
 	
-	# Find the game UI
+	# Find the game UI and camera rig
 	await get_tree().process_frame
 	var game_ui_nodes = get_tree().get_nodes_in_group("game_ui")
 	if game_ui_nodes.size() > 0:
@@ -49,6 +50,7 @@ func _ready() -> void:
 		var game_node = get_tree().get_first_node_in_group("game")
 		if game_node:
 			game_ui = game_node.get_node("GameUI")
+			camera_rig = game_node.get_node("CameraRig")
 
 func _on_game_started() -> void:
 	is_crouching = false
@@ -75,26 +77,34 @@ func _physics_process(delta: float) -> void:
 			if is_running:
 				_stop_running()
 	
-	# Get input direction - simple top-down controls
-	var direction := Vector3()
+	# Get input direction relative to camera orientation
+	var input_dir := Vector2()
 	
-	# Up arrow = move up on screen (negative X)
+	# Get raw input
 	if Input.is_action_pressed("move_forward"):
-		direction.x -= 1.0
-	
-	# Down arrow = move down on screen (positive X)
+		input_dir.y -= 1.0
 	if Input.is_action_pressed("move_backward"):
-		direction.x += 1.0
-		
-	# Left arrow = move left on screen (positive Z)
+		input_dir.y += 1.0
 	if Input.is_action_pressed("move_left"):
-		direction.z += 1.0
-		
-	# Right arrow = move right on screen (negative Z)
+		input_dir.x -= 1.0
 	if Input.is_action_pressed("move_right"):
-		direction.z -= 1.0
+		input_dir.x += 1.0
+	
+	input_dir = input_dir.normalized()
+	
+	# Transform input relative to camera rotation
+	var direction := Vector3()
+	if input_dir.length() > 0 and camera_rig:
+		# Get camera's Y rotation (yaw) to transform movement
+		var camera_yaw = camera_rig.rotation.y
 		
-	direction = direction.normalized()
+		# Transform input direction based on camera orientation
+		direction.x = input_dir.y * cos(camera_yaw) + input_dir.x * sin(camera_yaw)
+		direction.z = input_dir.y * -sin(camera_yaw) + input_dir.x * cos(camera_yaw)
+	elif input_dir.length() > 0:
+		# Fallback to default movement if camera_rig not found
+		direction.x = -input_dir.y
+		direction.z = input_dir.x
 	
 	if direction.length() > 0:
 		velocity.x = direction.x * current_speed

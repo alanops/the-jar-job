@@ -8,6 +8,27 @@ class_name IsometricCamera
 @export var fade_distance: float = 2.0
 @export var fade_alpha: float = 0.3
 
+# Camera view settings
+var current_camera_view: int = 0  # 0 = high angle (current), 1 = lower angle (better depth)
+var camera_views: Array[Dictionary] = [
+	{
+		"name": "High Angle",
+		"yaw": -45,
+		"pitch": -60,
+		"height": 20,
+		"distance": 10,
+		"size": 20.0
+	},
+	{
+		"name": "Medium Angle", 
+		"yaw": -45,
+		"pitch": -35,
+		"height": 15,
+		"distance": 15,
+		"size": 18.0
+	}
+]
+
 @onready var camera: Camera3D = $Camera3D
 @onready var fade_raycast: RayCast3D = $FadeRaycast
 
@@ -15,22 +36,8 @@ var target: Node3D
 var faded_objects: Dictionary = {}
 
 func _ready() -> void:
-	# Set up isometric camera angle (45° yaw, 45-60° pitch)
-	rotation.y = deg_to_rad(-45)
-	rotation.x = deg_to_rad(-45)
-	
-	# Position camera
-	camera.position = Vector3(0, camera_height, camera_distance)
-	camera.look_at(Vector3.ZERO, Vector3.UP)
-	
-	# Set orthogonal projection for true isometric
-	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 10.0
-	
-	# Enable culling optimizations
-	camera.cull_mask = 0xFFFFF  # See all layers
-	camera.near = 0.1
-	camera.far = 100.0  # Reduce far plane for better culling
+	# Set up initial camera view
+	_apply_camera_view(current_camera_view)
 	
 	# Set up fade raycast
 	fade_raycast.target_position = Vector3(0, -20, -20)
@@ -38,6 +45,32 @@ func _ready() -> void:
 
 func set_target(new_target: Node3D) -> void:
 	target = new_target
+
+func _apply_camera_view(view_index: int) -> void:
+	var view = camera_views[view_index]
+	
+	# Set rotation
+	rotation.y = deg_to_rad(view.yaw)
+	rotation.x = deg_to_rad(view.pitch)
+	
+	# Position camera
+	camera.position = Vector3(0, view.height, view.distance)
+	camera.look_at(Vector3.ZERO, Vector3.UP)
+	
+	# Set orthogonal projection
+	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+	camera.size = view.size
+	
+	# Enable culling optimizations
+	camera.cull_mask = 0xFFFFF  # See all layers
+	camera.near = 0.1
+	camera.far = 100.0  # Reduce far plane for better culling
+	
+	print("Camera switched to: ", view.name)
+
+func toggle_camera_view() -> void:
+	current_camera_view = (current_camera_view + 1) % camera_views.size()
+	_apply_camera_view(current_camera_view)
 
 func _physics_process(delta: float) -> void:
 	if not target:

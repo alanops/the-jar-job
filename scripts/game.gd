@@ -127,6 +127,10 @@ func _input(event: InputEvent) -> void:
 			# Log performance report
 			if advanced_performance_monitor:
 				advanced_performance_monitor.log_performance_report()
+		elif event.keycode == KEY_TAB:
+			# Toggle camera view
+			if camera_rig:
+				camera_rig.toggle_camera_view()
 
 func _on_game_start_timer_timeout() -> void:
 	# Reset all NPC systems before starting
