@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://b7hf5w8nxkgvq"]
+[gd_scene load_steps=28 format=3 uid="uid://b7hf5w8nxkgvq"]
 
 [ext_resource type="Script" uid="uid://dx38cl2wfggri" path="res://scripts/game.gd" id="1_game"]
 [ext_resource type="PackedScene" uid="uid://bvnx4jpyxvhqo" path="res://scenes/player.tscn" id="8_player"]
@@ -11,6 +11,15 @@
 [ext_resource type="PackedScene" uid="uid://cpvug3wlypb3j" path="res://environment/elevator.tscn" id="17_elevator"]
 [ext_resource type="PackedScene" uid="uid://cfappif73htlf" path="res://models/floorplan.blend" id="17_floorplan"]
 [ext_resource type="PackedScene" uid="uid://bwb8c5rgdmn1l" path="res://models/floor.blend" id="18_floor"]
+[ext_resource type="PackedScene" path="res://environment/big_cubicle.tscn" id="19_bigcubicle"]
+[ext_resource type="PackedScene" uid="uid://cjw6k3xn5b8yr" path="res://environment/conference_table.tscn" id="20_conftable"]
+[ext_resource type="PackedScene" uid="uid://dkx7l4yo6da0s" path="res://environment/conference_chairs.tscn" id="21_confchairs"]
+[ext_resource type="PackedScene" uid="uid://b7gqm3t1xkr5j" path="res://environment/office_desk.tscn" id="22_desk"]
+[ext_resource type="PackedScene" uid="uid://b8nmhsv3cygkq" path="res://environment/office_chair.tscn" id="23_chair"]
+[ext_resource type="PackedScene" uid="uid://cm2l8xk4wgvhg" path="res://environment/office_plant.tscn" id="24_plant"]
+[ext_resource type="PackedScene" uid="uid://bxlp8v0jn6q4t" path="res://environment/filing_cabinet.tscn" id="25_filing"]
+[ext_resource type="PackedScene" uid="uid://dp48qmwjqb6n5" path="res://environment/computer_monitor.tscn" id="26_monitor"]
+[ext_resource type="PackedScene" uid="uid://dxk1m5oqswbgw" path="res://environment/kitchen_counter.tscn" id="27_kitchen"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.9, 0.9, 0.95, 1)
@@ -60,7 +69,7 @@ visible = false
 navigation_mesh = SubResource("NavigationMesh_1")
 
 [node name="Player" parent="." instance=ExtResource("8_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.9566, 0.1, -9.54785)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.42963, 0.1, -9.61941)
 
 [node name="CameraRig" type="Node3D" parent="."]
 script = ExtResource("9_camera")
@@ -159,7 +168,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.914, 0, -9.71927)
 collision_layer = 8
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="ExitElevator"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.7011, 1, -8.55648)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.227915, 1, 4.71785)
 mesh = SubResource("BoxMesh_1")
 surface_material_override/0 = SubResource("StandardMaterial3D_1")
 
@@ -187,9 +196,128 @@ autostart = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0352497, 0, -0.0537515)
 
 [node name="floor" parent="." instance=ExtResource("18_floor")]
-visible = false
 
 [node name="Elevator" parent="." instance=ExtResource("17_elevator")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.4257, -0.100002, -10.1742)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.4257, -0.100002, -9.5302)
+
+[node name="BigCubicle1" parent="." instance=ExtResource("19_bigcubicle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 5)
+
+[node name="ConferenceTable1" parent="." instance=ExtResource("20_conftable")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -3)
+
+[node name="ConferenceChairs1" parent="." instance=ExtResource("21_confchairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -3)
+
+[node name="BigCubicle2" parent="." instance=ExtResource("19_bigcubicle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -8)
+
+[node name="OfficeChair1" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 6.81447, 0, -3.48395)
+
+[node name="ComputerMonitor1" parent="." instance=ExtResource("26_monitor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.75, 7.5)
+
+[node name="OfficeDesk2" parent="." instance=ExtResource("22_desk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.7951, 9.53674e-07, -4.67851)
+
+[node name="OfficeChair2" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -2.79061, 9.53674e-07, -2.19726)
+
+[node name="ComputerMonitor2" parent="." instance=ExtResource("26_monitor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.75, 7.5)
+
+[node name="FilingCabinet1" parent="." instance=ExtResource("25_filing")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.38803, 0, -2.54856)
+
+[node name="OfficePlant1" parent="." instance=ExtResource("24_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.6788, 0, -10.0626)
+
+[node name="OfficeChair3" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 6)
+
+[node name="ComputerMonitor3" parent="." instance=ExtResource("26_monitor")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 15.5, 0.75, 6)
+
+[node name="OfficeDesk4" parent="." instance=ExtResource("22_desk")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 15, 0, 2)
+
+[node name="OfficeChair4" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 2)
+
+[node name="ComputerMonitor4" parent="." instance=ExtResource("26_monitor")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 15.5, 0.75, 2)
+
+[node name="FilingCabinet2" parent="." instance=ExtResource("25_filing")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 4)
+
+[node name="OfficePlant2" parent="." instance=ExtResource("24_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0, 8)
+
+[node name="OfficeChair5" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -2.89781, 0, 6.91977)
+
+[node name="ComputerMonitor5" parent="." instance=ExtResource("26_monitor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.75, -12.5)
+
+[node name="OfficeDesk6" parent="." instance=ExtResource("22_desk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -12)
+
+[node name="OfficeChair6" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -3.95346, 9.53674e-07, 6.94169)
+
+[node name="ComputerMonitor6" parent="." instance=ExtResource("26_monitor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.75, -12.5)
+
+[node name="FilingCabinet3" parent="." instance=ExtResource("25_filing")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -12)
+
+[node name="KitchenCounter2" parent="." instance=ExtResource("27_kitchen")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -12, 0, 4)
+
+[node name="OfficeChair7" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0, 2)
+
+[node name="OfficeChair8" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 2)
+
+[node name="OfficePlant3" parent="." instance=ExtResource("24_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.96891, 0, 2.4089)
+
+[node name="BigCubicle4" parent="." instance=ExtResource("19_bigcubicle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.8368, -9.53674e-07, -1.82394)
+
+[node name="ConferenceTable2" parent="." instance=ExtResource("20_conftable")]
+transform = Transform3D(0.0611705, 0, 0.998127, 0, 1, 0, -0.998127, 0, 0.0611705, -2, 0, 2)
+
+[node name="ConferenceChairs2" parent="." instance=ExtResource("21_confchairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+
+[node name="FilingCabinet5" parent="." instance=ExtResource("25_filing")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -6)
+
+[node name="FilingCabinet6" parent="." instance=ExtResource("25_filing")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 14.862, 9.53674e-07, 0.603326)
+
+[node name="OfficePlant5" parent="." instance=ExtResource("24_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.87239, 0, -10.2347)
+
+[node name="OfficePlant6" parent="." instance=ExtResource("24_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, 0)
+
+[node name="OfficeChair9" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 4, 0, -5)
+
+[node name="ComputerMonitor7" parent="." instance=ExtResource("26_monitor")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 3.5, 0.75, -5)
+
+[node name="OfficeDesk8" parent="." instance=ExtResource("22_desk")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 3, 0, -1)
+
+[node name="OfficeChair10" parent="." instance=ExtResource("23_chair")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 4, 0, -1)
+
+[node name="ComputerMonitor8" parent="." instance=ExtResource("26_monitor")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 3.5, 0.75, -1)
 
 [connection signal="timeout" from="GameStart/Timer" to="." method="_on_game_start_timer_timeout"]
