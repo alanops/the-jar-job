@@ -21,7 +21,7 @@ enum NPCState {
 @export var turn_speed: float = 2.0
 
 # Timing Properties
-@export var wait_time_at_waypoint: float = 2.0
+@export var wait_time_at_waypoint: float = 3.0
 @export var suspicious_time: float = 2.0
 @export var investigation_time: float = 3.0
 @export var search_time: float = 5.0
@@ -386,7 +386,18 @@ func _handle_patrol_state(delta: float) -> void:
 		# Reached waypoint, wait then move to next
 		if state_timer.is_stopped():
 			state_timer.start(wait_time_at_waypoint)
-			print("NPCController: Reached waypoint, waiting...")
+			print("NPCController(", name, "): Reached waypoint ", current_waypoint_index, ", waiting for ", wait_time_at_waypoint, " seconds...")
+		
+		# Face the next waypoint while waiting
+		if patrol_waypoints.size() > 0:
+			var next_waypoint_index = (current_waypoint_index + 1) % patrol_waypoints.size()
+			var next_waypoint_pos = patrol_waypoints[next_waypoint_index].global_position
+			var direction_to_next = (next_waypoint_pos - global_position).normalized()
+			if direction_to_next.length() > 0.1:
+				_rotate_towards_direction(direction_to_next, get_process_delta_time())
+		
+		velocity.x = 0
+		velocity.z = 0
 		return
 	
 	var current_position := global_position
@@ -423,8 +434,10 @@ func _handle_investigate_state(delta: float) -> void:
 		if state_timer.is_stopped():
 			state_timer.start(investigation_time)
 		
-		# Rotate while investigating
-		rotation.y += turn_speed * 0.5 * delta
+		# More purposeful investigation - look towards likely hiding spots
+		var investigation_angle = sin(Time.get_ticks_msec() * 0.001 * 1.2) * PI * 0.3  # Sweep back and forth
+		var base_rotation = atan2(0, 1)  # Face forward initially
+		rotation.y = lerp_angle(rotation.y, base_rotation + investigation_angle, turn_speed * 0.8 * delta)
 		
 		# Direction arrow and flashlight rotate with parent automatically
 		
@@ -550,7 +563,7 @@ func _is_player_in_flashlight() -> bool:
 	
 	var npc_pos = global_position
 	var flashlight_pos = flashlight.global_position
-	# Use NPC forward direction - NPCs face positive Z direction
+	# Use NPC forward direction - NPCs face positive Z direction in Godot
 	var npc_forward = global_transform.basis.z
 	var player_pos = player_reference.global_position
 	
@@ -789,7 +802,18 @@ func _handle_fallback_patrol(delta: float) -> void:
 		# Reached waypoint, wait then move to next
 		if state_timer.is_stopped():
 			state_timer.start(wait_time_at_waypoint)
-			print("NPCController: Fallback reached waypoint, waiting...")
+			print("NPCController(", name, "): Fallback reached waypoint ", current_waypoint_index, ", waiting for ", wait_time_at_waypoint, " seconds...")
+		
+		# Face the next waypoint while waiting
+		if patrol_waypoints.size() > 0:
+			var next_waypoint_index = (current_waypoint_index + 1) % patrol_waypoints.size()
+			var next_waypoint_pos = patrol_waypoints[next_waypoint_index].global_position
+			var direction_to_next = (next_waypoint_pos - current_pos).normalized()
+			if direction_to_next.length() > 0.1:
+				_rotate_towards_direction(direction_to_next, delta)
+		
+		velocity.x = 0
+		velocity.z = 0
 		return
 	
 	# Direct movement towards waypoint
@@ -885,6 +909,7 @@ func _handle_goap_system(delta: float) -> void:
 func _on_state_timer_timeout() -> void:
 	match current_state:
 		NPCState.PATROL:
+			print("NPCController(", name, "): Wait time finished, moving to next waypoint")
 			_set_next_patrol_target()
 		NPCState.SUSPICIOUS:
 			if suspicion_level >= investigate_threshold:
@@ -1092,8 +1117,17 @@ func _handle_suspicious_state(delta: float) -> void:
 	velocity.x = 0
 	velocity.z = 0
 	
-	# Slowly turn around looking for the player
-	rotation.y += turn_speed * 0.3 * delta
+	# Look towards the last known player position, then sweep around
+	if last_known_player_position != Vector3.ZERO:
+		var direction_to_last_seen = (last_known_player_position - global_position).normalized()
+		var target_rotation = atan2(direction_to_last_seen.x, direction_to_last_seen.z)
+		
+		# Add a sweeping motion around the target direction
+		var sweep_angle = sin(Time.get_ticks_msec() * 0.001 * 0.8) * PI * 0.4  # Wider sweep than investigation
+		rotation.y = lerp_angle(rotation.y, target_rotation + sweep_angle, turn_speed * 0.6 * delta)
+	else:
+		# If no last position, just rotate slowly
+		rotation.y += turn_speed * 0.3 * delta
 	
 	# Direction arrow and flashlight rotate with parent automatically
 

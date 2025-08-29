@@ -339,8 +339,17 @@ func _interact_with_object() -> void:
 		DebugLogger.warning("No interactable object!", "PlayerController")
 		return
 	
+	# Track interaction
+	if GameManager:
+		GameManager.track_interaction()
+	
 	DebugLogger.info("Interacting with: %s Groups: %s" % [interactable_object.name, str(interactable_object.get_groups())], "PlayerController")
-	if interactable_object.is_in_group("biscuit_jar"):
+	
+	# Check if object has interact_with_player method (for collectibles)
+	if interactable_object.has_method("interact_with_player"):
+		interactable_object.interact_with_player(self)
+		interactable_object = null
+	elif interactable_object.is_in_group("biscuit_jar"):
 		DebugLogger.info("Collecting biscuit jar!", "PlayerController")
 		GameManager.collect_jar()
 		interactable_object.queue_free()
@@ -353,3 +362,6 @@ func _interact_with_object() -> void:
 
 func get_noise_position() -> Vector3:
 	return global_position
+
+func get_is_crouching() -> bool:
+	return is_crouching

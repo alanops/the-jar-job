@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://b8xh2wv3k8s4p"]
+
+[ext_resource type="Script" path="res://scripts/biscuit_collectible.gd" id="1_collectible"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_1"]
+radius = 0.15
+height = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.8, 0.6, 0.3, 1)
+emission_enabled = true
+emission = Color(0.9, 0.7, 0.4, 1)
+emission_energy = 0.3
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_1"]
+radius = 0.2
+
+[node name="BiscuitCollectible" type="StaticBody3D" groups=["collectibles", "interactables"]]
+collision_layer = 8
+script = ExtResource("1_collectible")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("SphereMesh_1")
+surface_material_override/0 = SubResource("StandardMaterial3D_1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("SphereShape3D_1")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.1
+autostart = true

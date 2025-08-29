@@ -192,6 +192,10 @@ func _apply_camera_view(view_index: int) -> void:
 func toggle_camera_view() -> void:
 	current_camera_view = (current_camera_view + 1) % 3
 	_switch_to_camera(current_camera_view)
+	
+	# Track camera switch
+	if GameManager:
+		GameManager.track_camera_switch()
 
 func _switch_to_camera(index: int) -> void:
 	# Disable all cameras
