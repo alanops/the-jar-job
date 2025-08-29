@@ -23,11 +23,11 @@ var camera_views: Array[Dictionary] = [
 	{
 		"name": "Isometric",
 		"yaw": -45,
-		"pitch": -35,
-		"height": 10,
-		"distance": 10,
+		"pitch": -30,
+		"height": 12,
+		"distance": 14,
 		"size": 16.0,
-		"offset": Vector3(0, 0, 5),
+		"offset": Vector3(-5, 0, -5),
 		"is_first_person": false
 	},
 	{
