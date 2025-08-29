@@ -28,7 +28,7 @@ godot
 - **Ctrl**: Crouch (quieter movement)
 - **E**: Interact with objects
 - **R**: Reset level
-- **Tab**: Toggle camera view (Top Down ↔ Isometric)
+- **Tab**: Toggle camera view (Top Down → Isometric → First Person)
 - **Escape**: Pause menu
 
 ## Architecture Overview
@@ -60,13 +60,14 @@ godot
 - Optimized vision cone detection
 
 #### 4. Camera System
-- **Dual Camera Views**: Top Down (90° straight down) and Isometric (Theme Hospital style)
-- **Top Down View**: Perfect strategic overview, straight vertical perspective
+- **Triple Camera Views**: Top Down, Isometric, and First Person perspectives
+- **Top Down View**: Perfect strategic overview, 90° straight vertical angle
 - **Isometric View**: Classic 30° angle inspired by Theme Hospital
-- **Toggle System**: Tab key switches between the two perspectives
+- **First Person View**: Immersive perspective from player's eye level (1.6m height)
+- **Toggle System**: Tab key cycles through all three perspectives
 - **Camera-Relative Movement**: Player controls automatically adjust to camera orientation
-- **Orthogonal Projection**: Both views use orthogonal projection for clarity
-- **Wall Fading**: Dynamic transparency for objects blocking player view
+- **Mixed Projection**: Orthogonal for top-down/isometric, perspective for first person
+- **Wall Fading**: Dynamic transparency for objects blocking player view (disabled in first person)
 
 #### 5. Audio System
 - **AudioManager Singleton**: Centralized audio control with automatic initialization

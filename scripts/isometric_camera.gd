@@ -9,7 +9,7 @@ class_name IsometricCamera
 @export var fade_alpha: float = 0.3
 
 # Camera view settings
-var current_camera_view: int = 0  # 0 = top-down, 1 = isometric theme hospital style
+var current_camera_view: int = 0  # 0 = top-down, 1 = isometric, 2 = first person
 var camera_views: Array[Dictionary] = [
 	{
 		"name": "Top Down",
@@ -17,7 +17,8 @@ var camera_views: Array[Dictionary] = [
 		"pitch": -90,
 		"height": 20,
 		"distance": 0.1,
-		"size": 20.0
+		"size": 20.0,
+		"is_first_person": false
 	},
 	{
 		"name": "Isometric",
@@ -25,7 +26,17 @@ var camera_views: Array[Dictionary] = [
 		"pitch": -30,
 		"height": 12,
 		"distance": 17,
-		"size": 16.0
+		"size": 16.0,
+		"is_first_person": false
+	},
+	{
+		"name": "First Person",
+		"yaw": 0,
+		"pitch": 0,
+		"height": 1.6,
+		"distance": 0.1,
+		"fov": 75,
+		"is_first_person": true
 	}
 ]
 
@@ -49,22 +60,40 @@ func set_target(new_target: Node3D) -> void:
 func _apply_camera_view(view_index: int) -> void:
 	var view = camera_views[view_index]
 	
-	# Set rotation
-	rotation.y = deg_to_rad(view.yaw)
-	rotation.x = deg_to_rad(view.pitch)
-	
-	# Position camera
-	camera.position = Vector3(0, view.height, view.distance)
-	camera.look_at(Vector3.ZERO, Vector3.UP)
-	
-	# Set orthogonal projection
-	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = view.size
-	
-	# Enable culling optimizations
-	camera.cull_mask = 0xFFFFF  # See all layers
-	camera.near = 0.1
-	camera.far = 100.0  # Reduce far plane for better culling
+	if view.is_first_person:
+		# First person mode
+		rotation.y = 0  # Follow player rotation
+		rotation.x = 0
+		
+		# Position camera at eye level
+		camera.position = Vector3(0, view.height, 0)
+		camera.rotation = Vector3(0, 0, 0)
+		
+		# Set perspective projection for first person
+		camera.projection = Camera3D.PROJECTION_PERSPECTIVE
+		camera.fov = view.fov
+		
+		# Adjust near plane for first person
+		camera.near = 0.01
+		camera.far = 100.0
+	else:
+		# Top-down or isometric mode
+		# Set rotation
+		rotation.y = deg_to_rad(view.yaw)
+		rotation.x = deg_to_rad(view.pitch)
+		
+		# Position camera
+		camera.position = Vector3(0, view.height, view.distance)
+		camera.look_at(Vector3.ZERO, Vector3.UP)
+		
+		# Set orthogonal projection
+		camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+		camera.size = view.size
+		
+		# Enable culling optimizations
+		camera.cull_mask = 0xFFFFF  # See all layers
+		camera.near = 0.1
+		camera.far = 100.0  # Reduce far plane for better culling
 	
 	print("Camera switched to: ", view.name)
 
@@ -76,12 +105,23 @@ func _physics_process(delta: float) -> void:
 	if not target:
 		return
 	
-	# Smooth follow target
-	var target_pos := target.global_position
-	global_position = global_position.lerp(target_pos, follow_speed * delta)
+	var view = camera_views[current_camera_view]
 	
-	# Wall fade system
-	_update_wall_fade()
+	if view.is_first_person:
+		# First person mode - camera follows player exactly
+		global_position = target.global_position
+		
+		# Match player rotation for first person view
+		if target.has_method("get_rotation"):
+			rotation.y = target.rotation.y
+	else:
+		# Smooth follow for top-down/isometric
+		var target_pos := target.global_position
+		global_position = global_position.lerp(target_pos, follow_speed * delta)
+	
+	# Wall fade system (only for non-first person views)
+	if not view.is_first_person:
+		_update_wall_fade()
 
 func _update_wall_fade() -> void:
 	if not target:
