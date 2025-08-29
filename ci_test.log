@@ -1,0 +1,42 @@
+WorkerThreadPool: 24 threads, 18 max low-priority.
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+JoypadLinux: udev enabled and loaded successfully.
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+CORE API HASH: 4052744068
+EDITOR API HASH: 910296392
+Loading resource: /home/alan/.config/godot/editor_settings-4.4.tres
+EditorSettings: Load OK!
+EditorTheme: Generating new theme for the config '66886095'.
+EditorTheme: Generating new icons.
+EditorTheme: Generating new fonts.
+EditorTheme: Generating new styles.
+Loading resource: /home/alan/.cache/godot/editor_doc_cache-4.4.res
+Loaded system CA certificates
+first_scan_filesystem: begin: Project initialization steps: 5
+	first_scan_filesystem: step 0: Scanning file structure...
+WARNING: Detected another project.godot at res://addons/godot-jolt/examples. The folder will be ignored.
+     at: _should_skip_directory (editor/editor_file_system.cpp:3363)
+	first_scan_filesystem: step 1: Loading global class names...
+	first_scan_filesystem: step 2: Verifying GDExtensions...
+	first_scan_filesystem: step 3: Creating autoload scripts...
+Loading resource: res://scripts/game_manager.gd
+Loading resource: res://scripts/objective_manager.gd
+Loading resource: res://scripts/npc_communication_manager.gd
+	first_scan_filesystem: step 4: Initializing plugins...
+	first_scan_filesystem: step 5: Starting file scan...
+first_scan_filesystem: end
+_update_scan_actions: begin: Scanning actions... steps: 9
+	_update_scan_actions: step 0: logo.svg
+	_update_scan_actions: step 1: index.apple-touch-icon.png
+	_update_scan_actions: step 2: index.icon.png
+	_update_scan_actions: step 3: index.png
+	_update_scan_actions: step 4: floor.blend
+	_update_scan_actions: step 5: floorplan1.blend
+	_update_scan_actions: step 6: floorplan.blend
+	_update_scan_actions: step 7: icon.svg
+	_update_scan_actions: step 8: icon.webp
+_update_scan_actions: end

@@ -1,0 +1,43 @@
+ERROR: Could not create directory: '/home/alan/.local/share/godot'.
+   at: make_dir_recursive (core/io/dir_access.cpp:180)
+ERROR: Error attempting to create data dir: /home/alan/.local/share/godot/app_userdata/The Jar Job.
+   at: ensure_user_data_dir (core/os/os.cpp:410)
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+ERROR: Could not create directory: '/home/alan/.local/share/godot'.
+   at: make_dir_recursive (core/io/dir_access.cpp:180)
+ERROR: Could not create editor data directory: /home/alan/.local/share/godot
+   at: EditorPaths (editor/editor_paths.cpp:198)
+
+first_scan_filesystem: begin: Project initialization steps: 5
+	first_scan_filesystem: step 0: Scanning file structure...
+WARNING: Detected another project.godot at res://addons/godot-jolt/examples. The folder will be ignored.
+     at: _should_skip_directory (editor/editor_file_system.cpp:3363)
+	first_scan_filesystem: step 1: Loading global class names...
+	first_scan_filesystem: step 2: Verifying GDExtensions...
+	first_scan_filesystem: step 3: Creating autoload scripts...
+	first_scan_filesystem: step 4: Initializing plugins...
+	first_scan_filesystem: step 5: Starting file scan...
+first_scan_filesystem: end
+ERROR: Cannot export project with preset "Web" due to configuration errors:
+No export template found at the expected path:
+/home/alan/.local/share/godot/export_templates/4.4.1.stable/web_nothreads_debug.zip
+No export template found at the expected path:
+/home/alan/.local/share/godot/export_templates/4.4.1.stable/web_nothreads_release.zip
+
+   at: _fs_changed (editor/editor_node.cpp:1087)
+ERROR: Project export for preset "Web" failed.
+   at: _fs_changed (editor/editor_node.cpp:1103)
+loading_editor_layout: begin: Loading editor steps: 5
+	loading_editor_layout: step 0: Loading editor layout...
+	loading_editor_layout: step 1: Loading docks...
+	loading_editor_layout: step 2: Reopening scenes...
+WARNING: res://ui/advanced_performance_monitor.tscn:3 - ext_resource, invalid UID: uid://bd3u2yh4wk7rq - using text path instead: res://scripts/advanced_performance_monitor.gd
+     at: load (scene/resources/resource_format_text.cpp:447)
+	loading_editor_layout: step 3: Loading central editor layout...
+	loading_editor_layout: step 4: Loading plugin window layout...
+	loading_editor_layout: step 5: Editor layout ready.
+loading_editor_layout: end
+ERROR: Can't save resource to empty path. Provide non-empty path or a Resource with non-empty resource_path.
+   at: save (core/io/resource_saver.cpp:106)
+ERROR: Error saving editor settings to 
+   at: save (editor/editor_settings.cpp:1321)

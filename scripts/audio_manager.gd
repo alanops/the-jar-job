@@ -19,18 +19,25 @@ extends Node
 @onready var music_player: AudioStreamPlayer
 @onready var ambient_player: AudioStreamPlayer
 @onready var sfx_player: AudioStreamPlayer
+@onready var npc_alert_player: AudioStreamPlayer
 @onready var ui_player: AudioStreamPlayer
 
-# Volume settings
-@export var master_volume: float = 0.8
-@export var music_volume: float = 0.6
-@export var sfx_volume: float = 0.8
-@export var ambient_volume: float = 0.4
+# Volume settings - loaded from GameConfig
+var master_volume: float
+var music_volume: float
+var sfx_volume: float
+var ambient_volume: float
 
 var is_music_playing: bool = false
 var is_ambient_playing: bool = false
 
 func _ready():
+	if DebugLogger:
+		DebugLogger.info("AudioManager _ready() starting", "AudioManager")
+	
+	# Load configuration
+	_load_config_values()
+	
 	# Create audio players if they don't exist
 	create_audio_players()
 	
@@ -42,6 +49,15 @@ func _ready():
 	
 	# Start ambient sounds
 	play_ambient()
+	
+	if DebugLogger:
+		DebugLogger.info("AudioManager initialized successfully", "AudioManager")
+
+func _load_config_values() -> void:
+	master_volume = GameConfig.audio_master_volume
+	music_volume = GameConfig.audio_music_volume
+	sfx_volume = GameConfig.audio_sfx_volume
+	ambient_volume = GameConfig.audio_ambient_volume
 
 func create_audio_players():
 	# Music player
@@ -62,6 +78,12 @@ func create_audio_players():
 	sfx_player.bus = "SFX"
 	add_child(sfx_player)
 	
+	# NPC alert player (separate from general SFX to avoid conflicts)
+	npc_alert_player = AudioStreamPlayer.new()
+	npc_alert_player.name = "NPCAlertPlayer"
+	npc_alert_player.bus = "SFX"
+	add_child(npc_alert_player)
+	
 	# UI player
 	ui_player = AudioStreamPlayer.new()
 	ui_player.name = "UIPlayer"
@@ -69,19 +91,35 @@ func create_audio_players():
 	add_child(ui_player)
 
 func load_audio_resources():
-	background_music = load("res://assets/audio/background_music.ogg")
-	ambient_sound = load("res://assets/audio/ambient.ogg")
-	footstep_sound = load("res://assets/audio/footstep.ogg")
-	button_click_sound = load("res://assets/audio/button_click.ogg")
-	door_sound = load("res://assets/audio/door.ogg")
-	door_open_sound = load("res://assets/audio/door_open.ogg")
-	door_close_sound = load("res://assets/audio/door_close.ogg")
-	item_pickup_sound = load("res://assets/audio/item_pickup.ogg")
-	victory_sound = load("res://assets/audio/victory.ogg")
-	alert_sound = load("res://assets/audio/alert.ogg")
-	alert_suspicious_sound = load("res://assets/audio/alert_suspicious.ogg")
-	alert_chase_sound = load("res://assets/audio/alert_chase.ogg")
-	detected_sound = load("res://assets/audio/detected.ogg")
+	var audio_files = {
+		"background_music": "res://assets/audio/background_music.ogg",
+		"ambient_sound": "res://assets/audio/ambient.ogg",
+		"footstep_sound": "res://assets/audio/footstep.ogg",
+		"button_click_sound": "res://assets/audio/button_click.ogg",
+		"door_sound": "res://assets/audio/door.ogg",
+		"door_open_sound": "res://assets/audio/door_open.ogg",
+		"door_close_sound": "res://assets/audio/door_close.ogg",
+		"item_pickup_sound": "res://assets/audio/item_pickup.ogg",
+		"victory_sound": "res://assets/audio/victory.ogg",
+		"alert_sound": "res://assets/audio/alert.ogg",
+		"alert_suspicious_sound": "res://assets/audio/alert_suspicious.ogg",
+		"alert_chase_sound": "res://assets/audio/alert_chase.ogg",
+		"detected_sound": "res://assets/audio/detected.ogg"
+	}
+	
+	var loaded_count = 0
+	for prop_name in audio_files:
+		var file_path = audio_files[prop_name]
+		var resource = load(file_path)
+		if resource:
+			set(prop_name, resource)
+			loaded_count += 1
+		else:
+			if DebugLogger:
+				DebugLogger.warning("Failed to load audio file: %s" % file_path, "AudioManager")
+	
+	if DebugLogger:
+		DebugLogger.info("Loaded %d/%d audio resources" % [loaded_count, audio_files.size()], "AudioManager")
 
 func set_volumes():
 	if music_player:
@@ -172,14 +210,28 @@ func play_alert():
 		sfx_player.play()
 
 func play_alert_suspicious():
-	if alert_suspicious_sound and sfx_player:
-		sfx_player.stream = alert_suspicious_sound
-		sfx_player.play()
+	if DebugLogger:
+		DebugLogger.info("play_alert_suspicious called", "AudioManager")
+	if alert_suspicious_sound and npc_alert_player:
+		if DebugLogger:
+			DebugLogger.info("Playing suspicious alert sound", "AudioManager")
+		npc_alert_player.stream = alert_suspicious_sound
+		npc_alert_player.play()
+	else:
+		if DebugLogger:
+			DebugLogger.warning("Cannot play suspicious alert: alert_suspicious_sound=%s, npc_alert_player=%s" % [alert_suspicious_sound != null, npc_alert_player != null], "AudioManager")
 
 func play_alert_chase():
-	if alert_chase_sound and sfx_player:
-		sfx_player.stream = alert_chase_sound
-		sfx_player.play()
+	if DebugLogger:
+		DebugLogger.info("play_alert_chase called", "AudioManager")
+	if alert_chase_sound and npc_alert_player:
+		if DebugLogger:
+			DebugLogger.info("Playing chase alert sound", "AudioManager")
+		npc_alert_player.stream = alert_chase_sound
+		npc_alert_player.play()
+	else:
+		if DebugLogger:
+			DebugLogger.warning("Cannot play chase alert: alert_chase_sound=%s, npc_alert_player=%s" % [alert_chase_sound != null, npc_alert_player != null], "AudioManager")
 
 func play_door_open():
 	if door_open_sound and sfx_player:

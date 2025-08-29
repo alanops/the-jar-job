@@ -2,15 +2,17 @@ extends CharacterBody3D
 
 class_name PlayerController
 
-const WALK_SPEED := 5.0
-const RUN_SPEED := 8.0
-const CROUCH_SPEED := 2.0
-const CROUCH_HEIGHT := 0.9
-const NORMAL_HEIGHT := 1.8
+# Movement speeds - loaded from GameConfig
+var walk_speed: float
+var run_speed: float
+var crouch_speed: float
+var crouch_height: float
+var normal_height: float
 
-@export var noise_radius_walk: float = 5.0
-@export var noise_radius_run: float = 8.0
-@export var noise_radius_crouch: float = 2.0
+# Noise radii - loaded from GameConfig
+var noise_radius_walk: float
+var noise_radius_run: float
+var noise_radius_crouch: float
 
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
@@ -19,7 +21,7 @@ const NORMAL_HEIGHT := 1.8
 
 var is_crouching: bool = false
 var is_running: bool = false
-var current_speed: float = WALK_SPEED
+var current_speed: float
 var current_noise_radius: float = noise_radius_walk
 var interactable_object: Node3D = null
 var game_ui: Control
@@ -28,17 +30,55 @@ var camera_rig: Node3D
 signal made_noise(position: Vector3, radius: float)
 
 func _ready() -> void:
+	_load_config_values()
+	_initialize_collision_shape()
+	_connect_signals()
+	_initialize_components()
+
+func _load_config_values() -> void:
+	walk_speed = GameConfig.player_walk_speed
+	run_speed = GameConfig.player_run_speed
+	crouch_speed = GameConfig.player_crouch_speed
+	crouch_height = GameConfig.player_crouch_height
+	normal_height = GameConfig.player_normal_height
+	
+	noise_radius_walk = GameConfig.noise_radius_walk
+	noise_radius_run = GameConfig.noise_radius_run
+	noise_radius_crouch = GameConfig.noise_radius_crouch
+	
+	current_speed = walk_speed
+	current_noise_radius = noise_radius_walk
+	
+	DebugLogger.info("Player config loaded", "PlayerController")
+
+func _initialize_collision_shape() -> void:
+	if not collision_shape:
+		DebugLogger.error("CollisionShape3D not found!", "PlayerController")
+		return
+	
 	collision_shape.shape = collision_shape.shape.duplicate()
+
+func _connect_signals() -> void:
+	if not interaction_area:
+		DebugLogger.error("InteractionArea not found!", "PlayerController")
+		return
 	
-	interaction_area.body_entered.connect(_on_interaction_area_entered)
-	interaction_area.body_exited.connect(_on_interaction_area_exited)
-	# Also connect area signals for better detection
-	interaction_area.area_entered.connect(_on_interaction_area_area_entered)
-	interaction_area.area_exited.connect(_on_interaction_area_area_exited)
+	if not interaction_area.body_entered.is_connected(_on_interaction_area_entered):
+		interaction_area.body_entered.connect(_on_interaction_area_entered)
+	if not interaction_area.body_exited.is_connected(_on_interaction_area_exited):
+		interaction_area.body_exited.connect(_on_interaction_area_exited)
+	if not interaction_area.area_entered.is_connected(_on_interaction_area_area_entered):
+		interaction_area.area_entered.connect(_on_interaction_area_area_entered)
+	if not interaction_area.area_exited.is_connected(_on_interaction_area_area_exited):
+		interaction_area.area_exited.connect(_on_interaction_area_area_exited)
 	
-	footstep_timer.timeout.connect(_on_footstep)
+	if footstep_timer and not footstep_timer.timeout.is_connected(_on_footstep):
+		footstep_timer.timeout.connect(_on_footstep)
 	
-	GameManager.game_started.connect(_on_game_started)
+	if GameManager and not GameManager.game_started.is_connected(_on_game_started):
+		GameManager.game_started.connect(_on_game_started)
+
+func _initialize_components() -> void:
 	
 	# Find the game UI and camera rig
 	await get_tree().process_frame
@@ -185,43 +225,61 @@ func _physics_process(delta: float) -> void:
 
 func _start_crouch() -> void:
 	is_crouching = true
-	current_speed = CROUCH_SPEED
+	current_speed = crouch_speed
 	current_noise_radius = noise_radius_crouch
-	footstep_timer.wait_time = 0.8
+	if footstep_timer:
+		footstep_timer.wait_time = 0.8
 	_update_crouch_state()
+	DebugLogger.debug("Started crouching", "PlayerController")
 
 func _stop_crouch() -> void:
 	is_crouching = false
 	is_running = false  # Stop running when starting to crouch
-	current_speed = WALK_SPEED
+	current_speed = walk_speed
 	current_noise_radius = noise_radius_walk
-	footstep_timer.wait_time = 0.5
+	if footstep_timer:
+		footstep_timer.wait_time = 0.5
 	_update_crouch_state()
+	DebugLogger.debug("Stopped crouching", "PlayerController")
 
 func _start_running() -> void:
 	if is_crouching:
 		return  # Can't run while crouching
 	is_running = true
-	current_speed = RUN_SPEED
+	current_speed = run_speed
 	current_noise_radius = noise_radius_run
-	footstep_timer.wait_time = 0.3  # Faster footsteps when running
+	if footstep_timer:
+		footstep_timer.wait_time = 0.3  # Faster footsteps when running
+	DebugLogger.debug("Started running", "PlayerController")
 
 func _stop_running() -> void:
 	is_running = false
-	current_speed = WALK_SPEED
-	current_noise_radius = noise_radius_walk  
-	footstep_timer.wait_time = 0.5
+	current_speed = walk_speed
+	current_noise_radius = noise_radius_walk
+	if footstep_timer:
+		footstep_timer.wait_time = 0.5
+	DebugLogger.debug("Stopped running", "PlayerController")
 
 func _update_crouch_state() -> void:
+	if not collision_shape or not collision_shape.shape:
+		DebugLogger.error("Invalid collision shape for crouch update", "PlayerController")
+		return
+	
 	var shape: CapsuleShape3D = collision_shape.shape as CapsuleShape3D
+	if not shape:
+		DebugLogger.error("Collision shape is not a CapsuleShape3D", "PlayerController")
+		return
+	
 	if is_crouching:
-		shape.height = CROUCH_HEIGHT
-		collision_shape.position.y = CROUCH_HEIGHT / 2
-		mesh_instance.scale.y = 0.5
+		shape.height = crouch_height
+		collision_shape.position.y = crouch_height / 2
+		if mesh_instance:
+			mesh_instance.scale.y = 0.5
 	else:
-		shape.height = NORMAL_HEIGHT
-		collision_shape.position.y = NORMAL_HEIGHT / 2
-		mesh_instance.scale.y = 1.0
+		shape.height = normal_height
+		collision_shape.position.y = normal_height / 2
+		if mesh_instance:
+			mesh_instance.scale.y = 1.0
 
 func _on_footstep() -> void:
 	if velocity.length() > 0.1:
@@ -240,10 +298,10 @@ func _on_footstep() -> void:
 			AudioManager.play_footstep()  # We'll add pitch variation later
 
 func _on_interaction_area_entered(body: Node3D) -> void:
-	print("Body entered: ", body.name, " Groups: ", body.get_groups())
+	DebugLogger.debug("Body entered: %s Groups: %s" % [body.name, str(body.get_groups())], "PlayerController")
 	if body.is_in_group("interactables"):
 		interactable_object = body
-		print("Set interactable object: ", body.name)
+		DebugLogger.debug("Set interactable object: %s" % body.name, "PlayerController")
 		# Show interaction prompt in UI
 		if game_ui and game_ui.has_method("show_interaction_prompt"):
 			game_ui.show_interaction_prompt(true)
@@ -256,11 +314,12 @@ func _on_interaction_area_exited(body: Node3D) -> void:
 			game_ui.show_interaction_prompt(false)
 
 func _on_interaction_area_area_entered(area: Area3D) -> void:
-	print("Area entered: ", area.name, " Parent: ", area.get_parent().name if area.get_parent() else "None")
+	var parent_name = area.get_parent().name if area.get_parent() else "None"
+	DebugLogger.debug("Area entered: %s Parent: %s" % [area.name, parent_name], "PlayerController")
 	var parent := area.get_parent()
 	if parent and parent.is_in_group("interactables"):
 		interactable_object = parent
-		print("Set interactable object from area: ", parent.name)
+		DebugLogger.debug("Set interactable object from area: %s" % parent.name, "PlayerController")
 		# Show interaction prompt
 		if game_ui and game_ui.has_method("show_interaction_prompt"):
 			game_ui.show_interaction_prompt(true)
@@ -274,22 +333,23 @@ func _on_interaction_area_area_exited(area: Area3D) -> void:
 			game_ui.show_interaction_prompt(false)
 
 func _interact_with_object() -> void:
-	print("Attempting to interact with: ", interactable_object.name if interactable_object else "null")
+	var obj_name = interactable_object.name if interactable_object else "null"
+	DebugLogger.debug("Attempting to interact with: %s" % obj_name, "PlayerController")
 	if not interactable_object:
-		print("No interactable object!")
+		DebugLogger.warning("No interactable object!", "PlayerController")
 		return
 	
-	print("Interacting with: ", interactable_object.name, " Groups: ", interactable_object.get_groups())
+	DebugLogger.info("Interacting with: %s Groups: %s" % [interactable_object.name, str(interactable_object.get_groups())], "PlayerController")
 	if interactable_object.is_in_group("biscuit_jar"):
-		print("Collecting biscuit jar!")
+		DebugLogger.info("Collecting biscuit jar!", "PlayerController")
 		GameManager.collect_jar()
 		interactable_object.queue_free()
 		interactable_object = null
 	elif interactable_object.is_in_group("exit_door") and GameManager.has_jar:
-		print("Using exit door!")
+		DebugLogger.info("Using exit door!", "PlayerController")
 		GameManager.trigger_victory()
 	else:
-		print("Object not recognized for interaction")
+		DebugLogger.warning("Object not recognized for interaction: %s" % interactable_object.name, "PlayerController")
 
 func get_noise_position() -> Vector3:
 	return global_position
