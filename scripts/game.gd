@@ -247,11 +247,8 @@ func _reposition_game_elements(bounds: Rect2) -> void:
 	if not playable_area_analyzer:
 		return
 	
-	# Position player at center of playable area
-	if player:
-		var player_pos = playable_area_analyzer.get_center_position()
-		player.global_position = player_pos
-		print("  Player positioned at: ", player_pos)
+	# Keep player at their starting position (in elevator)
+	# Don't reposition the player automatically
 	
 	# Generate new patrol waypoints within playable area
 	if security_guard and playable_area_analyzer:
