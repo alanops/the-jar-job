@@ -6,9 +6,13 @@ extends Node
 @export var footstep_sound: AudioStream
 @export var button_click_sound: AudioStream
 @export var door_sound: AudioStream
+@export var door_open_sound: AudioStream
+@export var door_close_sound: AudioStream
 @export var item_pickup_sound: AudioStream
 @export var victory_sound: AudioStream
 @export var alert_sound: AudioStream
+@export var alert_suspicious_sound: AudioStream
+@export var alert_chase_sound: AudioStream
 @export var detected_sound: AudioStream
 
 # Audio players
@@ -70,9 +74,13 @@ func load_audio_resources():
 	footstep_sound = load("res://assets/audio/footstep.ogg")
 	button_click_sound = load("res://assets/audio/button_click.ogg")
 	door_sound = load("res://assets/audio/door.ogg")
+	door_open_sound = load("res://assets/audio/door_open.ogg")
+	door_close_sound = load("res://assets/audio/door_close.ogg")
 	item_pickup_sound = load("res://assets/audio/item_pickup.ogg")
 	victory_sound = load("res://assets/audio/victory.ogg")
 	alert_sound = load("res://assets/audio/alert.ogg")
+	alert_suspicious_sound = load("res://assets/audio/alert_suspicious.ogg")
+	alert_chase_sound = load("res://assets/audio/alert_chase.ogg")
 	detected_sound = load("res://assets/audio/detected.ogg")
 
 func set_volumes():
@@ -161,6 +169,26 @@ func play_victory():
 func play_alert():
 	if alert_sound and sfx_player:
 		sfx_player.stream = alert_sound
+		sfx_player.play()
+
+func play_alert_suspicious():
+	if alert_suspicious_sound and sfx_player:
+		sfx_player.stream = alert_suspicious_sound
+		sfx_player.play()
+
+func play_alert_chase():
+	if alert_chase_sound and sfx_player:
+		sfx_player.stream = alert_chase_sound
+		sfx_player.play()
+
+func play_door_open():
+	if door_open_sound and sfx_player:
+		sfx_player.stream = door_open_sound
+		sfx_player.play()
+
+func play_door_close():
+	if door_close_sound and sfx_player:
+		sfx_player.stream = door_close_sound
 		sfx_player.play()
 
 func play_detected():

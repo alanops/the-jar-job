@@ -84,37 +84,28 @@ func _physics_process(delta: float) -> void:
 	# Check if we're in first person mode
 	if camera_rig and camera_rig.has_method("get_current_camera_view"):
 		is_first_person = camera_rig.get_current_camera_view() == 2
-		if is_first_person:
-			print("In FPS mode")
 	
 	if is_first_person:
 		# Pure FPS controls using WASD
 		var input_vector := Vector2()
 		
-		# Test basic key detection first
-		if Input.is_key_pressed(KEY_W):
+		# Get FPS input using WASD
+		if Input.is_action_pressed("fps_forward"):
 			input_vector.y += 1.0
-			print("W key detected")
-		if Input.is_key_pressed(KEY_S):
+		if Input.is_action_pressed("fps_backward"):
 			input_vector.y -= 1.0
-			print("S key detected")
-		if Input.is_key_pressed(KEY_A):
+		if Input.is_action_pressed("fps_strafe_left"):
 			input_vector.x -= 1.0
-			print("A key detected")
-		if Input.is_key_pressed(KEY_D):
+		if Input.is_action_pressed("fps_strafe_right"):
 			input_vector.x += 1.0
-			print("D key detected")
 		
 		input_vector = input_vector.normalized()
 		
 		if input_vector.length() > 0:
-			print("FPS input detected: ", input_vector)
-			
 			# Get camera yaw for FPS movement
 			var camera_yaw = 0.0
 			if camera_rig.has_method("get_camera_yaw"):
 				camera_yaw = camera_rig.get_camera_yaw()
-				print("Camera yaw: ", camera_yaw)
 			
 			# Convert to radians and calculate direction vectors
 			var yaw_rad = deg_to_rad(camera_yaw)
@@ -123,7 +114,6 @@ func _physics_process(delta: float) -> void:
 			
 			# Apply input to movement
 			direction = forward * input_vector.y + right * input_vector.x
-			print("FPS direction: ", direction)
 	else:
 		# Top-down/isometric controls using arrow keys
 		var input_dir := Vector2()
