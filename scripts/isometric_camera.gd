@@ -27,7 +27,7 @@ var camera_views: Array[Dictionary] = [
 		"height": 12,
 		"distance": 14,
 		"size": 16.0,
-		"offset": Vector3(-5, 0, -5),
+		"offset": Vector3(5, 0, 5),
 		"is_first_person": false
 	},
 	{
