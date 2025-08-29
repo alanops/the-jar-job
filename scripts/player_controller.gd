@@ -77,34 +77,96 @@ func _physics_process(delta: float) -> void:
 			if is_running:
 				_stop_running()
 	
-	# Get input direction relative to camera orientation
-	var input_dir := Vector2()
-	
-	# Get raw input
-	if Input.is_action_pressed("move_forward"):
-		input_dir.y -= 1.0
-	if Input.is_action_pressed("move_backward"):
-		input_dir.y += 1.0
-	if Input.is_action_pressed("move_left"):
-		input_dir.x -= 1.0
-	if Input.is_action_pressed("move_right"):
-		input_dir.x += 1.0
-	
-	input_dir = input_dir.normalized()
-	
-	# Transform input relative to camera rotation
+	# Get input direction based on camera mode
 	var direction := Vector3()
-	if input_dir.length() > 0 and camera_rig:
-		# Get camera's Y rotation (yaw) to transform movement
-		var camera_yaw = camera_rig.rotation.y
+	var is_first_person = false
+	
+	# Check if we're in first person mode
+	if camera_rig and camera_rig.has_method("get_current_camera_view"):
+		is_first_person = camera_rig.get_current_camera_view() == 2
+		if is_first_person:
+			print("In FPS mode")
+	
+	if is_first_person:
+		# Pure FPS controls using WASD
+		var input_vector := Vector2()
 		
-		# Transform input direction based on camera orientation
-		direction.x = input_dir.y * cos(camera_yaw) + input_dir.x * sin(camera_yaw)
-		direction.z = input_dir.y * -sin(camera_yaw) + input_dir.x * cos(camera_yaw)
-	elif input_dir.length() > 0:
-		# Fallback to default movement if camera_rig not found
-		direction.x = -input_dir.y
-		direction.z = input_dir.x
+		# Test basic key detection first
+		if Input.is_key_pressed(KEY_W):
+			input_vector.y += 1.0
+			print("W key detected")
+		if Input.is_key_pressed(KEY_S):
+			input_vector.y -= 1.0
+			print("S key detected")
+		if Input.is_key_pressed(KEY_A):
+			input_vector.x -= 1.0
+			print("A key detected")
+		if Input.is_key_pressed(KEY_D):
+			input_vector.x += 1.0
+			print("D key detected")
+		
+		input_vector = input_vector.normalized()
+		
+		if input_vector.length() > 0:
+			print("FPS input detected: ", input_vector)
+			
+			# Get camera yaw for FPS movement
+			var camera_yaw = 0.0
+			if camera_rig.has_method("get_camera_yaw"):
+				camera_yaw = camera_rig.get_camera_yaw()
+				print("Camera yaw: ", camera_yaw)
+			
+			# Convert to radians and calculate direction vectors
+			var yaw_rad = deg_to_rad(camera_yaw)
+			var forward = Vector3(-sin(yaw_rad), 0, -cos(yaw_rad))  # Negative because camera looks down -Z
+			var right = Vector3(cos(yaw_rad), 0, -sin(yaw_rad))
+			
+			# Apply input to movement
+			direction = forward * input_vector.y + right * input_vector.x
+			print("FPS direction: ", direction)
+	else:
+		# Top-down/isometric controls using arrow keys
+		var input_dir := Vector2()
+		
+		# Get arrow key input
+		if Input.is_action_pressed("move_forward"):
+			input_dir.y += 1.0
+		if Input.is_action_pressed("move_backward"):
+			input_dir.y -= 1.0
+		if Input.is_action_pressed("move_left"):
+			input_dir.x -= 1.0
+		if Input.is_action_pressed("move_right"):
+			input_dir.x += 1.0
+		
+		input_dir = input_dir.normalized()
+		
+		if input_dir.length() > 0 and camera_rig:
+			var active_camera = null
+			if camera_rig.has_method("get_active_camera"):
+				active_camera = camera_rig.get_active_camera()
+			
+			if active_camera:
+				# Use camera's transform to get proper direction vectors
+				var cam_transform = active_camera.global_transform
+				var forward = -cam_transform.basis.z  # Camera forward (negative z)
+				var right = cam_transform.basis.x     # Camera right
+				
+				# Project onto horizontal plane for movement
+				forward.y = 0
+				right.y = 0
+				forward = forward.normalized()
+				right = right.normalized()
+				
+				# Combine input with camera-relative directions
+				direction = forward * input_dir.y + right * input_dir.x
+			else:
+				# Fallback: simple world-space movement
+				direction.x = input_dir.x
+				direction.z = -input_dir.y
+		elif input_dir.length() > 0:
+			# Fallback to default movement if camera_rig not found
+			direction.x = input_dir.x
+			direction.z = -input_dir.y
 	
 	if direction.length() > 0:
 		velocity.x = direction.x * current_speed

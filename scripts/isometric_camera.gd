@@ -21,7 +21,7 @@ class_name IsometricCamera
 @export var iso_height: float = 12.0
 @export var iso_distance: float = 14.0
 @export var iso_size: float = 16.0
-@export var iso_offset: Vector3 = Vector3(5, 0, 5)
+@export var iso_offset: Vector3 = Vector3(0, 0, 0)
 
 @export_group("First Person Camera")
 @export var fps_height: float = 1.6
@@ -30,6 +30,12 @@ class_name IsometricCamera
 # Camera view settings
 var current_camera_view: int = 0  # 0 = top-down, 1 = isometric, 2 = first person
 var camera_views: Array[Dictionary] = []
+
+# Mouse look variables
+var mouse_sensitivity: float = 0.002
+var pitch_limit: float = 89.0
+var camera_pitch: float = 0.0
+var camera_yaw: float = 0.0
 
 @onready var camera_topdown: Camera3D = $CameraTopDown
 @onready var camera_isometric: Camera3D = $CameraIsometric
@@ -108,6 +114,33 @@ func _build_camera_views() -> void:
 func set_target(new_target: Node3D) -> void:
 	target = new_target
 
+func get_active_camera() -> Camera3D:
+	return active_camera
+
+func get_current_camera_view() -> int:
+	return current_camera_view
+
+func get_camera_yaw() -> float:
+	return camera_yaw
+
+func _input(event: InputEvent) -> void:
+	# Only handle mouse look in first person view
+	if current_camera_view != 2:
+		return
+		
+	if event is InputEventMouseMotion:
+		var mouse_delta = event.relative
+		
+		# Apply mouse sensitivity
+		camera_yaw -= mouse_delta.x * mouse_sensitivity * 180.0 / PI
+		camera_pitch -= mouse_delta.y * mouse_sensitivity * 180.0 / PI
+		
+		# Clamp pitch to prevent camera from flipping
+		camera_pitch = clamp(camera_pitch, -pitch_limit, pitch_limit)
+		
+		# Wrap yaw to keep it within 0-360 range
+		camera_yaw = fmod(camera_yaw, 360.0)
+
 func _apply_camera_view(view_index: int) -> void:
 	var view = camera_views[view_index]
 	
@@ -117,16 +150,16 @@ func _apply_camera_view(view_index: int) -> void:
 		rotation.x = 0
 		
 		# Position camera at eye level
-		camera.position = Vector3(0, view.height, 0)
-		camera.rotation = Vector3(0, 0, 0)
+		active_camera.position = Vector3(0, view.height, 0)
+		active_camera.rotation = Vector3(0, 0, 0)
 		
 		# Set perspective projection for first person
-		camera.projection = Camera3D.PROJECTION_PERSPECTIVE
-		camera.fov = view.fov
+		active_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
+		active_camera.fov = view.fov
 		
 		# Adjust near plane for first person
-		camera.near = 0.01
-		camera.far = 100.0
+		active_camera.near = 0.01
+		active_camera.far = 100.0
 	else:
 		# Top-down or isometric mode
 		# Set rotation
@@ -142,22 +175,23 @@ func _apply_camera_view(view_index: int) -> void:
 			var rotated_offset = offset.rotated(Vector3.UP, deg_to_rad(view.yaw))
 			cam_pos += rotated_offset
 		
-		camera.position = cam_pos
-		camera.look_at(Vector3.ZERO, Vector3.UP)
+		active_camera.position = cam_pos
+		active_camera.look_at(Vector3.ZERO, Vector3.UP)
 		
 		# Set orthogonal projection
-		camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-		camera.size = view.size
+		active_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+		active_camera.size = view.size
 		
 		# Enable culling optimizations
-		camera.cull_mask = 0xFFFFF  # See all layers
-		camera.near = 0.1
-		camera.far = 100.0  # Reduce far plane for better culling
+		active_camera.cull_mask = 0xFFFFF  # See all layers
+		active_camera.near = 0.1
+		active_camera.far = 100.0  # Reduce far plane for better culling
 	
 	print("Camera switched to: ", view.name)
 
 func toggle_camera_view() -> void:
 	current_camera_view = (current_camera_view + 1) % 3
+	print("Toggling to camera view: ", current_camera_view)
 	_switch_to_camera(current_camera_view)
 
 func _switch_to_camera(index: int) -> void:
@@ -176,16 +210,22 @@ func _switch_to_camera(index: int) -> void:
 				camera_topdown.current = true
 				active_camera = camera_topdown
 				print("Switched to Top Down camera")
+				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		1:
 			if camera_isometric:
 				camera_isometric.current = true
 				active_camera = camera_isometric
 				print("Switched to Isometric camera")
+				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		2:
 			if camera_firstperson:
 				camera_firstperson.current = true
 				active_camera = camera_firstperson
 				print("Switched to First Person camera")
+				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+				# Reset camera rotation when entering first person
+				camera_pitch = 0.0
+				camera_yaw = 0.0
 
 func _physics_process(delta: float) -> void:
 	if not target or not active_camera:
@@ -195,9 +235,9 @@ func _physics_process(delta: float) -> void:
 		# Camera rig follows player exactly
 		global_position = target.global_position
 		
-		# Match player rotation for first person view
-		if target.has_method("get_rotation"):
-			rotation.y = target.rotation.y
+		# Apply mouse look rotation to first person camera
+		camera_firstperson.rotation.x = deg_to_rad(camera_pitch)
+		camera_firstperson.rotation.y = deg_to_rad(camera_yaw)
 	else:
 		# Smooth follow for top-down/isometric
 		var target_pos := target.global_position
@@ -212,8 +252,8 @@ func _update_wall_fade() -> void:
 		return
 	
 	# Cast ray from camera to player
-	fade_raycast.global_position = camera.global_position
-	fade_raycast.target_position = target.global_position - camera.global_position
+	fade_raycast.global_position = active_camera.global_position
+	fade_raycast.target_position = target.global_position - active_camera.global_position
 	fade_raycast.force_raycast_update()
 	
 	# Track which objects should be faded
@@ -253,23 +293,23 @@ func _fade_object(obj: Node3D, fade: bool) -> void:
 		obj.set_fade(fade, fade_alpha)
 
 func toggle_projection() -> void:
-	if camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
-		camera.projection = Camera3D.PROJECTION_PERSPECTIVE
-		camera.fov = 45
+	if active_camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		active_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
+		active_camera.fov = 45
 	else:
-		camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-		camera.size = 10.0
+		active_camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+		active_camera.size = 10.0
 
 func zoom_in() -> void:
-	if camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
-		camera.size = max(5.0, camera.size - 1.0)
+	if active_camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		active_camera.size = max(5.0, active_camera.size - 1.0)
 	else:
 		camera_distance = max(10.0, camera_distance - 2.0)
-		camera.position.z = camera_distance
+		active_camera.position.z = camera_distance
 
 func zoom_out() -> void:
-	if camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
-		camera.size = min(20.0, camera.size + 1.0)
+	if active_camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		active_camera.size = min(20.0, active_camera.size + 1.0)
 	else:
 		camera_distance = min(30.0, camera_distance + 2.0)
-		camera.position.z = camera_distance
+		active_camera.position.z = camera_distance
