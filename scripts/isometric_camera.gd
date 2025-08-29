@@ -9,7 +9,7 @@ class_name IsometricCamera
 @export var fade_alpha: float = 0.3
 
 # Camera view settings
-var current_camera_view: int = 0  # 0 = high angle (current), 1 = lower angle (better depth)
+var current_camera_view: int = 2  # 0 = high angle (current), 1 = lower angle (better depth), 2 = theme hospital style
 var camera_views: Array[Dictionary] = [
 	{
 		"name": "High Angle",
@@ -26,6 +26,14 @@ var camera_views: Array[Dictionary] = [
 		"height": 15,
 		"distance": 15,
 		"size": 18.0
+	},
+	{
+		"name": "Theme Hospital",
+		"yaw": -45,
+		"pitch": -30,
+		"height": 12,
+		"distance": 17,
+		"size": 16.0
 	}
 ]
 

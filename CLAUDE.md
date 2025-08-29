@@ -28,7 +28,7 @@ godot
 - **Ctrl**: Crouch (quieter movement)
 - **E**: Interact with objects
 - **R**: Reset level
-- **Tab**: Toggle camera view (High Angle ↔ Medium Angle)
+- **Tab**: Toggle camera view (Theme Hospital → High Angle → Medium Angle)
 - **Escape**: Pause menu
 
 ## Architecture Overview
@@ -60,8 +60,9 @@ godot
 - Optimized vision cone detection
 
 #### 4. Camera System
-- **Dual Camera Views**: High Angle (60° pitch) and Medium Angle (35° pitch) 
-- **Toggle System**: Tab key switches between views for better depth perception
+- **Triple Camera Views**: Theme Hospital (30° pitch), High Angle (60° pitch), and Medium Angle (35° pitch)
+- **Theme Hospital Default**: Classic isometric view inspired by the iconic game
+- **Toggle System**: Tab key cycles through all three camera perspectives
 - **Camera-Relative Movement**: Player controls automatically adjust to camera orientation
 - **Orthogonal Projection**: Maintains isometric top-down feel
 - **Wall Fading**: Dynamic transparency for objects blocking player view
