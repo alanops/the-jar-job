@@ -23,10 +23,11 @@ var camera_views: Array[Dictionary] = [
 	{
 		"name": "Isometric",
 		"yaw": -45,
-		"pitch": -30,
-		"height": 12,
-		"distance": 17,
+		"pitch": -35,
+		"height": 10,
+		"distance": 10,
 		"size": 16.0,
+		"offset": Vector3(0, 0, 5),
 		"is_first_person": false
 	},
 	{
@@ -82,8 +83,16 @@ func _apply_camera_view(view_index: int) -> void:
 		rotation.y = deg_to_rad(view.yaw)
 		rotation.x = deg_to_rad(view.pitch)
 		
-		# Position camera
-		camera.position = Vector3(0, view.height, view.distance)
+		# Position camera with optional offset
+		var cam_pos = Vector3(0, view.height, view.distance)
+		if view.has("offset"):
+			# Apply offset to better center camera over player
+			var offset = view.offset
+			# Rotate offset by camera yaw to maintain correct positioning
+			var rotated_offset = offset.rotated(Vector3.UP, deg_to_rad(view.yaw))
+			cam_pos += rotated_offset
+		
+		camera.position = cam_pos
 		camera.look_at(Vector3.ZERO, Vector3.UP)
 		
 		# Set orthogonal projection
