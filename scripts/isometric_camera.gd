@@ -8,38 +8,28 @@ class_name IsometricCamera
 @export var fade_distance: float = 2.0
 @export var fade_alpha: float = 0.3
 
+@export_group("Top Down Camera")
+@export var topdown_yaw: float = 0.0
+@export var topdown_pitch: float = -90.0
+@export var topdown_height: float = 20.0
+@export var topdown_distance: float = 0.1
+@export var topdown_size: float = 20.0
+
+@export_group("Isometric Camera")
+@export var iso_yaw: float = -45.0
+@export var iso_pitch: float = -30.0
+@export var iso_height: float = 12.0
+@export var iso_distance: float = 14.0
+@export var iso_size: float = 16.0
+@export var iso_offset: Vector3 = Vector3(5, 0, 5)
+
+@export_group("First Person Camera")
+@export var fps_height: float = 1.6
+@export var fps_fov: float = 75.0
+
 # Camera view settings
 var current_camera_view: int = 0  # 0 = top-down, 1 = isometric, 2 = first person
-var camera_views: Array[Dictionary] = [
-	{
-		"name": "Top Down",
-		"yaw": 0,
-		"pitch": -90,
-		"height": 20,
-		"distance": 0.1,
-		"size": 20.0,
-		"is_first_person": false
-	},
-	{
-		"name": "Isometric",
-		"yaw": -45,
-		"pitch": -30,
-		"height": 12,
-		"distance": 14,
-		"size": 16.0,
-		"offset": Vector3(5, 0, 5),
-		"is_first_person": false
-	},
-	{
-		"name": "First Person",
-		"yaw": 0,
-		"pitch": 0,
-		"height": 1.6,
-		"distance": 0.1,
-		"fov": 75,
-		"is_first_person": true
-	}
-]
+var camera_views: Array[Dictionary] = []
 
 @onready var camera: Camera3D = $Camera3D
 @onready var fade_raycast: RayCast3D = $FadeRaycast
@@ -48,12 +38,48 @@ var target: Node3D
 var faded_objects: Dictionary = {}
 
 func _ready() -> void:
+	# Build camera views from export variables
+	_build_camera_views()
+	
 	# Set up initial camera view
 	_apply_camera_view(current_camera_view)
 	
 	# Set up fade raycast
 	fade_raycast.target_position = Vector3(0, -20, -20)
 	fade_raycast.collision_mask = 1  # Only check world layer
+
+func _build_camera_views() -> void:
+	# Build camera view configurations from export variables
+	camera_views = [
+		{
+			"name": "Top Down",
+			"yaw": topdown_yaw,
+			"pitch": topdown_pitch,
+			"height": topdown_height,
+			"distance": topdown_distance,
+			"size": topdown_size,
+			"is_first_person": false
+		},
+		{
+			"name": "Isometric",
+			"yaw": iso_yaw,
+			"pitch": iso_pitch,
+			"height": iso_height,
+			"distance": iso_distance,
+			"size": iso_size,
+			"offset": iso_offset,
+			"is_first_person": false
+		},
+		{
+			"name": "First Person",
+			"yaw": 0,
+			"pitch": 0,
+			"height": fps_height,
+			"distance": 0.1,
+			"fov": fps_fov,
+			"is_first_person": true
+		}
+	]
 
 func set_target(new_target: Node3D) -> void:
 	target = new_target
