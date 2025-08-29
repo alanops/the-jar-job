@@ -69,7 +69,7 @@ visible = false
 navigation_mesh = SubResource("NavigationMesh_1")
 
 [node name="Player" parent="." instance=ExtResource("8_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.42963, 0.1, -9.61941)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.6747, 0.1, -9.46572)
 
 [node name="CameraRig" type="Node3D" parent="."]
 script = ExtResource("9_camera")
