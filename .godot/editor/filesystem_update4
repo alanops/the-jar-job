@@ -26,3 +26,8 @@ res://scripts/npc_vision_component.gd
 res://scripts/performance_optimizer.gd
 res://scripts/debug_logger.gd
 res://scripts/npc_controller.gd
+res://scripts/game_config.gd
+res://scripts/vision_system.gd
+res://scripts/isometric_camera.gd
+res://scripts/stats_screen.gd
+res://scripts/biscuit_collectible.gd
