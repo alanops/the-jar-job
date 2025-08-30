@@ -17,7 +17,6 @@ emission_energy = 0.4
 radius = 0.4
 height = 1.8
 
-[sub_resource type="NavigationAgent3D" id="NavigationAgent3D_1"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
 size = Vector3(0.1, 0.1, 0.8)
