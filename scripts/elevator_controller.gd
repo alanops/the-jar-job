@@ -107,13 +107,11 @@ func open_doors() -> void:
 	# Animate doors opening
 	door_tween.tween_property(door_left, "position", left_door_open_pos, door_animation_speed)
 	door_tween.tween_property(door_right, "position", right_door_open_pos, door_animation_speed)
-	
+	$ElevatorOpen.play()
 	# Change button color to indicate active state
 	call_button.material_override = button_material_active
 	
-	# Play door opening sound
-	if AudioManager:
-		AudioManager.play_button_click()  # Using button click as elevator ding
+
 
 func close_doors() -> void:
 	if not doors_open:
@@ -132,13 +130,11 @@ func close_doors() -> void:
 	# Animate doors closing
 	door_tween.tween_property(door_left, "position", left_door_closed_pos, door_animation_speed)
 	door_tween.tween_property(door_right, "position", right_door_closed_pos, door_animation_speed)
-	
+	$ElevatorClose.play()
 	# Change button back to normal color
 	call_button.material_override = button_material_normal
 	
-	# Play door closing sound
-	if AudioManager:
-		AudioManager.play_button_click()  # Using button click as elevator sound
+
 
 func force_open_doors() -> void:
 	# Public method to force doors open (e.g., when interacting with button)

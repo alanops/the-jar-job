@@ -1,29 +1,32 @@
-[gd_scene load_steps=32 format=3 uid="uid://b7hf5w8nxkgvq"]
+[gd_scene load_steps=35 format=3 uid="uid://b7hf5w8nxkgvq"]
 
 [ext_resource type="Script" uid="uid://dx38cl2wfggri" path="res://scripts/game.gd" id="1_game"]
 [ext_resource type="PackedScene" uid="uid://bvnx4jpyxvhqo" path="res://scenes/player.tscn" id="8_player"]
 [ext_resource type="Script" uid="uid://x0bnonghuli0" path="res://scripts/isometric_camera.gd" id="9_camera"]
 [ext_resource type="PackedScene" uid="uid://cevuj3wqn8kxp" path="res://scenes/npc.tscn" id="10_npc"]
 [ext_resource type="PackedScene" uid="uid://cx6yb7xqiqy8d" path="res://objects/biscuit_jar.tscn" id="11_jar"]
+[ext_resource type="AudioStream" uid="uid://c5m2s8dvn675c" path="res://assets/audio/door_close.ogg" id="12_bhx41"]
 [ext_resource type="PackedScene" uid="uid://bxphv8gxrykwj" path="res://ui/game_ui.tscn" id="12_ui"]
 [ext_resource type="PackedScene" uid="uid://cxvh4pqv3n8fb" path="res://ui/performance_monitor.tscn" id="13_performance"]
+[ext_resource type="AudioStream" uid="uid://snot6rj8p3ab" path="res://assets/audio/door_open.wav" id="13_qnb83"]
 [ext_resource type="PackedScene" uid="uid://clhx8v4d3qy2r" path="res://environment/object_label.tscn" id="14_label"]
 [ext_resource type="PackedScene" uid="uid://cpvug3wlypb3j" path="res://environment/elevator.tscn" id="17_elevator"]
 [ext_resource type="PackedScene" uid="uid://cfappif73htlf" path="res://models/floorplan.blend" id="17_floorplan"]
 [ext_resource type="PackedScene" uid="uid://bwb8c5rgdmn1l" path="res://models/floor.blend" id="18_floor"]
-[ext_resource type="PackedScene" path="res://environment/big_cubicle.tscn" id="19_bigcubicle"]
+[ext_resource type="PackedScene" uid="uid://bjw5k2xm4a7xp" path="res://environment/big_cubicle.tscn" id="19_bigcubicle"]
 [ext_resource type="PackedScene" uid="uid://cjw6k3xn5b8yr" path="res://environment/conference_table.tscn" id="20_conftable"]
 [ext_resource type="PackedScene" uid="uid://dkx7l4yo6da0s" path="res://environment/conference_chairs.tscn" id="21_confchairs"]
 [ext_resource type="PackedScene" uid="uid://b7gqm3t1xkr5j" path="res://environment/office_desk.tscn" id="22_desk"]
 [ext_resource type="PackedScene" uid="uid://b8nmhsv3cygkq" path="res://environment/office_chair.tscn" id="23_chair"]
 [ext_resource type="PackedScene" uid="uid://cm2l8xk4wgvhg" path="res://environment/office_plant.tscn" id="24_plant"]
 [ext_resource type="PackedScene" uid="uid://bxlp8v0jn6q4t" path="res://environment/filing_cabinet.tscn" id="25_filing"]
+[ext_resource type="AudioStream" uid="uid://btn8elgblmmq" path="res://assets/audio/background_music.ogg" id="25_pl11u"]
 [ext_resource type="PackedScene" uid="uid://dp48qmwjqb6n5" path="res://environment/computer_monitor.tscn" id="26_monitor"]
 [ext_resource type="PackedScene" uid="uid://dxk1m5oqswbgw" path="res://environment/kitchen_counter.tscn" id="27_kitchen"]
-[ext_resource type="PackedScene" path="res://objects/biscuit_collectible.tscn" id="28_biscuit"]
-[ext_resource type="PackedScene" path="res://objects/secret_coffee_cup.tscn" id="29_coffee"]
-[ext_resource type="PackedScene" path="res://objects/secret_usb_drive.tscn" id="30_usb"]
-[ext_resource type="PackedScene" path="res://objects/secret_golden_stapler.tscn" id="31_stapler"]
+[ext_resource type="PackedScene" uid="uid://b8xh2wv3k8s4p" path="res://objects/biscuit_collectible.tscn" id="28_biscuit"]
+[ext_resource type="PackedScene" uid="uid://c8v3h2nan5l4k" path="res://objects/secret_coffee_cup.tscn" id="29_coffee"]
+[ext_resource type="PackedScene" uid="uid://dcclrif68qcyf" path="res://objects/secret_usb_drive.tscn" id="30_usb"]
+[ext_resource type="PackedScene" uid="uid://be6bd13ydtrhy" path="res://objects/secret_golden_stapler.tscn" id="31_stapler"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.9, 0.9, 0.95, 1)
@@ -75,6 +78,9 @@ navigation_mesh = SubResource("NavigationMesh_1")
 [node name="Player" parent="." instance=ExtResource("8_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.6747, 0.1, -9.46572)
 
+[node name="AudioListener3D" type="AudioListener3D" parent="Player"]
+current = true
+
 [node name="CameraRig" type="Node3D" parent="."]
 script = ExtResource("9_camera")
 
@@ -113,8 +119,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.1, -5)
 [node name="GuardLabel3" parent="SecurityGuard3" instance=ExtResource("14_label")]
 label_text = "👮 GUARD 3"
 show_distance = 8.0
-
-
 
 [node name="PatrolWaypoints" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.89232, 0, 4.40795)
@@ -258,6 +262,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0352497, 0, -0.0537515)
 
 [node name="Elevator" parent="." instance=ExtResource("17_elevator")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.4257, -0.100002, -9.5302)
+
+[node name="ElevatorClose" type="AudioStreamPlayer3D" parent="Elevator"]
+stream = ExtResource("12_bhx41")
+pitch_scale = 2.0
+max_distance = 8.0
+bus = &"SFX"
+
+[node name="ElevatorOpen" type="AudioStreamPlayer3D" parent="Elevator"]
+stream = ExtResource("13_qnb83")
+volume_db = 4.0
+max_distance = 8.0
+bus = &"SFX"
 
 [node name="BigCubicle1" parent="." instance=ExtResource("19_bigcubicle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 5)
@@ -408,5 +424,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.8, 8)
 
 [node name="SecretGoldenStapler1" parent="." instance=ExtResource("31_stapler")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0.8, -5)
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("25_pl11u")
+volume_db = -11.143
+autoplay = true
 
 [connection signal="timeout" from="GameStart/Timer" to="." method="_on_game_start_timer_timeout"]

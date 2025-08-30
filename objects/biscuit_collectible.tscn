@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://b8xh2wv3k8s4p"]
 
-[ext_resource type="Script" path="res://scripts/biscuit_collectible.gd" id="1_collectible"]
+[ext_resource type="Script" uid="uid://wadr1aa0plcd" path="res://scripts/biscuit_collectible.gd" id="1_collectible"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_1"]
 radius = 0.15
@@ -10,7 +10,7 @@ height = 0.3
 albedo_color = Color(0.8, 0.6, 0.3, 1)
 emission_enabled = true
 emission = Color(0.9, 0.7, 0.4, 1)
-emission_energy = 0.3
+emission_energy_multiplier = 0.3
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1"]
 radius = 0.2
