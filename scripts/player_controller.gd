@@ -97,8 +97,10 @@ func _on_game_started() -> void:
 	_update_crouch_state()
 
 func _physics_process(delta: float) -> void:
-	if GameManager.current_state != GameManager.GameState.PLAYING:
-		return
+	# Temporarily disabled for debugging
+	#if GameManager.current_state != GameManager.GameState.PLAYING:
+	#	DebugLogger.debug("Game not in PLAYING state: " + str(GameManager.current_state), "PlayerController")
+	#	return
 	
 	# Handle crouching
 	if Input.is_action_pressed("crouch"):
@@ -124,22 +126,40 @@ func _physics_process(delta: float) -> void:
 	# Check if we're in first person mode
 	if camera_rig and camera_rig.has_method("get_current_camera_view"):
 		is_first_person = camera_rig.get_current_camera_view() == 2
+		
+	# Debug: only print when mode changes
+	static var last_is_first_person = false
+	if is_first_person != last_is_first_person:
+		DebugLogger.info("Camera mode changed - First person: " + str(is_first_person), "PlayerController")
+		last_is_first_person = is_first_person
 	
 	if is_first_person:
 		# Pure FPS controls using WASD
 		var input_vector := Vector2()
 		
+		# Test direct keyboard input
+		if Input.is_key_pressed(KEY_W):
+			DebugLogger.debug("Direct W key detected!", "PlayerController")
+		
 		# Get FPS input using WASD
 		if Input.is_action_pressed("fps_forward"):
 			input_vector.y += 1.0
+			DebugLogger.debug("W pressed", "PlayerController")
 		if Input.is_action_pressed("fps_backward"):
 			input_vector.y -= 1.0
+			DebugLogger.debug("S pressed", "PlayerController")
 		if Input.is_action_pressed("fps_strafe_left"):
 			input_vector.x -= 1.0
+			DebugLogger.debug("A pressed", "PlayerController")
 		if Input.is_action_pressed("fps_strafe_right"):
 			input_vector.x += 1.0
+			DebugLogger.debug("D pressed", "PlayerController")
 		
 		input_vector = input_vector.normalized()
+		
+		# Debug output
+		if input_vector.length() > 0:
+			DebugLogger.debug("FPS input: " + str(input_vector), "PlayerController")
 		
 		if input_vector.length() > 0:
 			# Get camera yaw for FPS movement
@@ -154,6 +174,11 @@ func _physics_process(delta: float) -> void:
 			
 			# Apply input to movement
 			direction = forward * input_vector.y + right * input_vector.x
+		
+		# Always rotate player to match camera yaw in first person (even when not moving)
+		if camera_rig.has_method("get_camera_yaw"):
+			var camera_yaw = camera_rig.get_camera_yaw()
+			rotation.y = deg_to_rad(camera_yaw)
 	else:
 		# Top-down/isometric controls using arrow keys
 		var input_dir := Vector2()

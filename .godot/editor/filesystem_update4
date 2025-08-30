@@ -31,3 +31,5 @@ res://scripts/vision_system.gd
 res://scripts/isometric_camera.gd
 res://scripts/stats_screen.gd
 res://scripts/biscuit_collectible.gd
+res://scripts/secret_collectible.gd
+res://scripts/game.gd

@@ -32,7 +32,7 @@ var current_camera_view: int = 0  # 0 = top-down, 1 = isometric, 2 = first perso
 var camera_views: Array[Dictionary] = []
 
 # Mouse look variables
-var mouse_sensitivity: float = 0.002
+var mouse_sensitivity: float = 0.003  # Increased for better responsiveness
 var pitch_limit: float = 89.0
 var camera_pitch: float = 0.0
 var camera_yaw: float = 0.0
@@ -124,8 +124,16 @@ func get_camera_yaw() -> float:
 	return camera_yaw
 
 func _input(event: InputEvent) -> void:
-	# Only handle mouse look in first person view
-	if current_camera_view != 2:
+	# Handle escape key to release mouse in first person
+	if event.is_action_pressed("ui_cancel") and current_camera_view == 2:
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		return
+	
+	# Only handle mouse look in first person view when mouse is captured
+	if current_camera_view != 2 or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 		
 	if event is InputEventMouseMotion:
