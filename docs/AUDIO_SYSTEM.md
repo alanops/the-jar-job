@@ -18,11 +18,26 @@ The system uses four separate audio buses for optimal mixing and individual volu
 # Four separate audio buses for optimal mixing
 music_player.bus = "Music"      # Background music
 ambient_player.bus = "Ambient"  # Environmental sounds
-sfx_player.bus = "SFX"         # Game sound effects
+sfx_players[].bus = "SFX"      # Game sound effects (pooled)
 ui_player.bus = "UI"           # User interface sounds
 ```
 
 Each bus can be controlled independently while respecting the master volume setting.
+
+### AudioStreamPlayer Pooling System
+
+To prevent sound cutoffs and enable simultaneous audio playback, the system implements player pools:
+
+```gdscript
+# Audio player pools for simultaneous playback
+const SFX_PLAYER_POOL_SIZE = 8      # 8 concurrent SFX sounds
+const NPC_ALERT_POOL_SIZE = 4       # 4 concurrent NPC alerts
+
+var sfx_players: Array[AudioStreamPlayer] = []
+var npc_alert_players: Array[AudioStreamPlayer] = []
+```
+
+This architecture allows multiple sounds to play simultaneously without interruption, solving polyphony limitations.
 
 ## Audio Categories
 
@@ -68,14 +83,19 @@ Interactive and contextual sound effects that respond to gameplay events:
   - Running: 120% volume (louder)
 
 #### Detection and Alert Audio
-- **Files**: `detected.ogg`, `alert.ogg`
-- **Usage**: NPC detection system feedback
+- **Files**: 
+  - `detected.wav` - Player detection/game over sound
+  - `alert_suspicious.ogg` - NPC becomes suspicious
+  - `alert_chase.ogg` - NPC enters chase state
+- **Usage**: NPC detection system feedback with pooled playback
 - **Integration**: Connected to NPC state machine transitions
+- **Features**: Cooldown system prevents sound spam (0.5s minimum interval)
 
 #### Interaction Audio
 - **Files**: 
   - `item_pickup.ogg` - Item collection feedback
-  - `door.ogg` - Interaction with doors/elevators
+  - `door_close.ogg` - Door closing sounds
+  - `door_open.wav` - Door opening sounds (3D positioned)
   - `victory.ogg` - Success state audio
 
 ### User Interface Sounds
@@ -189,11 +209,11 @@ AudioManager.stop_ambient()
 ```gdscript
 AudioManager.play_footstep()
 AudioManager.play_button_click()
-AudioManager.play_door_sound()
 AudioManager.play_item_pickup()
 AudioManager.play_victory()
-AudioManager.play_alert()
-AudioManager.play_detected()
+AudioManager.play_alert_suspicious()    # NPC suspicious state
+AudioManager.play_alert_chase()        # NPC chase state
+AudioManager.play_detected()           # Player detected
 AudioManager.play_game_over()
 ```
 
@@ -224,18 +244,21 @@ assets/audio/
 ├── ambient.ogg            # Environmental sounds
 ├── footstep.ogg           # Player movement
 ├── button_click.ogg       # UI interactions
-├── door.ogg               # Door/elevator sounds
+├── door_close.ogg         # Door closing sounds
+├── door_open.wav          # Door opening sounds (3D positioned)
 ├── item_pickup.ogg        # Item collection
 ├── victory.ogg            # Success audio
-├── alert.ogg              # NPC alert states
-└── detected.ogg           # Detection/game over
+├── alert_suspicious.ogg   # NPC suspicious state
+├── alert_chase.ogg        # NPC chase state
+└── detected.wav           # Detection/game over
 ```
 
 ## Performance Considerations
 
 ### Memory Management
 - Audio files loaded once at initialization
-- Shared AudioStreamPlayer instances for each category
+- Pooled AudioStreamPlayer instances prevent conflicts and enable simultaneous playback
+- 8 SFX players + 4 NPC alert players for comprehensive audio coverage
 - Automatic garbage collection of temporary audio tweens
 
 ### Web Build Optimization
@@ -246,6 +269,8 @@ assets/audio/
 ### CPU Optimization
 - Single AudioManager instance prevents multiple audio system overhead
 - Efficient volume calculation using linear_to_db conversion
+- Pooled audio players reduce instantiation overhead
+- Smart player selection algorithm finds available instances quickly
 - Minimal audio processing during gameplay
 
 ## Troubleshooting
@@ -278,8 +303,22 @@ print(AudioManager.master_volume)  # Check volume setting
 ## Future Enhancements
 
 ### Planned Features
-- **Spatial Audio**: 3D positioned audio for enhanced immersion
-- **Audio Occlusion**: Sound dampening through walls
+- **3D Spatial Audio**: AudioStreamPlayer3D integration for individual objects (Milo's approach)
+- **Audio Occlusion**: Sound dampening through walls using Area3D detection
 - **Dynamic Music**: Interactive music that responds to gameplay tension
 - **Audio Mixing**: Real-time audio effects based on environment
 - **Voice Acting**: Character dialogue and narrative audio
+- **Hybrid Architecture**: Individual object audio + centralized bus management
+
+### Recent Improvements (v1.4.3)
+- ✅ **AudioStreamPlayer Pooling**: Eliminated sound cutoffs with 8 SFX + 4 NPC alert pools
+- ✅ **Enhanced Polyphony**: Multiple simultaneous sounds without interruption  
+- ✅ **NPC Alert Reliability**: Fixed delayed/missing alert sounds with cooldown system
+- ✅ **3D Audio Foundation**: System now supports both centralized and individual object audio
+- ✅ **Project Audio Settings**: Optimized audio configuration for better performance
+
+### Architecture Evolution
+The current system provides the foundation for Milo's planned 3D audio enhancements:
+- Objects can have individual `AudioStreamPlayer3D` instances for positioned audio
+- AudioManager handles buses, effects, and 2D sounds through pooled players
+- This hybrid approach maximizes both performance and spatial audio capabilities
