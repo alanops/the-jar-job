@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="CompressedTexture2D" path="res://assets/models/office_furniture/PcSetup + Textures/colour.png" id="1_colour"]
+[ext_resource type="CompressedTexture2D" path="res://assets/models/office_furniture/PcSetup + Textures/metal.png" id="2_metallic"]
+[ext_resource type="CompressedTexture2D" path="res://assets/models/office_furniture/PcSetup + Textures/rough.png" id="3_roughness"]
+[ext_resource type="CompressedTexture2D" path="res://assets/models/office_furniture/PcSetup + Textures/normal.png" id="4_normal"]
+
+[resource]
+albedo_texture = ExtResource("1_colour")
+metallic_texture = ExtResource("2_metallic")
+roughness_texture = ExtResource("3_roughness")
+normal_texture = ExtResource("4_normal")

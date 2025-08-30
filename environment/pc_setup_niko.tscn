@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://byavy5k7wtjou"]
+
+[ext_resource type="Mesh" uid="uid://1095778271489937956" path="res://assets/models/office_furniture/PcSetup + Textures/PcSetup.obj" id="1"]
+[ext_resource type="Material" path="res://materials/pc_setup_material.tres" id="2"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_1"]
+
+[node name="PcSetupNiko" type="StaticBody3D"]
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1")
+surface_material_override/0 = ExtResource("2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_1")

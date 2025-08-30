@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://Character/Character/Metallic.png" id="4_metallic"]
 
 [resource]
+albedo_color = Color(0.075, 0.090, 0.114, 1)
 albedo_texture = ExtResource("1_albedo")
 metallic_texture = ExtResource("4_metallic")
 roughness_texture = ExtResource("3_roughness")

@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" load_steps=6 format=3 uid="uid://b3qu8yyup74qu"]
+
+[ext_resource type="Texture2D" uid="uid://datchnbyxanfd" path="res://assets/models/office_furniture/Chair Model + Textures/colour.png" id="1_colour"]
+[ext_resource type="Texture2D" uid="uid://8y8vjvy4mp88" path="res://assets/models/office_furniture/Chair Model + Textures/metallic.png" id="2_metallic"]
+[ext_resource type="Texture2D" uid="uid://ljd5bqcqebyt" path="res://assets/models/office_furniture/Chair Model + Textures/roughness.png" id="3_roughness"]
+[ext_resource type="Texture2D" uid="uid://dd8c4lhq8ql5j" path="res://assets/models/office_furniture/Chair Model + Textures/normal.png" id="4_normal"]
+[ext_resource type="Texture2D" uid="uid://bv0x64hblirlt" path="res://assets/models/office_furniture/Chair Model + Textures/height.png" id="5_height"]
+
+[resource]
+albedo_color = Color(0.071, 0.078, 0.082, 1)
+albedo_texture = ExtResource("1_colour")
+metallic_texture = ExtResource("2_metallic")
+roughness_texture = ExtResource("3_roughness")
+normal_texture = ExtResource("4_normal")
+heightmap_texture = ExtResource("5_height")

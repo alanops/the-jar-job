@@ -1,16 +1,17 @@
-[gd_resource type="StandardMaterial3D" load_steps=6 format=3]
+[gd_resource type="StandardMaterial3D" load_steps=6 format=3 uid="uid://druvyiqexgtue"]
 
-[ext_resource type="Texture2D" path="res://models/Texttures/Albedo(BaseColour).png" id="1_albedo"]
-[ext_resource type="Texture2D" path="res://models/Texttures/Metallic.png" id="2_metallic"]
-[ext_resource type="Texture2D" path="res://models/Texttures/Roughness.png" id="3_roughness"]
-[ext_resource type="Texture2D" path="res://models/Texttures/Normal.png" id="4_normal"]
-[ext_resource type="Texture2D" path="res://models/Texttures/Height.png" id="5_height"]
+[ext_resource type="Texture2D" uid="uid://hrap42x3pe7u" path="res://models/Texttures/Albedo(BaseColour).png" id="1_albedo"]
+[ext_resource type="Texture2D" uid="uid://jv8xlcin2bxn" path="res://models/Texttures/Metallic.png" id="2_metallic"]
+[ext_resource type="Texture2D" uid="uid://d1nolpyiv4k5s" path="res://models/Texttures/Roughness.png" id="3_roughness"]
+[ext_resource type="Texture2D" uid="uid://dssjqfdyofryt" path="res://models/Texttures/Normal.png" id="4_normal"]
+[ext_resource type="Texture2D" uid="uid://4uyhtc4w84rc" path="res://models/Texttures/Height.png" id="5_height"]
 
 [resource]
+albedo_color = Color(0.075, 0.09, 0.114, 1)
 albedo_texture = ExtResource("1_albedo")
 metallic_texture = ExtResource("2_metallic")
 roughness_texture = ExtResource("3_roughness")
 normal_texture = ExtResource("4_normal")
-heightmap_texture = ExtResource("5_height")
 heightmap_enabled = true
 heightmap_scale = 0.05
+heightmap_texture = ExtResource("5_height")
