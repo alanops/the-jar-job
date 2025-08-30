@@ -2,20 +2,20 @@ extends Node
 class_name ColorScheme
 
 # Centralized color scheme for the game
-# Based on a cohesive architectural/interior design palette
+# Based on The Jar Job color palette: Concept art (stealth atmosphere) + Splash art (tension/drama)
 
 # Environment colors
-static var wall_color    = Color("#F5F5F5")  # Off-white/Light gray walls
-static var floor_color   = Color("#D6CFC7")  # Warm beige flooring
-static var desk_color    = Color("#A89F91")  # Muted brown furniture
-static var jar_color     = Color("#D2691E")  # Chocolate orange accent
+static var wall_color    = Color("#13171C")  # Charcoal gray walls
+static var floor_color   = Color("#13161B")  # Charcoal blue tint flooring
+static var desk_color    = Color("#615258")  # Dusky mauve-gray furniture
+static var jar_color     = Color("#DC863F")  # Warm orange accent
 
 # Character colors  
-static var player_color  = Color("#007ACC")  # Professional blue
-static var npc_color     = Color("#C0392B")  # Alert red for guards
+static var player_color  = Color("#394554")  # Muted blue-gray
+static var npc_color     = Color("#87521A")  # Dark amber-brown for guards
 
 # UI colors
-static var ui_alert      = Color("#FFB400")  # Warning amber
+static var ui_alert      = Color("#744812")  # Rich brown alert
 
 # Apply colors to various game elements
 static func apply_color_scheme():

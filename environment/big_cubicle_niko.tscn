@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://cy0wx6k8xukpv"]
+
+[ext_resource type="Mesh" uid="uid://ncylpg5mu3qc" path="res://assets/models/office_furniture/BigCubicle + Textures/BigCubicle.obj" id="1"]
+[ext_resource type="Material" path="res://materials/big_cubicle_new_material.tres" id="2"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_1"]
+
+[node name="BigCubicleNiko" type="StaticBody3D"]
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1")
+surface_material_override/0 = ExtResource("2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_1")

@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://s2qqhi7wmhu"
+path="res://.godot/imported/Office Chair.obj-7844406d2cba9fe8435abde10c7bf657.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Office Chair.obj-7844406d2cba9fe8435abde10c7bf657.mesh"]
+
+source_file="res://assets/models/office_furniture/Chair Model + Textures/Office Chair.obj"
+dest_files=["res://.godot/imported/Office Chair.obj-7844406d2cba9fe8435abde10c7bf657.mesh", "res://.godot/imported/Office Chair.obj-7844406d2cba9fe8435abde10c7bf657.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(0.01, 0.01, 0.01)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

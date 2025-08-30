@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://b7hf5w8nxkgvq"]
+[gd_scene load_steps=38 format=3 uid="uid://b7hf5w8nxkgvq"]
 
 [ext_resource type="Script" uid="uid://dx38cl2wfggri" path="res://scripts/game.gd" id="1_game"]
 [ext_resource type="PackedScene" uid="uid://bvnx4jpyxvhqo" path="res://scenes/player.tscn" id="8_player"]
@@ -22,17 +22,20 @@
 [ext_resource type="PackedScene" uid="uid://bxlp8v0jn6q4t" path="res://environment/filing_cabinet.tscn" id="25_filing"]
 [ext_resource type="AudioStream" uid="uid://btn8elgblmmq" path="res://assets/audio/background_music.ogg" id="25_pl11u"]
 [ext_resource type="PackedScene" uid="uid://dp48qmwjqb6n5" path="res://environment/computer_monitor.tscn" id="26_monitor"]
-[ext_resource type="PackedScene" uid="uid://dxk1m5oqswbgw" path="res://environment/kitchen_counter.tscn" id="27_kitchen"]
 [ext_resource type="PackedScene" uid="uid://b8xh2wv3k8s4p" path="res://objects/biscuit_collectible.tscn" id="28_biscuit"]
 [ext_resource type="PackedScene" uid="uid://c8v3h2nan5l4k" path="res://objects/secret_coffee_cup.tscn" id="29_coffee"]
 [ext_resource type="PackedScene" uid="uid://dcclrif68qcyf" path="res://objects/secret_usb_drive.tscn" id="30_usb"]
-[ext_resource type="PackedScene" uid="uid://be6bd13ydtrhy" path="res://objects/secret_golden_stapler.tscn" id="31_stapler"]
+[ext_resource type="PackedScene" uid="uid://cjuifktxkoc1y" path="res://environment/office_chair_niko.tscn" id="32_chair_niko"]
+[ext_resource type="PackedScene" uid="uid://bnly3nvxxtxkn" path="res://environment/kitchen_table_niko.tscn" id="33_kitchen_table_niko"]
+[ext_resource type="PackedScene" path="res://environment/kitchen_chair_niko.tscn" id="34_kitchen_chair_niko"]
+[ext_resource type="PackedScene" path="res://environment/pc_setup_niko.tscn" id="35_pc_setup_niko"]
+[ext_resource type="PackedScene" path="res://environment/big_cubicle_niko.tscn" id="36_big_cubicle_niko"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
-sky_top_color = Color(0.9, 0.9, 0.95, 1)
-sky_horizon_color = Color(0.8, 0.8, 0.85, 1)
-ground_bottom_color = Color(0.6, 0.6, 0.65, 1)
-ground_horizon_color = Color(0.7, 0.7, 0.75, 1)
+sky_top_color = Color(0.071, 0.078, 0.082, 1)
+sky_horizon_color = Color(0.224, 0.271, 0.329, 1)
+ground_bottom_color = Color(0.071, 0.075, 0.082, 1)
+ground_horizon_color = Color(0.075, 0.09, 0.114, 1)
 
 [sub_resource type="Sky" id="Sky_1"]
 sky_material = SubResource("ProceduralSkyMaterial_1")
@@ -41,8 +44,8 @@ sky_material = SubResource("ProceduralSkyMaterial_1")
 background_mode = 2
 sky = SubResource("Sky_1")
 ambient_light_source = 3
-ambient_light_color = Color(0.95, 0.95, 1, 1)
-ambient_light_energy = 0.8
+ambient_light_color = Color(0.224, 0.271, 0.329, 1)
+ambient_light_energy = 0.3
 tonemap_mode = 2
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_1"]
@@ -68,7 +71,7 @@ environment = SubResource("Environment_1")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, 0.5, -0.5, 0, 0.704432, 4.01052)
-light_energy = 0.4
+light_energy = 0.2
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.71735, 0, -0.904255)
@@ -222,6 +225,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -2)
 [node name="BiscuitJar" parent="." instance=ExtResource("11_jar")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5029, 1, -8.32094)
 
+[node name="JarSpotlight" type="SpotLight3D" parent="BiscuitJar"]
+transform = Transform3D(1, 0, 0, 0, -0.707107, 0.707107, 0, -0.707107, -0.707107, 0, 3, 0)
+light_color = Color(0.863, 0.525, 0.247, 1)
+light_energy = 1.5
+spot_range = 8.0
+spot_angle = 35.0
+
 [node name="BiscuitJarLabel" parent="BiscuitJar" instance=ExtResource("14_label")]
 label_text = "🍪 BISCUIT JAR"
 show_always = true
@@ -263,6 +273,24 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0352497, 0, -0.0537515)
 [node name="Elevator" parent="." instance=ExtResource("17_elevator")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.4257, -0.100002, -9.5302)
 
+[node name="ElevatorWarmLight" type="SpotLight3D" parent="Elevator"]
+transform = Transform3D(-0.99805, 0, 0.0624248, 0.0617629, 0.145237, 0.987467, -0.00906638, 0.989397, -0.144954, 0.482324, 3.30071, -1.00745)
+light_color = Color(0.863, 0.525, 0.247, 1)
+light_energy = 16.0
+light_size = 20.0
+shadow_enabled = true
+spot_range = 10.0
+spot_angle = 40.0
+
+[node name="ElevatorWarmLight2" type="SpotLight3D" parent="Elevator"]
+transform = Transform3D(-0.99805, -3.71802e-09, 0.0624248, 0.0356419, 0.82098, 0.569844, -0.0512495, 0.570957, -0.819379, 0.482324, 2.5315, -1.00745)
+light_color = Color(0.863, 0.525, 0.247, 1)
+light_energy = 16.0
+light_size = 20.0
+shadow_enabled = true
+spot_range = 10.0
+spot_angle = 40.0
+
 [node name="ElevatorClose" type="AudioStreamPlayer3D" parent="Elevator"]
 stream = ExtResource("12_bhx41")
 pitch_scale = 2.0
@@ -287,17 +315,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -3)
 [node name="BigCubicle2" parent="." instance=ExtResource("19_bigcubicle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -8)
 
-[node name="OfficeChair1" parent="." instance=ExtResource("23_chair")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 6.81447, 0, -3.48395)
-
 [node name="ComputerMonitor1" parent="." instance=ExtResource("26_monitor")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.75, 7.5)
-
-[node name="OfficeDesk2" parent="." instance=ExtResource("22_desk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.7951, 9.53674e-07, -4.67851)
-
-[node name="OfficeChair2" parent="." instance=ExtResource("23_chair")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -2.79061, 9.53674e-07, -2.19726)
 
 [node name="ComputerMonitor2" parent="." instance=ExtResource("26_monitor")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.75, 7.5)
@@ -329,33 +348,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 4)
 [node name="OfficePlant2" parent="." instance=ExtResource("24_plant")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0, 8)
 
-[node name="OfficeChair5" parent="." instance=ExtResource("23_chair")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -2.89781, 0, 6.91977)
-
-[node name="ComputerMonitor5" parent="." instance=ExtResource("26_monitor")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.75, -12.5)
-
-[node name="OfficeDesk6" parent="." instance=ExtResource("22_desk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -12)
-
-[node name="OfficeChair6" parent="." instance=ExtResource("23_chair")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -3.95346, 9.53674e-07, 6.94169)
-
-[node name="ComputerMonitor6" parent="." instance=ExtResource("26_monitor")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.75, -12.5)
-
-[node name="FilingCabinet3" parent="." instance=ExtResource("25_filing")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -12)
-
-[node name="KitchenCounter2" parent="." instance=ExtResource("27_kitchen")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -12, 0, 4)
-
-[node name="OfficeChair7" parent="." instance=ExtResource("23_chair")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0, 2)
-
-[node name="OfficeChair8" parent="." instance=ExtResource("23_chair")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 2)
-
 [node name="OfficePlant3" parent="." instance=ExtResource("24_plant")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.96891, 0, 2.4089)
 
@@ -366,7 +358,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.8368, -9.53674e-07, -1.823
 transform = Transform3D(0.0611705, 0, 0.998127, 0, 1, 0, -0.998127, 0, 0.0611705, -2, 0, 2)
 
 [node name="ConferenceChairs2" parent="." instance=ExtResource("21_confchairs")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.98213, 0, -2.83987)
 
 [node name="FilingCabinet5" parent="." instance=ExtResource("25_filing")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -6)
@@ -378,22 +370,7 @@ transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 14.862, 9.53674e-07, 0.60332
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.87239, 0, -10.2347)
 
 [node name="OfficePlant6" parent="." instance=ExtResource("24_plant")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, 0)
-
-[node name="OfficeChair9" parent="." instance=ExtResource("23_chair")]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 4, 0, -5)
-
-[node name="ComputerMonitor7" parent="." instance=ExtResource("26_monitor")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 3.5, 0.75, -5)
-
-[node name="OfficeDesk8" parent="." instance=ExtResource("22_desk")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 3, 0, -1)
-
-[node name="OfficeChair10" parent="." instance=ExtResource("23_chair")]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 4, 0, -1)
-
-[node name="ComputerMonitor8" parent="." instance=ExtResource("26_monitor")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 3.5, 0.75, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.4244, 0, 0.877685)
 
 [node name="BiscuitCollectible1" parent="." instance=ExtResource("28_biscuit")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 7)
@@ -422,8 +399,29 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 0, 3)
 [node name="SecretUSBDrive2" parent="." instance=ExtResource("30_usb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.8, 8)
 
-[node name="SecretGoldenStapler1" parent="." instance=ExtResource("31_stapler")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0.8, -5)
+[node name="OfficeChairNiko1" parent="." instance=ExtResource("32_chair_niko")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 3)
+
+[node name="OfficeChairNiko2" parent="." instance=ExtResource("32_chair_niko")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 10, 0, -2)
+
+[node name="KitchenTableNiko1" parent="." instance=ExtResource("33_kitchen_table_niko")]
+transform = Transform3D(0.977242, 0, 0.212126, 0, 1, 0, -0.212126, 0, 0.977242, 6.55855, 0, 1.51959)
+
+[node name="KitchenChairNiko1" parent="." instance=ExtResource("34_kitchen_chair_niko")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 9)
+
+[node name="KitchenChairNiko2" parent="." instance=ExtResource("34_kitchen_chair_niko")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -12, 0, 11)
+
+[node name="PcSetupNiko1" parent="." instance=ExtResource("35_pc_setup_niko")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -0.249294, 0.11867, 1.97856)
+
+[node name="PcSetupNiko2" parent="." instance=ExtResource("35_pc_setup_niko")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.323211, 0.141565, 0.0736188)
+
+[node name="BigCubicleNiko1" parent="." instance=ExtResource("36_big_cubicle_niko")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.117067, 0, -10.4639)
 
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("25_pl11u")

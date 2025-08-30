@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://pu2kqdb5yy7e"
+path="res://.godot/imported/PcSetup.obj-2b609edeb27261abdf2e33b0bb258ea6.mesh"
+
+[deps]
+
+files=["res://.godot/imported/PcSetup.obj-2b609edeb27261abdf2e33b0bb258ea6.mesh"]
+
+source_file="res://assets/models/office_furniture/PcSetup + Textures/PcSetup.obj"
+dest_files=["res://.godot/imported/PcSetup.obj-2b609edeb27261abdf2e33b0bb258ea6.mesh", "res://.godot/imported/PcSetup.obj-2b609edeb27261abdf2e33b0bb258ea6.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(0.01, 0.01, 0.01)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
