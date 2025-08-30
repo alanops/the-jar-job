@@ -14,8 +14,7 @@ func _ready() -> void:
 	AudioManager.play_ambient()
 
 func _on_play_pressed() -> void:
-	AudioManager.play_button_click()
-	AudioManager.fade_music_in(1.0)  # Start background music for gameplay
+	AudioManager.play_button_click()# Start background music for gameplay
 	get_tree().change_scene_to_file("res://scenes/game.tscn")
 
 func _on_quit_pressed() -> void:
