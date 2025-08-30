@@ -1,0 +1,55 @@
+[gd_scene load_steps=8 format=3 uid="uid://dvq5jy8h4m7xk"]
+
+[ext_resource type="Script" uid="uid://b45ay4cr1wm13" path="res://scripts/player_controller.gd" id="1_player_script"]
+[ext_resource type="PackedScene" uid="uid://character_model" path="res://Character/Character/TPoseCharacter.fbx" id="2_character_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.3
+height = 1.8
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_1"]
+radius = 1.0
+
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 1.0
+loop_mode = 1
+
+[sub_resource type="Animation" id="Animation_walk"]
+resource_name = "walk"
+length = 1.0
+loop_mode = 1
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1"]
+_data = {
+"idle": SubResource("Animation_idle"),
+"walk": SubResource("Animation_walk")
+}
+
+[node name="Player" type="CharacterBody3D" groups=["player"]]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_player_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="CharacterModel" parent="." instance=ExtResource("2_character_model")]
+transform = Transform3D(0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../CharacterModel")
+libraries = {
+"": SubResource("AnimationLibrary_1")
+}
+
+[node name="InteractionArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea"]
+shape = SubResource("SphereShape3D_1")
+
+[node name="FootstepTimer" type="Timer" parent="."]
+wait_time = 0.5
