@@ -29,14 +29,6 @@ var playable_area_analyzer: PlayableAreaAnalyzer
 var npc_manager: NPCManager
 
 func _ready() -> void:
-	# Debug: Print all NPCs in scene
-	print("=== NPCs in scene ===")
-	var all_npcs = get_tree().get_nodes_in_group("npcs")
-	all_npcs.append_array(get_tree().get_nodes_in_group("npc"))
-	for npc in all_npcs:
-		print("Found NPC: ", npc.name, " at ", npc.global_position)
-	print("===================")
-	
 	# Set up camera to follow player
 	camera_rig.set_target(player)
 	

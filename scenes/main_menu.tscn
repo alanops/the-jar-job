@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://bqvn5yxqwkp8x"]
+[gd_scene load_steps=4 format=3 uid="uid://bqvn5yxqwkp8x"]
 
 [ext_resource type="Script" uid="uid://cxk4y802fl26t" path="res://scripts/main_menu.gd" id="1_menu"]
+[ext_resource type="Texture2D" path="res://The_Jar_Job_Splash_Art.webp" id="2_splash"]
+[ext_resource type="Theme" uid="uid://lozenge_theme" path="res://ui/lozenge_button_style.tres" id="3_button_theme"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -11,14 +13,25 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1, 0.1, 0.15, 1)
+texture = ExtResource("2_splash")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.4)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -28,23 +41,20 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = -150.0
+offset_top = 50.0
 offset_right = 200.0
-offset_bottom = 150.0
+offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 20
-
-[node name="Title" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.7, 0.3, 1)
-theme_override_font_sizes/font_size = 64
-text = "THE JAR JOB"
-horizontal_alignment = 1
+theme_override_constants/separation = 30
 
 [node name="Subtitle" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
 text = "A stealth game about stealing biscuits"
 horizontal_alignment = 1
 
@@ -53,13 +63,25 @@ layout_mode = 2
 
 [node name="PlayButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
+custom_minimum_size = Vector2(300, 60)
+theme = ExtResource("3_button_theme")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.7, 0.3, 1)
+theme_override_colors/font_hover_color = Color(0.9, 0.7, 0.3, 1)
 theme_override_font_sizes/font_size = 32
 text = "Start Heist"
+flat = false
 
 [node name="QuitButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
+custom_minimum_size = Vector2(250, 50)
+theme = ExtResource("3_button_theme")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.4, 0.4, 1)
+theme_override_colors/font_hover_color = Color(1, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 24
 text = "Quit"
+flat = false
 
 [node name="Credits" type="Label" parent="."]
 layout_mode = 1
@@ -70,6 +92,10 @@ anchor_bottom = 1.0
 offset_top = -40.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0.8)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 16
 text = "Made for Brackeys Game Jam 2025.2"
 horizontal_alignment = 1
