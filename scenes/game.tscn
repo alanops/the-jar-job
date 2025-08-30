@@ -24,7 +24,6 @@
 [ext_resource type="PackedScene" path="res://objects/secret_coffee_cup.tscn" id="29_coffee"]
 [ext_resource type="PackedScene" path="res://objects/secret_usb_drive.tscn" id="30_usb"]
 [ext_resource type="PackedScene" path="res://objects/secret_golden_stapler.tscn" id="31_stapler"]
-[ext_resource type="PackedScene" uid="uid://caxh4wv2k7s1m" path="res://scenes/boss_npc.tscn" id="32_boss"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.9, 0.9, 0.95, 1)
@@ -115,8 +114,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.1, -5)
 label_text = "👮 GUARD 3"
 show_distance = 8.0
 
-[node name="BossNPC" parent="." instance=ExtResource("32_boss")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0.1, -6)
 
 
 [node name="PatrolWaypoints" type="Node3D" parent="."]

@@ -5,11 +5,9 @@ extends Node3D
 @onready var security_guard: NPCController = $SecurityGuard
 @onready var security_guard2: NPCController = $SecurityGuard2
 @onready var security_guard3: NPCController = $SecurityGuard3
-@onready var boss_npc: NPCController = $BossNPC
 @onready var patrol_waypoints: Node3D = $PatrolWaypoints
 @onready var patrol_waypoints2: Node3D = $PatrolWaypoints2
 @onready var patrol_waypoints3: Node3D = $PatrolWaypoints3
-@onready var boss_waypoints: Node3D = $BossWaypoints
 @onready var biscuit_jar: StaticBody3D = $BiscuitJar
 @onready var game_ui: Control = $GameUI
 @onready var performance_monitor: PerformanceMonitor = $PerformanceMonitor
@@ -96,22 +94,6 @@ func _ready() -> void:
 		
 		# Register with NPC Manager
 		npc_manager.register_npc(security_guard3)
-	
-	# Set up Boss NPC waypoints
-	var boss_waypoint_array: Array[Node3D] = []
-	if boss_waypoints:
-		for child in boss_waypoints.get_children():
-			if child is Marker3D:
-				boss_waypoint_array.append(child)
-	
-	if boss_npc:
-		boss_npc.patrol_waypoints = boss_waypoint_array
-		boss_npc.connect("player_spotted", _on_player_spotted)
-		boss_npc.connect("detection_progress_changed", _on_detection_progress_changed)
-		npc_manager.register_npc(boss_npc)
-		print("Boss NPC initialized with ", boss_waypoint_array.size(), " waypoints at position ", boss_npc.global_position)
-	else:
-		print("ERROR: Boss NPC not found!")
 	
 	# Objectives are automatically initialized by ObjectiveManager
 	
