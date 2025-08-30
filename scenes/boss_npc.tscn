@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/npc_controller.gd" id="1_npc_controller"]
 [ext_resource type="PackedScene" uid="uid://clhx8v4d3qy2r" path="res://environment/object_label.tscn" id="2_label"]
 [ext_resource type="Script" uid="uid://fa7ueo3q0ur3" path="res://scripts/direction_arrow.gd" id="3_arrow"]
+[ext_resource type="Script" uid="uid://c6b0ku4en0d66" path="res://scripts/vision_cone.gd" id="4_vision"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
 radius = 0.4
@@ -70,6 +71,7 @@ agent_height_offset = 0.9
 [node name="VisionCone" type="Area3D" parent="."]
 collision_layer = 0
 collision_mask = 2
+script = ExtResource("4_vision")
 
 [node name="DirectionArrow" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0.4)
