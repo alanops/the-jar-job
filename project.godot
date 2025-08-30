@@ -19,6 +19,10 @@ run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.4")
 config/icon="res://icon.webp"
 
+[audio]
+
+general/io/print_frame_time_optimization=1
+
 [autoload]
 
 DebugLogger="*res://scripts/debug_logger.gd"

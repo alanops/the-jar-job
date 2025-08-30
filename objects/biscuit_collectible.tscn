@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://b8xh2wv3k8s4p"]
 
-[ext_resource type="Script" uid="uid://wadr1aa0plcd" path="res://scripts/biscuit_collectible.gd" id="1_collectible"]
+[ext_resource type="Script" uid="uid://cfwhvre1a6dv" path="res://scripts/biscuit_collectible.gd" id="1_collectible"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_1"]
 radius = 0.15
