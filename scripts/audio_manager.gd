@@ -12,9 +12,18 @@ extends Node
 
 # Audio players
 @onready var ambient_player: AudioStreamPlayer
-@onready var sfx_player: AudioStreamPlayer
-@onready var npc_alert_player: AudioStreamPlayer
+@onready var sfx_players: Array[AudioStreamPlayer] = []
+@onready var npc_alert_players: Array[AudioStreamPlayer] = []
 @onready var ui_player: AudioStreamPlayer
+
+# Audio player pool settings
+const SFX_PLAYER_POOL_SIZE = 8
+const NPC_ALERT_POOL_SIZE = 4
+
+# Prevent spam of NPC alert sounds
+var last_suspicious_alert_time: float = 0.0
+var last_chase_alert_time: float = 0.0
+const ALERT_SOUND_COOLDOWN: float = 0.5  # Minimum time between same alert sounds
 
 # Volume settings - loaded from GameConfig
 var master_volume: float
@@ -58,17 +67,21 @@ func create_audio_players():
 	ambient_player.bus = "Ambient"
 	add_child(ambient_player)
 	
-	# SFX player
-	sfx_player = AudioStreamPlayer.new()
-	sfx_player.name = "SFXPlayer"
-	sfx_player.bus = "SFX"
-	add_child(sfx_player)
+	# SFX player pool
+	for i in range(SFX_PLAYER_POOL_SIZE):
+		var sfx_player = AudioStreamPlayer.new()
+		sfx_player.name = "SFXPlayer" + str(i)
+		sfx_player.bus = "SFX"
+		sfx_players.append(sfx_player)
+		add_child(sfx_player)
 	
-	# NPC alert player (separate from general SFX to avoid conflicts)
-	npc_alert_player = AudioStreamPlayer.new()
-	npc_alert_player.name = "NPCAlertPlayer"
-	npc_alert_player.bus = "SFX"
-	add_child(npc_alert_player)
+	# NPC alert player pool (separate from general SFX to avoid conflicts)
+	for i in range(NPC_ALERT_POOL_SIZE):
+		var npc_alert_player = AudioStreamPlayer.new()
+		npc_alert_player.name = "NPCAlertPlayer" + str(i)
+		npc_alert_player.bus = "SFX"
+		npc_alert_players.append(npc_alert_player)
+		add_child(npc_alert_player)
 	
 	# UI player
 	ui_player = AudioStreamPlayer.new()
@@ -105,10 +118,34 @@ func load_audio_resources():
 func set_volumes():
 	if ambient_player:
 		ambient_player.volume_db = linear_to_db(master_volume * ambient_volume)
-	if sfx_player:
-		sfx_player.volume_db = linear_to_db(master_volume * sfx_volume)
+	
+	# Set volume for all SFX players
+	for player in sfx_players:
+		if player:
+			player.volume_db = linear_to_db(master_volume * sfx_volume)
+	
+	# Set volume for all NPC alert players
+	for player in npc_alert_players:
+		if player:
+			player.volume_db = linear_to_db(master_volume * sfx_volume)
+	
 	if ui_player:
 		ui_player.volume_db = linear_to_db(master_volume * sfx_volume)
+
+# Helper functions to get available players from pools
+func get_available_sfx_player() -> AudioStreamPlayer:
+	for player in sfx_players:
+		if player and not player.playing:
+			return player
+	# If all are playing, return the first one (oldest sound will be interrupted)
+	return sfx_players[0] if sfx_players.size() > 0 else null
+
+func get_available_npc_alert_player() -> AudioStreamPlayer:
+	for player in npc_alert_players:
+		if player and not player.playing:
+			return player
+	# If all are playing, return the first one (oldest sound will be interrupted)
+	return npc_alert_players[0] if npc_alert_players.size() > 0 else null
 
 # Ambient sound control
 func play_ambient():
@@ -124,9 +161,11 @@ func stop_ambient():
 
 # Sound effects
 func play_footstep():
-	if footstep_sound and sfx_player:
-		sfx_player.stream = footstep_sound
-		sfx_player.play()
+	if footstep_sound:
+		var player = get_available_sfx_player()
+		if player:
+			player.stream = footstep_sound
+			player.play()
 
 func play_button_click():
 	if button_click_sound and ui_player:
@@ -134,62 +173,107 @@ func play_button_click():
 		ui_player.play()
 
 func play_item_pickup():
-	if item_pickup_sound and sfx_player:
-		sfx_player.stream = item_pickup_sound
-		sfx_player.play()
+	if item_pickup_sound:
+		var player = get_available_sfx_player()
+		if player:
+			player.stream = item_pickup_sound
+			player.play()
 
 func play_victory():
-	if victory_sound and sfx_player:
+	if victory_sound:
 		await get_tree().create_timer(1.0).timeout
-		
-		sfx_player.stream = victory_sound
-		sfx_player.play()
+		var player = get_available_sfx_player()
+		if player:
+			player.stream = victory_sound
+			player.play()
 
 func play_alert_suspicious():
 	if DebugLogger:
 		DebugLogger.info("play_alert_suspicious called", "AudioManager")
-	if alert_suspicious_sound and npc_alert_player:
+	
+	# Check cooldown to prevent spam
+	var current_time = Time.get_unix_time_from_system()
+	if current_time - last_suspicious_alert_time < ALERT_SOUND_COOLDOWN:
 		if DebugLogger:
-			DebugLogger.info("Playing suspicious alert sound", "AudioManager")
-		npc_alert_player.stream = alert_suspicious_sound
-		npc_alert_player.play()
+			DebugLogger.debug("Suspicious alert sound on cooldown, skipping", "AudioManager")
+		return
+	
+	if alert_suspicious_sound:
+		var player = get_available_npc_alert_player()
+		if player:
+			if DebugLogger:
+				DebugLogger.info("Playing suspicious alert sound with available player", "AudioManager")
+			player.stream = alert_suspicious_sound
+			player.play()
+			last_suspicious_alert_time = current_time
+		else:
+			if DebugLogger:
+				DebugLogger.warning("No available NPC alert player for suspicious sound", "AudioManager")
 	else:
 		if DebugLogger:
-			DebugLogger.warning("Cannot play suspicious alert: alert_suspicious_sound=%s, npc_alert_player=%s" % [alert_suspicious_sound != null, npc_alert_player != null], "AudioManager")
+			DebugLogger.warning("Cannot play suspicious alert: alert_suspicious_sound is null", "AudioManager")
 
 func play_alert_chase():
 	if DebugLogger:
 		DebugLogger.info("play_alert_chase called", "AudioManager")
-	if alert_chase_sound and npc_alert_player:
+	
+	# Check cooldown to prevent spam
+	var current_time = Time.get_unix_time_from_system()
+	if current_time - last_chase_alert_time < ALERT_SOUND_COOLDOWN:
 		if DebugLogger:
-			DebugLogger.info("Playing chase alert sound", "AudioManager")
-		npc_alert_player.stream = alert_chase_sound
-		npc_alert_player.play()
+			DebugLogger.debug("Chase alert sound on cooldown, skipping", "AudioManager")
+		return
+	
+	if alert_chase_sound:
+		var player = get_available_npc_alert_player()
+		if player:
+			if DebugLogger:
+				DebugLogger.info("Playing chase alert sound with available player", "AudioManager")
+			player.stream = alert_chase_sound
+			player.play()
+			last_chase_alert_time = current_time
+		else:
+			if DebugLogger:
+				DebugLogger.warning("No available NPC alert player for chase sound", "AudioManager")
 	else:
 		if DebugLogger:
-			DebugLogger.warning("Cannot play chase alert: alert_chase_sound=%s, npc_alert_player=%s" % [alert_chase_sound != null, npc_alert_player != null], "AudioManager")
+			DebugLogger.warning("Cannot play chase alert: alert_chase_sound is null", "AudioManager")
 
 
 func play_detected():
-	if detected_sound and sfx_player:
-		sfx_player.stream = detected_sound
-		sfx_player.play()
+	if detected_sound:
+		var player = get_available_sfx_player()
+		if player:
+			player.stream = detected_sound
+			player.play()
 
 func play_game_over():
 	# Stop all other audio
 	stop_all_audio()
 	# Play detected sound as game over sound
-	if detected_sound and sfx_player:
-		sfx_player.stream = detected_sound
-		sfx_player.play()
+	if detected_sound:
+		var player = get_available_sfx_player()
+		if player:
+			player.stream = detected_sound
+			player.play()
 
 func stop_all_audio():
 	if ambient_player:
 		ambient_player.stop()
-	if sfx_player:
-		sfx_player.stop()
+	
+	# Stop all SFX players
+	for player in sfx_players:
+		if player:
+			player.stop()
+	
+	# Stop all NPC alert players
+	for player in npc_alert_players:
+		if player:
+			player.stop()
+	
 	if ui_player:
 		ui_player.stop()
+	
 	is_ambient_playing = false
 
 # Volume controls
