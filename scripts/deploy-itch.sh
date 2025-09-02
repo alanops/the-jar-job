@@ -5,7 +5,7 @@
 
 set -e
 
-PROJECT_NAME="the-jar-job"
+PROJECT_NAME="the-jar"
 ITCH_USER="downfallgames"
 BUILD_DIR="builds/web"
 GODOT_EXPORT_TEMPLATE="Web"
@@ -20,9 +20,9 @@ if ! command -v butler &> /dev/null; then
     exit 1
 fi
 
-# Check if logged into butler
-if ! butler status &> /dev/null; then
-    echo "❌ Not logged into butler. Run: butler login"
+# Check if butler credentials exist
+if [ ! -f "/home/alan/.config/itch/butler_creds" ]; then
+    echo "❌ Butler credentials not found. Run: butler login"
     exit 1
 fi
 

@@ -45,6 +45,7 @@ enum NPCState {
 @onready var state_label: Label3D = $StateLabel
 @onready var flashlight: SpotLight3D = $Flashlight
 @onready var vision_debug: Node3D = $VisionDebug
+@onready var laser_beam: Node3D = $LaserBeam
 
 # State Management
 var current_state: NPCState = NPCState.PATROL
@@ -245,6 +246,10 @@ func _ready() -> void:
 	if state_label:
 		state_label.text = "PATROL"
 		state_label.modulate = Color.WHITE
+	
+	# Initialize laser beam (hidden by default)
+	if laser_beam:
+		laser_beam.visible = false
 	
 	# Wait for navigation to be ready
 	await get_tree().process_frame
@@ -459,6 +464,31 @@ func _handle_chase_state(delta: float) -> void:
 	if not player_reference:
 		_switch_to_return_state()
 		return
+	
+	# Update laser beam to point at player
+	if laser_beam:
+		laser_beam.visible = true
+		var player_pos = player_reference.global_position + Vector3(0, 0.5, 0)  # Target player center
+		var laser_origin = laser_beam.global_position
+		var direction_to_player = (player_pos - laser_origin).normalized()
+		var distance_to_player = laser_origin.distance_to(player_pos)
+		
+		# Point laser at player
+		laser_beam.look_at(player_pos, Vector3.UP)
+		
+		# Scale laser length to reach player
+		if laser_beam.has_node("LaserMesh"):
+			var laser_mesh = laser_beam.get_node("LaserMesh")
+			# Update mesh to be correct length
+			if laser_mesh.mesh and laser_mesh.mesh is CylinderMesh:
+				laser_mesh.mesh.height = distance_to_player
+				# Position mesh at midpoint
+				laser_mesh.position = Vector3(0, 0, distance_to_player / 2.0)
+		
+		# Update raycast for collision detection
+		if laser_beam.has_node("RayCast3D"):
+			var laser_raycast = laser_beam.get_node("RayCast3D")
+			laser_raycast.target_position = Vector3(0, 0, distance_to_player)
 	
 	# Check if navigation agent is working, if not use fallback
 	if not navigation_agent or not navigation_agent.is_inside_tree():
@@ -1003,6 +1033,10 @@ func _get_state_name(state: NPCState) -> String:
 		_: return "UNKNOWN"
 
 func _on_state_entered(state: NPCState) -> void:
+	# Hide laser beam when not chasing
+	if laser_beam and state != NPCState.CHASE:
+		laser_beam.visible = false
+	
 	match state:
 		NPCState.SUSPICIOUS:
 			DebugLogger.info("NPC entering SUSPICIOUS state", "NPCController")

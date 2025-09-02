@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://g1jgwsvtrmwc"]
+
+[ext_resource type="Texture2D" uid="uid://dt7x0ql8xnksi" path="res://assets/textures/rugs/Rug1.webp" id="1_rug1"]
+
+[resource]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+specular_mode = 2
+albedo_texture = ExtResource("1_rug1")
+roughness = 0.8
+texture_filter = 1
+texture_repeat = false

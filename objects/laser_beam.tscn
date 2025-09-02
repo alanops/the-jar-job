@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2laser4chase"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
+height = 10.0
+radial_segments = 8
+rings = 1
+top_radius = 0.03
+bottom_radius = 0.03
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(1, 0, 0, 0.8)
+emission_enabled = true
+emission = Color(1, 0, 0, 1)
+emission_energy_multiplier = 2.0
+transparency = 1
+
+[sub_resource type="RayShape3D" id="RayShape3D_1"]
+length = 10.0
+
+[node name="LaserBeam" type="Node3D"]
+
+[node name="LaserMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 5)
+mesh = SubResource("CylinderMesh_1")
+surface_material_override/0 = SubResource("StandardMaterial3D_1")
+
+[node name="RayCast3D" type="RayCast3D" parent="."]
+target_position = Vector3(0, 0, 10)
+collision_mask = 1
