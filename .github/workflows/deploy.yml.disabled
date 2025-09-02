@@ -1,0 +1,75 @@
+name: Deploy to itch.io
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: 4.4.1
+
+jobs:
+  export-web:
+    name: Web Export and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          include-templates: true
+          use-dotnet: false
+
+      - name: Verify Export Presets
+        run: |
+          ls -la
+          cat export_presets.cfg
+          
+      - name: Web Build
+        run: |
+          set -e  # Exit on error
+          mkdir -v -p builds/web
+          
+          # Run Godot export and capture output
+          godot --headless --export-release "Web" builds/web/index.html 2>&1 | tee export.log
+          
+          # Check for errors in the log
+          if grep -q "ERROR:" export.log; then
+            echo "❌ Errors found during export:"
+            grep "ERROR:" export.log
+            exit 1
+          fi
+          
+          # Check for script errors
+          if grep -q "SCRIPT ERROR:" export.log; then
+            echo "❌ Script errors found during export:"
+            grep "SCRIPT ERROR:" export.log
+            exit 1
+          fi
+          
+          # Verify the build output exists
+          if [ ! -f "builds/web/index.html" ]; then
+            echo "❌ Build failed: index.html not found"
+            exit 1
+          fi
+          
+          echo "✅ Export completed successfully"
+
+      - name: Install Butler
+        run: |
+          curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+          unzip -o butler.zip
+          chmod +x butler
+          ./butler -V
+
+      - name: Deploy to itch.io
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          ./butler push builds/web downfallgames/the-jar:html5
