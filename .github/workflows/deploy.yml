@@ -72,4 +72,4 @@ jobs:
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
         run: |
-          ./butler push builds/web downfallgames/the-jar-job:html5
+          ./butler push builds/web downfallgames/the-jar:html5

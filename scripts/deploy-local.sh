@@ -6,7 +6,7 @@ echo "=============================="
 
 # Configuration
 ITCH_USER="downfallgames"
-ITCH_GAME="the-jar-job"
+ITCH_GAME="jar-job"
 ITCH_CHANNEL="html5"
 BUILD_DIR="builds/web"
 
