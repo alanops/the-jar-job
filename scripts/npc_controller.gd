@@ -1122,18 +1122,30 @@ func _generate_search_positions() -> void:
 	
 	# Generate search positions around the base position if we don't have specific targets
 	if search_positions.is_empty():
-		var search_radius := 3.0 * personality_persistence
-		var num_positions = 4
+		var search_radius := 4.0 * personality_persistence  # Increased base radius
+		var num_positions = 3  # Reduced positions for more focused search
 		
 		# More thorough search if memory suggests this area has hiding spots
 		if should_search_thoroughly_here(base_pos):
-			search_radius *= 1.5
-			num_positions = 6
+			search_radius *= 1.2
+			num_positions = 4
 		
+		# Generate positions in a more systematic pattern
 		for i in range(num_positions):
-			var angle: float = (i * PI * 2.0 / num_positions) + randf() * PI * 0.25
-			var offset := Vector3(cos(angle), 0, sin(angle)) * (search_radius * (0.5 + randf() * 0.5))
-			search_positions.append(base_pos + offset)
+			var angle: float = (i * PI * 2.0 / num_positions) + (PI * 0.33)  # Start offset to avoid symmetry
+			var distance_variation: float = 0.8 + (i * 0.4)  # Vary distance for each position
+			var offset: Vector3 = Vector3(cos(angle), 0, sin(angle)) * (search_radius * distance_variation)
+			var search_pos: Vector3 = base_pos + offset
+			
+			# Ensure positions are not too close to each other
+			var too_close = false
+			for existing_pos in search_positions:
+				if search_pos.distance_to(existing_pos) < 2.5:  # Minimum distance between search positions
+					too_close = true
+					break
+			
+			if not too_close:
+				search_positions.append(search_pos)
 
 func _get_vision_check_interval() -> float:
 	# More aggressive LOD system for better detection
@@ -1170,7 +1182,19 @@ func _handle_search_state(delta: float) -> void:
 		_change_state(NPCState.RETURN_TO_PATROL)
 		return
 	
-	if navigation_agent.is_navigation_finished():
+	# Check if we're close to the current search position manually
+	var current_search_pos = search_positions[current_search_index]
+	var distance_to_search_pos = global_position.distance_to(current_search_pos)
+	
+	# If we're close to the search position or navigation is finished, move to next
+	if distance_to_search_pos < 1.5 or navigation_agent.is_navigation_finished():
+		# Stay at this position for a moment to "search"
+		if state_timer.is_stopped():
+			state_timer.start(1.0)  # Search for 1 second at each position
+			velocity = Vector3.ZERO  # Stop moving while searching
+			print("NPCController: Searching at position ", current_search_index)
+			return
+		
 		# Move to next search position
 		current_search_index += 1
 		if current_search_index >= search_positions.size():
@@ -1178,6 +1202,8 @@ func _handle_search_state(delta: float) -> void:
 			return
 		
 		navigation_agent.target_position = search_positions[current_search_index]
+		state_timer.stop()  # Reset timer for next position
+		print("NPCController: Moving to search position ", current_search_index)
 		return
 	
 	# Move to current search position
