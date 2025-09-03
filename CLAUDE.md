@@ -13,18 +13,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Open project in Godot editor
 godot --editor
 
-# Build for web export (headless)
-godot --headless --export-release "Web" builds/web/index.html
-
 # Run the game directly
 godot
 
-# Deploy to itch.io (requires Butler CLI)
+# Test export locally (validates build integrity)
+./scripts/test-export.sh
+
+# Setup deployment prerequisites (Butler CLI + export templates)
+./scripts/setup-butler.sh
+./scripts/install-export-templates.sh
+
+# Deploy to itch.io (full deployment pipeline)
+./scripts/deploy-local.sh
+
+# Simple deployment (requires prerequisites installed)
 ./scripts/deploy-itch.sh
+
+# Test CI environment locally
+./scripts/test-ci-locally.sh
 ```
 
 ### Game Controls
-- **Arrow Keys**: Movement
+- **Arrow Keys / WASD**: Movement (camera-relative)
 - **Ctrl**: Crouch (quieter movement)
 - **E**: Interact with objects
 - **R**: Reset level
@@ -50,8 +60,16 @@ godot
 - **Detection States**: Patrol → Investigate → Chase state machine
 
 #### 2. Singleton Architecture
-- `GameManager` (autoload) handles global game state
-- Manages scene transitions and win/lose conditions
+Nine autoloaded singletons provide core system services:
+- `DebugLogger` - Centralized logging with file output
+- `GameConfig` - Game configuration management  
+- `VisionSystem` - NPC vision and detection system
+- `PerformanceOptimizer` - Runtime performance optimization
+- `ErrorHandler` - Global error handling and recovery
+- `GameManager` - Core game state and scene transitions
+- `ObjectiveManager` - Mission and objective tracking
+- `NPCCommunication` - Inter-NPC communication system
+- `AudioManager` - Multi-bus audio system with persistent settings
 
 #### 3. NPC AI System
 - Waypoint-based patrol system
@@ -124,17 +142,18 @@ The game features a comprehensive audio system built around the `AudioManager` s
 - Keep scenes modular and reusable
 
 ### Version Management
-- Version stored in `project.godot` under `config/version`
-- Use semantic versioning (e.g., 1.4.2)
+- Current version: 0.2.0 (stored in `project.godot` under `config/version`)
+- Use semantic versioning for releases
 - Tag releases with `v` prefix for CI/CD
 
 ## Troubleshooting
 
 ### Common Issues
-- **Export fails**: Ensure Godot 4.4+ is installed
-- **Butler not found**: Install from https://itch.io/docs/butler/
-- **Performance issues**: Check performance monitor and profiler
-- **Web build problems**: Test in multiple browsers
+- **Export fails**: Run `./scripts/install-export-templates.sh` to get Godot 4.4.1 templates
+- **Butler not found**: Run `./scripts/setup-butler.sh` to install itch.io CLI
+- **Build validation**: Use `./scripts/test-export.sh` to check export integrity
+- **CI debugging**: Run `./scripts/test-ci-locally.sh` to simulate deployment environment
+- **Performance issues**: Check PerformanceOptimizer singleton and built-in profiler
 
 ### Development Tips
 - Use the built-in performance tools for optimization
@@ -146,6 +165,6 @@ The game features a comprehensive audio system built around the `AudioManager` s
 
 - Project uses Godot 4.4 engine (not compatible with 3.x)
 - Web export is the primary distribution method
-- Deployed to https://downfallgames.itch.io/the-jar-job
+- Deployed to https://downfallgames.itch.io/jar-job
 - No external dependencies beyond Godot engine
 - Performance optimizations are critical for web builds
