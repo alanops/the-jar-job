@@ -144,6 +144,16 @@ theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 layout_mode = 2
 text = "Crouch (quieter)"
 
+[node name="RunLabel" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Shift"
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="RunDesc" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Run (noisy!)"
+theme_override_colors/font_color = Color(1, 0.8, 0.8, 1)
+
 [node name="InteractLabel" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
 layout_mode = 2
 text = "E"
