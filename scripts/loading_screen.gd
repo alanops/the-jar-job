@@ -39,6 +39,10 @@ var loading_statuses: Array[String] = [
 var current_status_index: int = 0
 var status_timer: float = 0.0
 var tip_timer: float = 0.0
+var minimum_load_time: float = 2.0  # Minimum time to show loading screen
+var elapsed_time: float = 0.0
+var is_loaded: bool = false
+var loaded_scene: PackedScene = null
 
 func _ready() -> void:
 	# Set random tip
@@ -57,6 +61,9 @@ func start_loading(path: String) -> void:
 	current_status_index = 0
 	status_timer = 0.0
 	tip_timer = 0.0
+	elapsed_time = 0.0
+	is_loaded = false
+	loaded_scene = null
 	_update_status()
 	
 	# Start loading the scene in the background
@@ -71,6 +78,7 @@ func _process(delta: float) -> void:
 	# Update timers
 	status_timer += delta
 	tip_timer += delta
+	elapsed_time += delta
 	
 	# Update status message every 0.8 seconds
 	if status_timer >= 0.8:
@@ -83,40 +91,55 @@ func _process(delta: float) -> void:
 		tip_timer = 0.0
 		_update_tip()
 	
-	# Check loading progress
+	# Check loading progress if not already loaded
+	if not is_loaded:
+		var load_progress = []
+		var status = ResourceLoader.load_threaded_get_status(scene_path, load_progress)
+		
+		if status == ResourceLoader.THREAD_LOAD_LOADED:
+			# Loading complete! But don't transition yet
+			is_loaded = true
+			loaded_scene = ResourceLoader.load_threaded_get(scene_path)
+			print("Scene loaded, waiting for minimum time...")
+			
+		elif status == ResourceLoader.THREAD_LOAD_FAILED:
+			status_label.text = "Loading failed!"
+			print("ERROR: Failed to load scene: ", scene_path)
+			return
+	
+	# Calculate progress based on both actual loading and minimum time
+	var time_progress = min(elapsed_time / minimum_load_time, 1.0)
 	var load_progress = []
 	var status = ResourceLoader.load_threaded_get_status(scene_path, load_progress)
+	var actual_progress = 0.0
 	
-	if status == ResourceLoader.THREAD_LOAD_LOADED:
-		# Loading complete!
+	if load_progress.size() > 0:
+		actual_progress = load_progress[0]
+	elif is_loaded:
+		actual_progress = 1.0
+	
+	# Use whichever is lower to ensure smooth progress
+	var combined_progress = min(time_progress, actual_progress) if not is_loaded else time_progress
+	
+	# Smooth progress bar animation
+	progress_bar.value = lerp(progress_bar.value, combined_progress, delta * 5.0)
+	
+	# Check if we can transition
+	if is_loaded and elapsed_time >= minimum_load_time:
 		progress_bar.value = 1.0
 		status_label.text = "Loading complete!"
 		
-		# Get the loaded scene
-		var loaded_scene = ResourceLoader.load_threaded_get(scene_path)
-		
 		# Small delay for visual feedback
-		await get_tree().create_timer(0.3).timeout
+		await get_tree().create_timer(0.2).timeout
 		
 		# Change to the loaded scene
-		get_tree().change_scene_to_packed(loaded_scene)
+		if loaded_scene:
+			get_tree().change_scene_to_packed(loaded_scene)
 		
 		# Hide loading screen
 		visible = false
 		
 		print("Loading complete, transitioning to scene")
-		
-	elif status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-		# Update progress bar
-		if load_progress.size() > 0:
-			progress_bar.value = load_progress[0]
-		else:
-			# Fake progress for visual feedback
-			progress_bar.value = min(progress_bar.value + delta * 0.3, 0.9)
-			
-	elif status == ResourceLoader.THREAD_LOAD_FAILED:
-		status_label.text = "Loading failed!"
-		print("ERROR: Failed to load scene: ", scene_path)
 
 func _update_status() -> void:
 	if current_status_index < loading_statuses.size():
