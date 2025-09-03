@@ -127,6 +127,10 @@ func reset_npc_state():
 	if vision_cone:
 		vision_cone.set_alert_mode(false)
 	
+	# Hide laser beam
+	if laser_beam:
+		laser_beam.visible = false
+	
 	# Reset GOAP system
 	if goap_system:
 		goap_system.stuck_timer = 0.0
@@ -729,7 +733,8 @@ func _on_player_spotted() -> void:
 	if communication_manager:
 		communication_manager.raise_alert(NPCCommunicationManager.AlertLevel.HIGH, player_reference.global_position, self)
 	
-	current_state = NPCState.CHASE
+	# Change state through proper state machine to ensure laser shows
+	_change_state(NPCState.CHASE)
 	state_timer.stop()
 	player_spotted.emit(self)
 	GameManager.trigger_game_over("You were spotted by the security guard!")
@@ -739,7 +744,8 @@ func _on_player_caught() -> void:
 	if GameManager.current_state == GameManager.GameState.GAME_OVER:
 		return
 		
-	current_state = NPCState.CHASE
+	# Change state through proper state machine
+	_change_state(NPCState.CHASE)
 	state_timer.stop()
 	player_caught.emit(self)
 	GameManager.trigger_game_over("You were caught by the security guard!")
@@ -758,7 +764,7 @@ func _on_player_made_noise(noise_position: Vector3, noise_radius: float) -> void
 		
 		# If noise radius is large (player is running), chase directly
 		if noise_radius >= 7.0:  # Running noise threshold
-			current_state = NPCState.CHASE
+			_change_state(NPCState.CHASE)
 			state_timer.stop()
 		else:
 			_switch_to_investigate_state(noise_position)
