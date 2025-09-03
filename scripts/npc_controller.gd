@@ -757,17 +757,91 @@ func _on_player_made_noise(noise_position: Vector3, noise_radius: float) -> void
 	var distance_to_noise := global_position.distance_to(noise_position)
 	
 	if distance_to_noise <= noise_radius:
+		# Enhanced hearing with directional awareness
+		var hearing_effectiveness = _calculate_hearing_effectiveness(noise_position, noise_radius, distance_to_noise)
+		
+		# Only react if the sound is loud enough after falloff
+		if hearing_effectiveness < 0.3:  # Hearing threshold
+			return
+		
+		print("NPC ", name, " heard noise at ", noise_position, " (effectiveness: ", hearing_effectiveness, ")")
+		
+		# Record noise in memory system
+		if memory_system and learning_enabled:
+			memory_system.add_memory(NPCMemorySystem.MemoryType.NOISE_EVENT, noise_position, {
+				"volume": noise_radius * hearing_effectiveness,
+				"timestamp": Time.get_unix_time_from_system(),
+				"npc_position": global_position
+			})
+		
 		# Share noise information with nearby NPCs
 		if communication_manager:
 			var alert_level = NPCCommunicationManager.AlertLevel.MEDIUM if noise_radius >= 7.0 else NPCCommunicationManager.AlertLevel.LOW
 			communication_manager.raise_alert(alert_level, noise_position, self)
 		
-		# If noise radius is large (player is running), chase directly
-		if noise_radius >= 7.0:  # Running noise threshold
+		# React based on hearing effectiveness and noise intensity
+		var effective_noise = noise_radius * hearing_effectiveness
+		
+		if effective_noise >= 6.0:  # Very loud noise (running close by)
 			_change_state(NPCState.CHASE)
 			state_timer.stop()
-		else:
+			print("NPC ", name, " chasing due to loud noise")
+		elif effective_noise >= 3.0:  # Medium noise (walking nearby)
 			_switch_to_investigate_state(noise_position)
+			print("NPC ", name, " investigating noise")
+		else:  # Quiet noise (distant or muffled)
+			# Just increase suspicion slightly
+			suspicion_level = min(suspicion_level + 10.0, max_suspicion)
+			print("NPC ", name, " suspicious due to faint noise")
+
+func _calculate_hearing_effectiveness(noise_position: Vector3, noise_radius: float, distance: float) -> float:
+	# Base hearing effectiveness with distance falloff
+	var distance_falloff = 1.0 - (distance / noise_radius)
+	distance_falloff = max(distance_falloff, 0.0)
+	
+	# Directional hearing - NPCs hear better in the direction they're facing
+	var to_noise = (noise_position - global_position).normalized()
+	var facing_direction = global_transform.basis.z  # Forward direction
+	var directional_dot = facing_direction.dot(to_noise)
+	
+	# Convert dot product to hearing bonus/penalty
+	# Facing noise = 1.2x hearing, behind = 0.7x hearing
+	var directional_multiplier = 0.85 + (directional_dot * 0.35)  # 0.5 to 1.2
+	
+	# Wall occlusion check - sounds are muffled through walls
+	var occlusion_multiplier = _check_sound_occlusion(global_position, noise_position)
+	
+	# State-based hearing sensitivity
+	var state_multiplier = 1.0
+	match current_state:
+		NPCState.PATROL:
+			state_multiplier = 1.0  # Normal hearing
+		NPCState.SUSPICIOUS:
+			state_multiplier = 1.3  # Alert, better hearing
+		NPCState.INVESTIGATE:
+			state_multiplier = 1.5  # Actively listening
+		NPCState.SEARCH:
+			state_multiplier = 1.4  # On high alert
+		_:
+			state_multiplier = 1.0
+	
+	var final_effectiveness = distance_falloff * directional_multiplier * occlusion_multiplier * state_multiplier
+	return clamp(final_effectiveness, 0.0, 2.0)
+
+func _check_sound_occlusion(from_pos: Vector3, to_pos: Vector3) -> float:
+	# Raycast to check for walls blocking sound
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from_pos, to_pos)
+	query.collision_mask = 1  # Only walls
+	query.exclude = [self]
+	
+	var result = space_state.intersect_ray(query)
+	
+	if result.is_empty():
+		return 1.0  # No occlusion, full sound
+	else:
+		# Sound is muffled through walls
+		return 0.4  # 60% volume reduction through walls
 
 func _switch_to_investigate_state(position: Vector3) -> void:
 	current_state = NPCState.INVESTIGATE
