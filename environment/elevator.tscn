@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cpvug3wlypb3j"]
+[gd_scene load_steps=12 format=3 uid="uid://cpvug3wlypb3j"]
 
 [ext_resource type="Script" uid="uid://tqth3ioslss2" path="res://scripts/elevator_controller.gd" id="1_elevator"]
 
@@ -29,18 +29,6 @@ size = Vector3(1.3, 2.8, 0.1)
 albedo_color = Color(0.6, 0.6, 0.6, 1)
 metallic = 1.0
 roughness = 0.1
-
-[sub_resource type="BoxMesh" id="BoxMesh_3"]
-size = Vector3(0.2, 0.5, 0.2)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
-albedo_color = Color(0.8, 0.8, 0, 1)
-emission_enabled = true
-emission = Color(0.8, 0.8, 0, 1)
-emission_energy_multiplier = 0.5
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_2"]
-size = Vector3(0.2, 0.5, 0.2)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1"]
 radius = 3.0
@@ -97,18 +85,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65, 0, 0)
 mesh = SubResource("BoxMesh_2")
 surface_material_override/0 = SubResource("StandardMaterial3D_2")
 
-[node name="CallButton" type="StaticBody3D" parent="." groups=["interactables"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7, 1.2, 0)
-collision_layer = 8
-collision_mask = 0
-
-[node name="ButtonMesh" type="MeshInstance3D" parent="CallButton"]
-mesh = SubResource("BoxMesh_3")
-surface_material_override/0 = SubResource("StandardMaterial3D_3")
-
-[node name="ButtonCollision" type="CollisionShape3D" parent="CallButton"]
-shape = SubResource("BoxShape3D_2")
-
 [node name="ProximityDetection" type="Area3D" parent="."]
 collision_layer = 0
 collision_mask = 2
@@ -128,6 +104,10 @@ shape = SubResource("BoxShape3D_5")
 [node name="DoorOpenTimer" type="Timer" parent="."]
 wait_time = 3.0
 one_shot = true
+
+[node name="ElevatorOpen" type="AudioStreamPlayer3D" parent="."]
+
+[node name="ElevatorClose" type="AudioStreamPlayer3D" parent="."]
 
 [connection signal="body_entered" from="ProximityDetection" to="." method="_on_proximity_detection_body_entered"]
 [connection signal="body_exited" from="ProximityDetection" to="." method="_on_proximity_detection_body_exited"]

@@ -1,7 +1,6 @@
-[gd_scene load_steps=41 format=3 uid="uid://b7hf5w8nxkgvq"]
+[gd_scene load_steps=40 format=3 uid="uid://b7hf5w8nxkgvq"]
 
 [ext_resource type="Script" uid="uid://dx38cl2wfggri" path="res://scripts/game.gd" id="1_game"]
-[ext_resource type="Script" path="res://scripts/elevator_light_culling.gd" id="2_elevator_culling"]
 [ext_resource type="PackedScene" uid="uid://bvnx4jpyxvhqo" path="res://scenes/player.tscn" id="8_player"]
 [ext_resource type="Script" uid="uid://x0bnonghuli0" path="res://scripts/isometric_camera.gd" id="9_camera"]
 [ext_resource type="PackedScene" uid="uid://cevuj3wqn8kxp" path="res://scenes/npc.tscn" id="10_npc"]
@@ -317,7 +316,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0352497, 0, -0.0537515)
 
 [node name="Elevator" parent="." instance=ExtResource("17_elevator")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.4257, -0.100001, -9.5302)
-script = ExtResource("2_elevator_culling")
 
 [node name="ElevatorWarmLight2" type="OmniLight3D" parent="Elevator"]
 transform = Transform3D(-0.99805, 2.60262e-08, 0.0624248, 0.0356419, 0.82098, 0.569843, -0.0512495, 0.570957, -0.819379, -0.279953, 2.16011, -0.411149)
