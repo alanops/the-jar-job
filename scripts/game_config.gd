@@ -65,7 +65,7 @@ var audio_sfx_volume: float = 0.8
 var audio_ambient_volume: float = 0.4
 
 # === PERFORMANCE SETTINGS ===
-var enable_performance_monitoring: bool = true
+var enable_performance_monitoring: bool = false
 var enable_vision_debug: bool = false
 var max_concurrent_vision_checks: int = 3
 var enable_npc_learning: bool = true

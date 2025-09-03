@@ -316,18 +316,21 @@ func _physics_process(delta: float) -> void:
 	# Update suspicion and player tracking
 	_update_suspicion_system(delta)
 	_update_player_tracking(delta)
-	_update_memory_system(delta)
+	
+	# LOD: Only update expensive AI systems when player is relatively close
+	if distance_to_player <= 20.0:  # Only update memory system within 20 units
+		_update_memory_system(delta)
 	if performance_monitor:
 		performance_monitor.profile_section_end("NPC_Suspicion")
 	
 	if performance_monitor:
 		performance_monitor.profile_section_start("NPC_StateMachine")
 	
-	# Use GOAP system if enabled, otherwise use traditional state machine
-	if use_goap and goap_system:
+	# LOD: Use GOAP system only when player is close (more expensive AI)
+	if use_goap and goap_system and distance_to_player <= 15.0:
 		_handle_goap_system(delta)
 	else:
-		# Handle current state using traditional state machine
+		# Handle current state using traditional state machine (less expensive)
 		match current_state:
 			NPCState.IDLE:
 				_handle_idle_state(delta)
@@ -1148,15 +1151,15 @@ func _generate_search_positions() -> void:
 				search_positions.append(search_pos)
 
 func _get_vision_check_interval() -> float:
-	# More aggressive LOD system for better detection
+	# Optimized LOD system for better performance
 	if distance_to_player > 15.0:
-		return 0.2  # Very far - check every 0.2 seconds (was 0.5)
+		return 0.5  # Very far - check every 0.5 seconds
 	elif distance_to_player > 10.0:
-		return 0.1  # Far - check every 0.1 seconds (was 0.25)
+		return 0.25  # Far - check every 0.25 seconds
 	elif distance_to_player > 5.0:
-		return 0.05  # Medium - check every 0.05 seconds (was 0.1)
+		return 0.15  # Medium - check every 0.15 seconds
 	else:
-		return 0.02  # Close - check every 0.02 seconds (was 0.05)
+		return 0.1  # Close - check every 0.1 seconds (10fps instead of 50fps)
 
 # New State Handlers
 func _handle_suspicious_state(delta: float) -> void:
