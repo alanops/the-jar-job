@@ -57,7 +57,8 @@ func _ready() -> void:
 func start_loading(path: String) -> void:
 	scene_path = path
 	visible = true
-	progress_bar.value = 0
+	progress_bar.value = 0.0
+	progress_bar.max_value = 1.0
 	current_status_index = 0
 	status_timer = 0.0
 	tip_timer = 0.0
@@ -70,6 +71,9 @@ func start_loading(path: String) -> void:
 	ResourceLoader.load_threaded_request(scene_path)
 	
 	print("Loading screen started for: ", scene_path)
+	
+	# Set initial progress to show bar is active
+	progress_bar.value = 0.05
 
 func _process(delta: float) -> void:
 	if not visible:

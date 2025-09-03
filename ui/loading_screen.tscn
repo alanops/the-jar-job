@@ -1,9 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://btxswvyqrmhxu"]
+[gd_scene load_steps=4 format=3 uid="uid://btxswvyqrmhxu"]
 
 [ext_resource type="Script" path="res://scripts/loading_screen.gd" id="1_loading"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
 bg_color = Color(0.2, 0.8, 0.2, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0.1, 0.1, 0.1, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.3, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -57,11 +69,12 @@ text = "Loading..."
 horizontal_alignment = 1
 
 [node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
-custom_minimum_size = Vector2(400, 20)
+custom_minimum_size = Vector2(400, 30)
 layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_2")
 theme_override_styles/fill = SubResource("StyleBoxFlat_1")
 value = 0.0
-show_percentage = false
+show_percentage = true
 
 [node name="StatusLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
