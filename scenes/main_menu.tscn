@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://bqvn5yxqwkp8x"]
+[gd_scene load_steps=5 format=3 uid="uid://bqvn5yxqwkp8x"]
 
 [ext_resource type="Script" uid="uid://cxk4y802fl26t" path="res://scripts/main_menu.gd" id="1_menu"]
 [ext_resource type="Texture2D" path="res://The_Jar_Job_Splash_Art.webp" id="2_splash"]
 [ext_resource type="Theme" uid="uid://lozenge_theme" path="res://ui/lozenge_button_style.tres" id="3_button_theme"]
+[ext_resource type="PackedScene" uid="uid://btxswvyqrmhxu" path="res://ui/loading_screen.tscn" id="4_loading"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -96,6 +97,9 @@ theme_override_colors/font_color = Color(1, 1, 1, 0.8)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
+
+[node name="LoadingScreen" parent="." instance=ExtResource("4_loading")]
+visible = false
 theme_override_font_sizes/font_size = 16
 text = "Version 0.2.0"
 horizontal_alignment = 1
