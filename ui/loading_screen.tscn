@@ -25,34 +25,30 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.1, 0.1, 0.1, 0.7)
 
-[node name="LoadingPanel" type="Panel" parent="."]
+[node name="BottomPanel" type="Panel" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -80.0
-offset_right = 250.0
-offset_bottom = 80.0
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
 grow_horizontal = 2
-grow_vertical = 2
-self_modulate = Color(1, 1, 1, 0.9)
+grow_vertical = 0
+self_modulate = Color(0, 0, 0, 0.5)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 7
 anchor_left = 0.5
-anchor_top = 0.5
+anchor_top = 1.0
 anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -50.0
-offset_right = 200.0
-offset_bottom = 50.0
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -90.0
+offset_right = 250.0
+offset_bottom = -20.0
 grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
 
 [node name="LoadingLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
@@ -74,17 +70,17 @@ horizontal_alignment = 1
 
 [node name="TipsContainer" type="MarginContainer" parent="."]
 layout_mode = 1
-anchors_preset = 7
+anchors_preset = 8
 anchor_left = 0.5
-anchor_top = 1.0
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
+anchor_bottom = 0.5
 offset_left = -300.0
-offset_top = -100.0
+offset_top = -50.0
 offset_right = 300.0
-offset_bottom = -50.0
+offset_bottom = 50.0
 grow_horizontal = 2
-grow_vertical = 0
+grow_vertical = 2
 
 [node name="TipBackground" type="Panel" parent="TipsContainer"]
 layout_mode = 2
