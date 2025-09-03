@@ -79,7 +79,7 @@ light_energy = 0.2
 
 [node name="OfficeAmbientSpot1" type="OmniLight3D" parent="AmbientLights"]
 transform = Transform3D(1, 0, 0, 0, -0.5, 0.866025, 0, -0.866025, -0.5, 5, 3.5, 2)
-light_color = Color(0.4, 0.3, 0.8, 1)
+light_color = Color(0.120327, 0.312532, 0.952795, 1)
 light_energy = 7.6
 light_size = 0.5
 light_specular = 0.2
@@ -103,16 +103,16 @@ omni_range = 15.0
 
 [node name="HallwayAmbientSpot1" type="OmniLight3D" parent="AmbientLights"]
 transform = Transform3D(0.647215, -0.660177, -0.381154, -0.0508796, -0.536296, 0.842495, -0.760607, -0.525883, -0.380688, 0, 3.5, -10)
-light_color = Color(0.35, 0.25, 0.75, 1)
-light_energy = 12.984
+light_color = Color(0.158895, 0.125813, 1, 1)
+light_energy = 8.0
 light_size = 0.6
 light_specular = 0.15
 omni_range = 8.0
 
 [node name="CornerAmbientSpot1" type="OmniLight3D" parent="AmbientLights"]
-transform = Transform3D(1, 0, 0, 0, -0.707107, 0.707107, 0, -0.707107, -0.707107, -14, 3.5, -14)
-light_color = Color(0.25, 0.15, 0.6, 1)
-light_energy = 0.42
+transform = Transform3D(1, 0, 0, 0, -0.707107, 0.707107, 0, -0.707107, -0.707107, -16.7767, 3.5, -6.71283)
+light_color = Color(0.152474, 0.2081, 0.577351, 1)
+light_energy = 4.198
 light_size = 0.4
 light_specular = 0.08
 omni_range = 9.0
@@ -320,7 +320,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.4257, -0.100001, -9.5302)
 [node name="ElevatorWarmLight2" type="OmniLight3D" parent="Elevator"]
 transform = Transform3D(-0.99805, 2.60262e-08, 0.0624248, 0.0356419, 0.82098, 0.569843, -0.0512495, 0.570957, -0.819379, -0.279953, 2.16011, -0.411149)
 light_color = Color(0.863, 0.525, 0.247, 1)
-light_energy = 16.0
+light_energy = 8.0
 light_size = 20.0
 shadow_enabled = true
 omni_range = 10.0
