@@ -1,0 +1,216 @@
+[gd_scene load_steps=4 format=3 uid="uid://btxswvyqrmhxu"]
+
+[ext_resource type="Script" path="res://scripts/loading_screen.gd" id="1_loading"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.2, 0.8, 0.2, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0.1, 0.1, 0.1, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.3, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="LoadingScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_loading")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.1, 0.1, 0.1, 0.7)
+
+[node name="BottomPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+self_modulate = Color(0, 0, 0, 0.5)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -90.0
+offset_right = 250.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="LoadingLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Loading..."
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
+custom_minimum_size = Vector2(400, 30)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_2")
+theme_override_styles/fill = SubResource("StyleBoxFlat_1")
+value = 0.0
+show_percentage = true
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Preparing stealth mission..."
+horizontal_alignment = 1
+
+[node name="ControlsContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -100.0
+offset_right = 250.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ControlsBackground" type="Panel" parent="ControlsContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+self_modulate = Color(0, 0, 0, 0.7)
+
+[node name="MarginContainer" type="MarginContainer" parent="ControlsContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ControlsContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="ControlsTitle" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Controls"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="ControlsContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ControlsGrid" type="GridContainer" parent="ControlsContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 40
+theme_override_constants/v_separation = 5
+
+[node name="MoveLabel" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Arrow Keys / WASD"
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="MoveDesc" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Move"
+
+[node name="CrouchLabel" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Ctrl"
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="CrouchDesc" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Crouch (quieter)"
+
+[node name="RunLabel" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Shift"
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="RunDesc" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Run (noisy!)"
+theme_override_colors/font_color = Color(1, 0.8, 0.8, 1)
+
+[node name="InteractLabel" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "E"
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="InteractDesc" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Interact"
+
+[node name="CameraLabel" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Tab"
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="CameraDesc" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Change Camera"
+
+[node name="ResetLabel" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "R"
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="ResetDesc" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Reset Level"
+
+[node name="PauseLabel" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Escape"
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="PauseDesc" type="Label" parent="ControlsContainer/MarginContainer/VBoxContainer/ControlsGrid"]
+layout_mode = 2
+text = "Pause Menu"
+
+[node name="TipsContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = 120.0
+offset_right = 300.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TipBackground" type="Panel" parent="TipsContainer"]
+layout_mode = 2
+self_modulate = Color(0, 0, 0, 0.8)
+
+[node name="TipLabel" type="Label" parent="TipsContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Tip: Crouch to move quietly and avoid detection!"
+horizontal_alignment = 1
+autowrap_mode = 2

@@ -2,6 +2,7 @@ extends Control
 
 @onready var play_button: Button = $VBoxContainer/PlayButton
 @onready var quit_button: Button = $VBoxContainer/QuitButton
+@onready var loading_screen: Control = $LoadingScreen
 
 func _ready() -> void:
 	play_button.pressed.connect(_on_play_pressed)
@@ -14,8 +15,14 @@ func _ready() -> void:
 	AudioManager.play_ambient()
 
 func _on_play_pressed() -> void:
-	AudioManager.play_button_click()# Start background music for gameplay
-	get_tree().change_scene_to_file("res://scenes/game.tscn")
+	AudioManager.play_button_click()
+	
+	# Hide buttons during loading
+	play_button.visible = false
+	quit_button.visible = false
+	
+	# Start loading screen
+	loading_screen.start_loading("res://scenes/game.tscn")
 
 func _on_quit_pressed() -> void:
 	AudioManager.play_button_click()
