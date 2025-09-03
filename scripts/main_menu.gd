@@ -17,9 +17,9 @@ func _ready() -> void:
 func _on_play_pressed() -> void:
 	AudioManager.play_button_click()
 	
-	# Disable buttons during loading
-	play_button.disabled = true
-	quit_button.disabled = true
+	# Hide buttons during loading
+	play_button.visible = false
+	quit_button.visible = false
 	
 	# Start loading screen
 	loading_screen.start_loading("res://scenes/game.tscn")
