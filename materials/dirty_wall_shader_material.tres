@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/wall_dirt_3d.gdshader" id="1"]
+
+[resource]
+shader = ExtResource("1")
+shader_parameter/dirt_intensity = 0.35
+shader_parameter/grain_scale = 6.0
+shader_parameter/base_color = Color(0.75, 0.75, 0.7, 1)
+shader_parameter/dirt_color = Color(0.25, 0.2, 0.15, 1)
+shader_parameter/roughness = 0.8
+shader_parameter/metallic = 0.05
+shader_parameter/dirt_roughness_boost = 0.15
