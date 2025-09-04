@@ -123,7 +123,9 @@ func open_doors() -> void:
 	door_tween.tween_property(door_left, "position", left_door_open_pos, door_animation_speed)
 	door_tween.tween_property(door_right, "position", right_door_open_pos, door_animation_speed)
 	
-	if has_node("ElevatorOpen"):
+	if has_node("ElevatorOpen2"):
+		$ElevatorOpen2.play()
+	elif has_node("ElevatorOpen"):
 		$ElevatorOpen.play()
 	# Change button color to indicate active state
 	# Button removed - no visual feedback needed
@@ -147,7 +149,10 @@ func close_doors() -> void:
 	# Animate doors closing
 	door_tween.tween_property(door_left, "position", left_door_closed_pos, door_animation_speed)
 	door_tween.tween_property(door_right, "position", right_door_closed_pos, door_animation_speed)
-	$ElevatorClose.play()
+	if has_node("ElevatorClose2"):
+		$ElevatorClose2.play()
+	elif has_node("ElevatorClose"):
+		$ElevatorClose.play()
 	# Change button back to normal color
 	# Button removed - no visual feedback needed
 	
@@ -171,7 +176,10 @@ func interact() -> void:
 	toggle_doors()
 	
 	# Play a button press sound
-	if has_node("ElevatorOpen"):
+	if has_node("ElevatorOpen2"):
+		if not doors_open:
+			$ElevatorOpen2.play()
+	elif has_node("ElevatorOpen"):
 		if not doors_open:
 			$ElevatorOpen.play()
 	
