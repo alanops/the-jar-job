@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3 uid="uid://cpvug3wlypb3j"]
 
-[ext_resource type="Script" uid="uid://tqth3ioslss2" path="res://scripts/elevator_controller.gd" id="1_elevator"]
+[ext_resource type="Script" uid="uid://ci1xvc0ftndac" path="res://scripts/elevator_controller.gd" id="1_elevator"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
 size = Vector3(3, 0.2, 3)
@@ -36,7 +36,7 @@ radius = 3.0
 [sub_resource type="BoxShape3D" id="BoxShape3D_5"]
 size = Vector3(2.5, 2.5, 2.5)
 
-[node name="Elevator" type="StaticBody3D" groups=["exit_door", "interactables"]]
+[node name="Elevator" type="StaticBody3D" groups=["exit_door"]]
 collision_mask = 0
 script = ExtResource("1_elevator")
 

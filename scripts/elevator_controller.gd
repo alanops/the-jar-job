@@ -168,23 +168,7 @@ func force_close_doors() -> void:
 	door_timer.stop()
 	close_doors()
 
-# Handle interaction from player controller
-
-func interact() -> void:
-	# This method can be called by the player when interacting with the button
-	print("Elevator button pressed!")
-	toggle_doors()
-	
-	# Play a button press sound
-	if has_node("ElevatorOpen2"):
-		if not doors_open:
-			$ElevatorOpen2.play()
-	elif has_node("ElevatorOpen"):
-		if not doors_open:
-			$ElevatorOpen.play()
-	
-	# Visual feedback - make button flash
-	_flash_button()
+# Elevator operates automatically on proximity - no manual interaction needed
 
 func toggle_doors() -> void:
 	if doors_open:
