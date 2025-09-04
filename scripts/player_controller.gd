@@ -35,6 +35,7 @@ var noise_radius_crouch: float
 @onready var fallback_mesh: MeshInstance3D = get_node_or_null("FallbackMesh")
 @onready var interaction_area: Area3D = $InteractionArea
 @onready var footstep_timer: Timer = $FootstepTimer
+@onready var rug_detection: Area3D = $RugDetection
 @onready var animation_player: AnimationPlayer = get_node_or_null("AnimationPlayer")
 
 var is_crouching: bool = false
@@ -45,6 +46,10 @@ var interactable_object: Node3D = null
 var game_ui: Control
 var camera_rig: Node3D
 var last_is_first_person: bool = false
+
+# Rug detection
+var is_on_rug: bool = false
+var rugs_touching: int = 0
 
 # Animation state
 var current_animation: String = "idle"
@@ -110,6 +115,13 @@ func _connect_signals() -> void:
 	
 	if footstep_timer and not footstep_timer.timeout.is_connected(_on_footstep):
 		footstep_timer.timeout.connect(_on_footstep)
+	
+	# Connect rug detection signals
+	if rug_detection:
+		if not rug_detection.area_entered.is_connected(_on_rug_area_entered):
+			rug_detection.area_entered.connect(_on_rug_area_entered)
+		if not rug_detection.area_exited.is_connected(_on_rug_area_exited):
+			rug_detection.area_exited.connect(_on_rug_area_exited)
 	
 	if GameManager and not GameManager.game_started.is_connected(_on_game_started):
 		GameManager.game_started.connect(_on_game_started)
@@ -246,8 +258,12 @@ func _physics_process(delta: float) -> void:
 			direction.z = -input_dir.y
 	
 	if direction.length() > 0:
-		velocity.x = direction.x * current_speed
-		velocity.z = direction.z * current_speed
+		# Apply anti-clipping collision check before setting velocity
+		var intended_velocity = Vector3(direction.x * current_speed, velocity.y, direction.z * current_speed)
+		intended_velocity = _apply_wall_collision_prevention(intended_velocity, delta)
+		
+		velocity.x = intended_velocity.x
+		velocity.z = intended_velocity.z
 		is_moving = true
 		
 		# Start footstep timer if not running
@@ -335,7 +351,12 @@ func _update_crouch_state() -> void:
 
 func _on_footstep() -> void:
 	if velocity.length() > 0.1:
-		made_noise.emit(global_position, current_noise_radius)
+		# Reduce noise radius when on rugs
+		var effective_noise_radius = current_noise_radius
+		if is_on_rug:
+			effective_noise_radius *= 0.3  # 70% noise reduction on rugs
+		
+		made_noise.emit(global_position, effective_noise_radius)
 		
 		# Play footstep sound with volume based on movement type
 		if AudioManager:
@@ -344,6 +365,10 @@ func _on_footstep() -> void:
 				volume_modifier = 0.3  # Quieter when crouching
 			elif is_running:
 				volume_modifier = 1.2  # Louder when running
+			
+			# Further reduce volume when on rugs
+			if is_on_rug:
+				volume_modifier *= 0.5  # 50% volume reduction on rugs
 			
 			# Vary the pitch slightly for more natural footsteps
 			var pitch_variation = randf_range(0.9, 1.1)
@@ -464,3 +489,96 @@ func _update_animation() -> void:
 	if target_animation != current_animation:
 		current_animation = target_animation
 		animation_player.play(current_animation)
+
+# Rug detection functions
+func _on_rug_area_entered(area: Area3D) -> void:
+	if area.is_in_group("rug_surface"):
+		rugs_touching += 1
+		is_on_rug = true
+		_debug_log("Stepped on rug - footsteps now quieter", "PlayerController", "debug")
+
+func _on_rug_area_exited(area: Area3D) -> void:
+	if area.is_in_group("rug_surface"):
+		rugs_touching -= 1
+		if rugs_touching <= 0:
+			rugs_touching = 0
+			is_on_rug = false
+			_debug_log("Left rug - footsteps back to normal", "PlayerController", "debug")
+
+# Anti-clipping collision prevention system
+func _apply_wall_collision_prevention(intended_velocity: Vector3, delta: float) -> Vector3:
+	# Buffer distance to maintain from walls (larger than capsule radius)
+	const WALL_BUFFER = 0.1  # 10cm buffer beyond the capsule radius
+	const MAX_CHECK_DISTANCE = 1.0  # Maximum distance to check ahead
+	
+	# Get collision shape information
+	var collision_shape = $CollisionShape3D.shape as CapsuleShape3D
+	if not collision_shape:
+		return intended_velocity  # Fallback if shape not found
+	
+	var capsule_radius = collision_shape.radius + WALL_BUFFER
+	var movement_distance = intended_velocity.length() * delta
+	
+	# Only check if we're moving and the movement distance is significant
+	if movement_distance < 0.01:
+		return intended_velocity
+	
+	# Check collision in movement direction
+	var movement_direction = intended_velocity.normalized()
+	var check_distance = min(movement_distance + capsule_radius, MAX_CHECK_DISTANCE)
+	
+	# Cast multiple rays to detect walls in movement direction
+	var space_state = get_world_3d().direct_space_state
+	var corrected_velocity = intended_velocity
+	
+	# Check forward movement with raycast from center and slightly offset positions
+	var center_pos = global_position + Vector3(0, 0.9, 0)  # Center of capsule
+	
+	# Main forward raycast
+	var forward_query = PhysicsRayQueryParameters3D.create(
+		center_pos,
+		center_pos + movement_direction * check_distance
+	)
+	forward_query.collision_mask = 1  # Only check World layer (walls)
+	forward_query.exclude = [self]
+	
+	var forward_result = space_state.intersect_ray(forward_query)
+	
+	if not forward_result.is_empty():
+		var hit_distance = center_pos.distance_to(forward_result.position)
+		var safe_distance = capsule_radius + 0.05  # Extra safety margin
+		
+		if hit_distance < safe_distance:
+			# Wall is too close, reduce movement in that direction
+			var hit_normal = forward_result.normal
+			
+			# Project velocity away from wall normal
+			var perpendicular_velocity = intended_velocity - intended_velocity.project(hit_normal)
+			
+			# Allow sliding along walls but prevent moving into them
+			if intended_velocity.dot(hit_normal) < 0:  # Moving toward the wall
+				corrected_velocity = perpendicular_velocity
+				_debug_log("Wall collision prevented - sliding along wall", "PlayerController", "debug")
+	
+	# Additional side checks for better corner handling
+	var right_direction = movement_direction.cross(Vector3.UP).normalized()
+	for offset in [-capsule_radius * 0.7, capsule_radius * 0.7]:  # Check left and right sides
+		var side_pos = center_pos + right_direction * offset
+		var side_query = PhysicsRayQueryParameters3D.create(
+			side_pos,
+			side_pos + movement_direction * check_distance
+		)
+		side_query.collision_mask = 1
+		side_query.exclude = [self]
+		
+		var side_result = space_state.intersect_ray(side_query)
+		if not side_result.is_empty():
+			var hit_distance = side_pos.distance_to(side_result.position)
+			if hit_distance < capsule_radius + 0.05:
+				var hit_normal = side_result.normal
+				var perpendicular_velocity = corrected_velocity - corrected_velocity.project(hit_normal)
+				
+				if corrected_velocity.dot(hit_normal) < 0:
+					corrected_velocity = perpendicular_velocity
+	
+	return corrected_velocity
