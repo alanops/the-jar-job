@@ -297,12 +297,25 @@ func get_stats_summary() -> String:
 	]
 
 func _show_stats_screen() -> void:
+	# Hide the victory/game over panels from game UI to prevent overlap
+	var current_scene = get_tree().current_scene
+	if current_scene:
+		var game_ui = current_scene.find_child("GameUI", true, false)
+		if game_ui:
+			# Hide victory and game over panels to prevent overlap
+			var victory_panel = game_ui.get_node_or_null("VictoryPanel")
+			var game_over_panel = game_ui.get_node_or_null("GameOverPanel")
+			
+			if victory_panel:
+				victory_panel.visible = false
+			if game_over_panel:
+				game_over_panel.visible = false
+	
 	# Load and show the stats screen
 	var stats_screen_scene = preload("res://ui/stats_screen.tscn")
 	var stats_screen = stats_screen_scene.instantiate()
 	
 	# Add to current scene
-	var current_scene = get_tree().current_scene
 	if current_scene:
 		current_scene.add_child(stats_screen)
 		stats_screen.z_index = 100  # Make sure it's on top
