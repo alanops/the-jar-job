@@ -36,6 +36,7 @@ AudioManager="*res://scripts/audio_manager.gd"
 
 [debug]
 
+file_logging/enable_file_logging=true
 gdscript/warnings/untyped_declaration=1
 
 [display]

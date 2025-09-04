@@ -1,0 +1,294 @@
+[gd_scene load_steps=4 format=3 uid="uid://bfdk5lqpyvufo"]
+
+[ext_resource type="Script" path="res://scripts/settings_menu.gd" id="1_settings"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.2, 0.2, 0.2, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0.4, 0.4, 0.4, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="SettingsMenu" type="Control"]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_settings")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.7)
+
+[node name="SettingsPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -300.0
+offset_right = 350.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="MenuContainer" type="HBoxContainer" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="AudioButton" type="Button" parent="SettingsPanel/VBoxContainer/MenuContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_2")
+theme_override_font_sizes/font_size = 18
+text = "Audio"
+
+[node name="ControlsButton" type="Button" parent="SettingsPanel/VBoxContainer/MenuContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_2")
+theme_override_font_sizes/font_size = 18
+text = "Controls"
+
+[node name="HSeparator2" type="HSeparator" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AudioPanel" type="VBoxContainer" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="AudioSubMenu" type="HBoxContainer" parent="SettingsPanel/VBoxContainer/AudioPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="GeneralAudioButton" type="Button" parent="SettingsPanel/VBoxContainer/AudioPanel/AudioSubMenu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "General"
+
+[node name="MusicAudioButton" type="Button" parent="SettingsPanel/VBoxContainer/AudioPanel/AudioSubMenu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Music"
+
+[node name="GeneralAudioContainer" type="VBoxContainer" parent="SettingsPanel/VBoxContainer/AudioPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="MasterVolumeContainer" type="HBoxContainer" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer"]
+layout_mode = 2
+
+[node name="MasterLabel" type="Label" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer/MasterVolumeContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Master Volume"
+vertical_alignment = 1
+
+[node name="MasterSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer/MasterVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="MasterValueLabel" type="Label" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer/MasterVolumeContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "80%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SFXVolumeContainer" type="HBoxContainer" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer"]
+layout_mode = 2
+
+[node name="SFXLabel" type="Label" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer/SFXVolumeContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "SFX Volume"
+vertical_alignment = 1
+
+[node name="SFXSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer/SFXVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="SFXValueLabel" type="Label" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer/SFXVolumeContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "80%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AmbientVolumeContainer" type="HBoxContainer" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer"]
+layout_mode = 2
+
+[node name="AmbientLabel" type="Label" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer/AmbientVolumeContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Ambient Volume"
+vertical_alignment = 1
+
+[node name="AmbientSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer/AmbientVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.4
+
+[node name="AmbientValueLabel" type="Label" parent="SettingsPanel/VBoxContainer/AudioPanel/GeneralAudioContainer/AmbientVolumeContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "40%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MusicAudioContainer" type="VBoxContainer" parent="SettingsPanel/VBoxContainer/AudioPanel"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 15
+
+[node name="MusicVolumeContainer" type="HBoxContainer" parent="SettingsPanel/VBoxContainer/AudioPanel/MusicAudioContainer"]
+layout_mode = 2
+
+[node name="MusicLabel" type="Label" parent="SettingsPanel/VBoxContainer/AudioPanel/MusicAudioContainer/MusicVolumeContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Music Volume"
+vertical_alignment = 1
+
+[node name="MusicSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/AudioPanel/MusicAudioContainer/MusicVolumeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.6
+
+[node name="MusicValueLabel" type="Label" parent="SettingsPanel/VBoxContainer/AudioPanel/MusicAudioContainer/MusicVolumeContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "60%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ControlsPanel" type="VBoxContainer" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 20
+
+[node name="ControlsLabel" type="Label" parent="SettingsPanel/VBoxContainer/ControlsPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Game Controls"
+horizontal_alignment = 1
+
+[node name="ControlsList" type="VBoxContainer" parent="SettingsPanel/VBoxContainer/ControlsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MovementLabel" type="Label" parent="SettingsPanel/VBoxContainer/ControlsPanel/ControlsList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Movement: Arrow Keys / WASD"
+
+[node name="CrouchLabel" type="Label" parent="SettingsPanel/VBoxContainer/ControlsPanel/ControlsList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Crouch: Ctrl (quieter movement)"
+
+[node name="RunLabel" type="Label" parent="SettingsPanel/VBoxContainer/ControlsPanel/ControlsList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.6, 0.6, 1)
+text = "Run: Shift (noisy!)"
+
+[node name="InteractLabel" type="Label" parent="SettingsPanel/VBoxContainer/ControlsPanel/ControlsList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Interact: E"
+
+[node name="ResetLabel" type="Label" parent="SettingsPanel/VBoxContainer/ControlsPanel/ControlsList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Reset Level: R"
+
+[node name="CameraLabel" type="Label" parent="SettingsPanel/VBoxContainer/ControlsPanel/ControlsList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Toggle Camera: Tab"
+
+[node name="PauseLabel" type="Label" parent="SettingsPanel/VBoxContainer/ControlsPanel/ControlsList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Pause: P"
+
+[node name="SettingsLabel" type="Label" parent="SettingsPanel/VBoxContainer/ControlsPanel/ControlsList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Settings: Escape"
+
+[node name="HSeparator3" type="HSeparator" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="ApplyButton" type="Button" parent="SettingsPanel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_2")
+text = "Apply"
+
+[node name="ResetButton" type="Button" parent="SettingsPanel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_2")
+text = "Reset to Defaults"
+
+[node name="CloseButton" type="Button" parent="SettingsPanel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_2")
+text = "Close"

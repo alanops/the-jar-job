@@ -9,8 +9,11 @@ extends Node3D
 @onready var patrol_waypoints2: Node3D = $PatrolWaypoints2
 @onready var patrol_waypoints3: Node3D = $PatrolWaypoints3
 @onready var biscuit_jar: StaticBody3D = $BiscuitJar
-@onready var game_ui: Control = $GameUI
-@onready var performance_monitor: PerformanceMonitor = $PerformanceMonitor
+@onready var game_ui: Control = $UICanvas/GameUI
+@onready var settings_menu: Control = $UICanvas/SettingsMenu
+@onready var pause_menu: Control = $UICanvas/PauseMenu
+@onready var performance_monitor: PerformanceMonitor = $UICanvas/PerformanceMonitor
+@onready var fade_overlay: ColorRect = $UICanvas/FadeOverlay
 @onready var walls_node: Node3D = $walls if has_node("walls") else null
 @onready var floor_node: Node3D = $floor if has_node("floor") else null
 
@@ -111,11 +114,20 @@ func _ready() -> void:
 	
 	# Set up imported Blender level
 	_setup_imported_level()
+	
+	# Start fade-in effect
+	_start_fade_in()
 
 func _input(event: InputEvent) -> void:
-	# Toggle performance monitors
+	# Toggle performance monitors, settings, and pause
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_F3:
+		if event.keycode == KEY_P:
+			# Toggle pause menu
+			_toggle_pause()
+		elif event.keycode == KEY_ESCAPE:
+			# Toggle settings menu
+			_toggle_settings()
+		elif event.keycode == KEY_F3:
 			# Simple monitor
 			if performance_monitor:
 				performance_monitor.toggle_visibility()
@@ -292,3 +304,37 @@ func _reposition_game_elements(bounds: Rect2) -> void:
 			vertices.append(Vector3(bounds.end.x - center.x, 0.5, bounds.position.y - center.y))
 			nav_region.navigation_mesh.vertices = vertices
 			nav_region.navigation_mesh.add_polygon(PackedInt32Array([0, 1, 2, 3]))
+
+func _toggle_settings() -> void:
+	if settings_menu:
+		if settings_menu.visible:
+			settings_menu._close_settings()
+		else:
+			settings_menu.show_settings()
+
+func _toggle_pause() -> void:
+	# Don't allow pausing if game is over or not started
+	if GameManager.current_state != GameManager.GameState.PLAYING:
+		return
+	
+	if pause_menu:
+		if pause_menu.visible:
+			pause_menu.hide_pause_menu()
+		else:
+			pause_menu.show_pause_menu()
+
+func _start_fade_in() -> void:
+	# Brief pause to ensure everything is loaded
+	await get_tree().create_timer(0.5).timeout
+	
+	# Create fade from black tween
+	var fade_tween = create_tween()
+	fade_tween.set_ease(Tween.EASE_OUT)
+	fade_tween.set_trans(Tween.TRANS_CUBIC)
+	
+	# Fade from black over 2 seconds for cinematic effect
+	fade_tween.tween_property(fade_overlay, "color:a", 0.0, 2.0)
+	
+	# Wait for fade to complete, then hide overlay
+	await fade_tween.finished
+	fade_overlay.visible = false
