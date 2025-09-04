@@ -28,6 +28,11 @@ var alert_tween: Tween
 var detection_progress: float = 0.0
 var is_being_detected: bool = false
 
+# Track interaction prompt shows
+var interaction_prompt_shown_count: int = 0
+const MAX_INTERACTION_PROMPT_SHOWS: int = 1
+var interaction_fade_tween: Tween
+
 func _ready() -> void:
 	# Connect signals
 	GameManager.game_started.connect(_on_game_started)
@@ -51,7 +56,7 @@ var last_time_update: int = -1
 
 func _process(_delta: float) -> void:
 	if GameManager.current_state == GameManager.GameState.PLAYING:
-		var current_seconds = int(GameManager.game_timer)
+		var current_seconds: int = int(GameManager.game_timer)
 		if current_seconds != last_time_update:
 			last_time_update = current_seconds
 			timer_label.text = "Time: " + GameManager.get_time_string()
@@ -94,7 +99,7 @@ func show_alert(text: String, color: Color = Color.RED) -> void:
 	alert_tween.tween_property(alert_panel, "scale", Vector2(1, 1), 0.5)
 	alert_tween.tween_interval(2.0)
 	alert_tween.tween_property(alert_panel, "modulate:a", 0.0, 0.5)
-	alert_tween.tween_callback(func(): alert_panel.visible = false; alert_panel.modulate.a = 1.0)
+	alert_tween.tween_callback(func() -> void: alert_panel.visible = false; alert_panel.modulate.a = 1.0)
 
 func _on_retry_pressed() -> void:
 	GameManager.reset_game()
@@ -125,14 +130,39 @@ func update_suspicion_level(level: int) -> void:
 func update_player_in_vision(in_vision: bool) -> void:
 	player_in_vision_label.text = "Player In Vision: " + ("Yes" if in_vision else "No")
 
-func update_last_seen_position(position: Vector3) -> void:
-	if position == Vector3.ZERO:
+func update_last_seen_position(last_seen_position: Vector3) -> void:
+	if last_seen_position == Vector3.ZERO:
 		last_seen_label.text = "Last Seen: Never"
 	else:
-		last_seen_label.text = "Last Seen: (" + str(int(position.x)) + ", " + str(int(position.z)) + ")"
+		last_seen_label.text = "Last Seen: (" + str(int(last_seen_position.x)) + ", " + str(int(last_seen_position.z)) + ")"
 
 func update_patrol_point(point: int) -> void:
 	patrol_label.text = "Patrol Point: " + str(point)
 
-func show_interaction_prompt(show: bool) -> void:
-	interaction_prompt.visible = show
+func show_interaction_prompt(should_show: bool) -> void:
+	# Stop any existing fade tween
+	if interaction_fade_tween:
+		interaction_fade_tween.kill()
+	
+	if should_show:
+		# Only show the prompt if we haven't exceeded the limit
+		if interaction_prompt_shown_count >= MAX_INTERACTION_PROMPT_SHOWS:
+			return
+		
+		# If showing the prompt for the first time
+		if not interaction_prompt.visible:
+			interaction_prompt_shown_count += 1
+			
+			# Show the prompt immediately
+			interaction_prompt.visible = true
+			interaction_prompt.modulate.a = 1.0
+			
+			# Start fade out after a short delay
+			interaction_fade_tween = create_tween()
+			interaction_fade_tween.tween_interval(3.0)  # Show for 3 seconds
+			interaction_fade_tween.tween_property(interaction_prompt, "modulate:a", 0.0, 0.8)  # Fade out over 0.8 seconds
+			interaction_fade_tween.tween_callback(func() -> void: interaction_prompt.visible = false)
+	else:
+		# Hide immediately when requested
+		interaction_prompt.visible = false
+		interaction_prompt.modulate.a = 1.0  # Reset alpha for next time

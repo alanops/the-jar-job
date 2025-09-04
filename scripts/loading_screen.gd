@@ -3,6 +3,7 @@ extends Control
 @onready var progress_bar: ProgressBar = $VBoxContainer/ProgressBar
 @onready var status_label: Label = $VBoxContainer/StatusLabel
 @onready var tip_label: Label = $TipsContainer/TipLabel
+@onready var fade_overlay: ColorRect = $FadeOverlay
 
 var scene_path: String = ""
 var loading_thread: Thread
@@ -133,15 +134,8 @@ func _process(delta: float) -> void:
 		progress_bar.value = 1.0
 		status_label.text = "Loading complete!"
 		
-		# Small delay for visual feedback
-		await get_tree().create_timer(0.2).timeout
-		
-		# Change to the loaded scene
-		if loaded_scene:
-			get_tree().change_scene_to_packed(loaded_scene)
-		
-		# Hide loading screen
-		visible = false
+		# Start cinematic fade transition
+		await _start_cinematic_transition()
 		
 		print("Loading complete, transitioning to scene")
 
@@ -157,3 +151,25 @@ func set_custom_tip(tip: String) -> void:
 
 func set_custom_status(status: String) -> void:
 	status_label.text = status
+
+func _start_cinematic_transition() -> void:
+	# Brief pause for dramatic effect
+	await get_tree().create_timer(0.3).timeout
+	
+	# Create fade to black tween
+	var fade_tween = create_tween()
+	fade_tween.set_ease(Tween.EASE_IN)
+	fade_tween.set_trans(Tween.TRANS_CUBIC)
+	
+	# Fade to black over 1.5 seconds
+	fade_tween.tween_property(fade_overlay, "color:a", 1.0, 1.5)
+	
+	# Wait for fade to complete
+	await fade_tween.finished
+	
+	# Change to the loaded scene
+	if loaded_scene:
+		get_tree().change_scene_to_packed(loaded_scene)
+	
+	# The scene transition is now complete
+	# Note: The new scene should handle fading in from black
