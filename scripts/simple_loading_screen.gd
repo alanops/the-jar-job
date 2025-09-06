@@ -1,7 +1,7 @@
 extends Control
 
-@onready var progress_bar: ProgressBar = $VBoxContainer/ProgressBar
-@onready var status_label: Label = $VBoxContainer/StatusLabel
+var progress_bar: ProgressBar
+var status_label: Label
 
 var target_scene: String = ""
 var load_progress: float = 0.0
@@ -12,6 +12,16 @@ var loading_start_time: float = 0.0
 
 func _ready():
 	visible = false
+	_initialize_nodes()
+
+func _initialize_nodes():
+	progress_bar = get_node_or_null("VBoxContainer/ProgressBar")
+	status_label = get_node_or_null("VBoxContainer/StatusLabel")
+	
+	if not progress_bar:
+		print("ERROR: ProgressBar not found in SimpleLoadingScreen")
+	if not status_label:
+		print("ERROR: StatusLabel not found in SimpleLoadingScreen")
 
 func start_loading(scene_path: String):
 	target_scene = scene_path
@@ -19,8 +29,12 @@ func start_loading(scene_path: String):
 	loading_complete = false
 	load_progress = 0.0
 	displayed_progress = 0.0
-	progress_bar.value = 0.0
-	status_label.text = "Loading game..."
+	
+	if progress_bar:
+		progress_bar.value = 0.0
+	if status_label:
+		status_label.text = "Loading game..."
+	
 	loading_start_time = Time.get_ticks_msec() / 1000.0
 	
 	# Start threaded loading
@@ -44,21 +58,26 @@ func _process(delta):
 			load_progress = 1.0
 		
 		ResourceLoader.THREAD_LOAD_FAILED:
-			status_label.text = "Loading failed!"
+			if status_label:
+				status_label.text = "Loading failed!"
 			print("ERROR: Failed to load scene: ", target_scene)
 			return
 	
 	# Smooth progress bar animation
 	displayed_progress = move_toward(displayed_progress, load_progress, delta * 2.0)
-	progress_bar.value = displayed_progress
-	status_label.text = "Loading... " + str(int(displayed_progress * 100)) + "%"
+	
+	if progress_bar:
+		progress_bar.value = displayed_progress
+	if status_label:
+		status_label.text = "Loading... " + str(int(displayed_progress * 100)) + "%"
 	
 	# Check if loading is complete and minimum time has passed
 	var current_time = Time.get_ticks_msec() / 1000.0
 	var time_elapsed = current_time - loading_start_time
 	
 	if displayed_progress >= 1.0 and time_elapsed >= minimum_loading_time and not loading_complete:
-		status_label.text = "Complete!"
+		if status_label:
+			status_label.text = "Complete!"
 		loading_complete = true
 		# Short delay before transition
 		await get_tree().create_timer(0.5).timeout
