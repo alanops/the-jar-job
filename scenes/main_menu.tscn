@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cxk4y802fl26t" path="res://scripts/main_menu.gd" id="1_menu"]
 [ext_resource type="Texture2D" path="res://The_Jar_Job_Splash_Art.webp" id="2_splash"]
 [ext_resource type="Theme" uid="uid://lozenge_theme" path="res://ui/lozenge_button_style.tres" id="3_button_theme"]
-[ext_resource type="PackedScene" uid="uid://btxswvyqrmhxu" path="res://ui/loading_screen.tscn" id="4_loading"]
+[ext_resource type="PackedScene" uid="uid://simple_loading" path="res://ui/simple_loading_screen.tscn" id="4_loading"]
 [ext_resource type="PackedScene" path="res://ui/settings_menu.tscn" id="5_settings"]
 
 [node name="MainMenu" type="Control"]
