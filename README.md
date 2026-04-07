@@ -2,6 +2,8 @@
 
 A light-hearted stealth game built in Godot 4 for Brackeys Game Jam 2025.2.
 
+> Status: Active
+
 ## Overview
 
 Sneak into your neighbor's house and steal their precious biscuit jar! Avoid detection by crouching, moving quietly, and staying out of sight. But beware - the neighbor is patrolling and will spot you if you're not careful!
